@@ -34,9 +34,9 @@
     {
       "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "uri",
+        "type": "message",
         "label": "智慧聯絡簿",
-        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
+        "text": "📝 智慧聯絡簿功能正在全力開發中，敬請期待！"
       }
     },
     {
@@ -51,9 +51,9 @@
     {
       "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "uri",
+        "type": "message",
         "label": "繳費情形",
-        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
+        "text": "💳 線上繳費與帳務查詢功能正在全力開發中，敬請期待！"
       }
     }
   ]

@@ -28,7 +28,7 @@
       "action": {
         "type": "uri",
         "label": "分享MusiMate",
-        "uri": "https://musimate.nex-us.workers.dev/"
+        "uri": "https://lin05141021.github.io/test_musimate/index.html"
       }
     },
     {
@@ -42,9 +42,9 @@
     {
       "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "uri",
+        "type": "message",
         "label": "扣款申訴",
-        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
+        "text": "⚖️ 扣款申訴與退費客服功能正在全力開發中，敬請期待！"
       }
     },
     {
@@ -61,7 +61,7 @@
       "action": {
         "type": "uri",
         "label": "FAQ",
-        "uri": "https://musimate.nex-us.workers.dev/"
+        "uri": "https://lin05141021.github.io/test_musimate/index.html"
       }
     }
   ]
