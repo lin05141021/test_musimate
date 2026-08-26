@@ -14,23 +14,49 @@
     <!-- MusiMate 全站標準樣式庫 -->
     <link rel="stylesheet" href="UI/style_0824.css">
     
-    <!-- LINE LIFF 智慧路由分發器 (自動將 ?page=schedule 等導向專屬頁面) -->
+    <!-- LINE LIFF 智慧路由分發器 (自動解析 ?page=, liff.state, 或 hash 導向專屬頁面) -->
     <script>
         (function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const page = urlParams.get('page');
-            if (page === 'schedule') {
-                window.location.replace('src/test_uiredesign/student_schedule.html');
-            } else if (page === 'leave' || page === 'reschedule') {
-                window.location.replace('src/test_uiredesign/student_changeclass.html');
-            } else if (page === 'courses' || page === 'newclass') {
-                window.location.replace('src/newclass/oldstudent_newclass.html');
-            } else if (page === 'teachers' || page === 'homepage') {
-                window.location.replace('src/newclass/newclass_homepage.html');
-            } else if (page === 'billing') {
-                window.location.replace('src/test_uiredesign/student_schedule.html');
-            } else if (page === 'contact-book') {
-                window.location.replace('src/test_uiredesign/student_schedule.html');
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                let page = urlParams.get('page');
+                
+                // 處理 LINE LIFF 特有的 liff.state 參數編碼
+                if (!page && urlParams.get('liff.state')) {
+                    const liffState = decodeURIComponent(urlParams.get('liff.state'));
+                    const match = liffState.match(/page=([^&]+)/);
+                    if (match) {
+                        page = match[1];
+                    } else if (liffState.includes('schedule')) {
+                        page = 'schedule';
+                    } else if (liffState.includes('leave')) {
+                        page = 'leave';
+                    } else if (liffState.includes('courses')) {
+                        page = 'courses';
+                    }
+                }
+                
+                // 處理 Hash 路由 (#schedule)
+                if (!page && window.location.hash) {
+                    const hash = window.location.hash.replace('#', '');
+                    if (hash) page = hash;
+                }
+
+                if (page === 'schedule') {
+                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                } else if (page === 'leave' || page === 'reschedule') {
+                    window.location.replace('src/test_uiredesign/student_changeclass.html');
+                } else if (page === 'courses' || page === 'newclass') {
+                    window.location.replace('src/newclass/oldstudent_newclass.html');
+                } else if (page === 'teachers' || page === 'homepage') {
+                    window.location.replace('src/newclass/newclass_homepage.html');
+                } else if (page === 'billing') {
+                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                } else if (page === 'contact-book') {
+                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                }
+            } catch (err) {
+                console.warn('LIFF route parse error:', err);
             }
         })();
     </script>

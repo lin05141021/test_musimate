@@ -146,7 +146,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "我的課表",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=schedule"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
                 }
             },
             # 上排右: 我要請假/調課
@@ -155,7 +155,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "我要請假/調課",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=leave"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_changeclass.html"
                 }
             },
             # 下排左: 智慧聯絡簿
@@ -164,7 +164,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "智慧聯絡簿",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=contact-book"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
                 }
             },
             # 下排中: 練習打卡
@@ -183,7 +183,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "繳費情形",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=billing"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
                 }
             }
         ]
@@ -211,7 +211,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "開始新課程",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=courses"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/newclass/oldstudent_newclass.html"
                 }
             },
             # 上排中: 分享MusiMate
@@ -220,7 +220,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "分享MusiMate",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=share"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/index.html"
                 }
             },
             # 上排右: 音樂社群(待開發)
@@ -238,7 +238,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "扣款申訴",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=refund"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
                 }
             },
             # 下排中: 聯繫系統客服
@@ -257,7 +257,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "FAQ",
-                    "uri": f"https://liff.line.me/{LIFF_ID}?page=faq"
+                    "uri": f"https://liff.line.me/{LIFF_ID}/index.html"
                 }
             }
         ]
