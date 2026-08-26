@@ -200,6 +200,26 @@ const MusiMateDB = (() => {
             });
         },
 
+        // 依據 LINE User ID 自動識別學生
+        getStudentByLineUserId(lineUserId) {
+            if (!lineUserId) return null;
+            const students = this.getStudents();
+            return students.find(s => s.line_user_id === lineUserId);
+        },
+
+        // 綁定學生的 LINE User ID
+        bindStudentLineUserId(studentId, lineUserId) {
+            const db = getDB();
+            const student = db.students.find(s => s.id === studentId);
+            if (student) {
+                const user = db.users.find(u => u.id === student.user_id);
+                if (user) user.line_user_id = lineUserId;
+                saveDB(db);
+                return true;
+            }
+            return false;
+        },
+
         // 依據學生 ID 取得預約課表
         getAppointmentsByStudent(studentId) {
             const db = getDB();

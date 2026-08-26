@@ -20,7 +20,7 @@
       "action": {
         "type": "uri",
         "label": "我的課表",
-        "uri": "https://liff.line.me/2011164851-ycZLTOJv/src/test_uiredesign/student_schedule.html"
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
       }
     },
     {
@@ -28,7 +28,7 @@
       "action": {
         "type": "uri",
         "label": "我要請假/調課",
-        "uri": "https://liff.line.me/2011164851-ycZLTOJv/src/test_uiredesign/student_changeclass.html"
+        "uri": "https://liff.line.me/2011164851-3YNtzchu"
       }
     },
     {
@@ -36,7 +36,7 @@
       "action": {
         "type": "uri",
         "label": "智慧聯絡簿",
-        "uri": "https://liff.line.me/2011164851-ycZLTOJv/src/test_uiredesign/student_schedule.html"
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
       }
     },
     {
@@ -53,7 +53,7 @@
       "action": {
         "type": "uri",
         "label": "繳費情形",
-        "uri": "https://liff.line.me/2011164851-ycZLTOJv/src/test_uiredesign/student_schedule.html"
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB"
       }
     }
   ]

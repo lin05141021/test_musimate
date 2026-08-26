@@ -12,6 +12,8 @@
     <!-- 統一共用樣式庫 -->
     <link rel="stylesheet" href="../../UI/style_0824.css">
     <link rel="stylesheet" href="schedule_styles.css">
+    <!-- LINE LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
 </head>
@@ -207,9 +209,39 @@ function handleRescheduleClick(appointmentId) {
     window.location.href = `student_changeclass.html?lesson_id=${appointmentId}`;
 }
 
-function goToBookNew() {
-    const studentId = currentActiveStudent ? currentActiveStudent.student_id : '';
-    location.href = `../newclass/oldstudent_newclass.html?student_id=${studentId}`;
+async function initLiffAuth() {
+    try {
+        if (typeof liff !== 'undefined') {
+            await liff.init({ liffId: '2011164851-lGsEnQWB' });
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                console.log('✅ LINE LIFF 學生登入成功:', profile);
+                if (window.MusiMateDB && profile && profile.userId) {
+                    const students = window.MusiMateDB.getStudents();
+                    // 1. 先用 LINE User ID 比對
+                    let matched = window.MusiMateDB.getStudentByLineUserId(profile.userId);
+                    // 2. 若尚未綁定，用 Display Name 模糊比對
+                    if (!matched && profile.displayName) {
+                        matched = students.find(s => 
+                            profile.displayName.toLowerCase().includes(s.name.toLowerCase()) ||
+                            s.name.toLowerCase().includes(profile.displayName.toLowerCase())
+                        );
+                        if (matched) {
+                            window.MusiMateDB.bindStudentLineUserId(matched.student_id, profile.userId);
+                            console.log(`🔗 自動完成 LINE ID 綁定: ${matched.name} -> ${profile.userId}`);
+                        }
+                    }
+                    if (matched) {
+                        const sel = document.getElementById('studentSelector');
+                        if (sel) sel.value = matched.student_id;
+                        switchStudent(matched.student_id);
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('LIFF Auth skipped or failed:', e);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -217,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentActiveStudent) {
         switchStudent(currentActiveStudent.student_id);
     }
+    initLiffAuth();
 });
 </script>
 

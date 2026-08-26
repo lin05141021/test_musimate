@@ -12,6 +12,8 @@
     <!-- 統一共用樣式庫 -->
     <link rel="stylesheet" href="../../UI/style_0824.css">
     <link rel="stylesheet" href="schedule_styles.css">
+    <!-- LINE LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
 </head>
@@ -251,11 +253,34 @@ function submitLeave() {
     }, 1000);
 }
 
+async function initLiffAuth() {
+    try {
+        if (typeof liff !== 'undefined') {
+            await liff.init({ liffId: '2011164851-3YNtzchu' });
+            if (liff.isLoggedIn()) {
+                const profile = await liff.getProfile();
+                if (window.MusiMateDB && profile && profile.userId) {
+                    const matched = window.MusiMateDB.getStudentByLineUserId(profile.userId) || 
+                                    window.MusiMateDB.getStudents().find(s => profile.displayName && profile.displayName.toLowerCase().includes(s.name.toLowerCase()));
+                    if (matched) {
+                        currentStudentId = matched.student_id;
+                        document.getElementById('studentNamePill').innerText = `${matched.name}`;
+                        renderSchedule();
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('LIFF Auth in changeclass skipped/failed:', e);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const targetLessonId = urlParams.get('lesson_id') || 'app-l1';
     renderSchedule();
     openRescheduleModal(targetLessonId);
+    initLiffAuth();
 });
 </script>
 

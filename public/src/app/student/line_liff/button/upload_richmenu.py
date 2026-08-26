@@ -16,7 +16,11 @@ if sys.platform == 'win32':
 
 # ==================== LINE 官方帳號金鑰設定 ====================
 CHANNEL_ACCESS_TOKEN = "4P6wRAmmAqc+bN1bN0loO8cAVzHhb5fsWWiGzBUFl/k+vrAHTrTHFDsBm4mLKtNgRF6ghQr9E3nbHVXuZdRDtoE1Cixcz5vzKopcLd/MeUiOY/Pv5VMoQ5Csg0H9T8N0yJ85TGJd2ERsUiImkusS/wdB04t89/1O/w1cDnyilFU="
-LIFF_ID = "2011164851-ycZLTOJv"
+
+# 專屬 LIFF IDs
+LIFF_SCHEDULE = "2011164851-lGsEnQWB"  # 課表
+LIFF_LEAVE = "2011164851-3YNtzchu"     # 調課/請假
+LIFF_COURSES = "2011164851-id3vAnRx"   # 新課
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -140,31 +144,31 @@ def main():
                     "data": "action=switch_to_page2"
                 }
             },
-            # 上排左: 我的課表
+            # 上排左: 我的課表 (專屬 LIFF ID: 2011164851-lGsEnQWB)
             {
                 "bounds": { "x": 0, "y": 286, "width": 1250, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "我的課表",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
                 }
             },
-            # 上排右: 我要請假/調課
+            # 上排右: 我要請假/調課 (專屬 LIFF ID: 2011164851-3YNtzchu)
             {
                 "bounds": { "x": 1250, "y": 286, "width": 1250, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "我要請假/調課",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_changeclass.html"
+                    "uri": f"https://liff.line.me/{LIFF_LEAVE}"
                 }
             },
-            # 下排左: 智慧聯絡簿
+            # 下排左: 智慧聯絡簿 (LIFF ID: 2011164851-lGsEnQWB)
             {
                 "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "智慧聯絡簿",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
                 }
             },
             # 下排中: 練習打卡
@@ -177,13 +181,13 @@ def main():
                     "displayText": "我要練習打卡"
                 }
             },
-            # 下排右: 繳費情形
+            # 下排右: 繳費情形 (LIFF ID: 2011164851-lGsEnQWB)
             {
                 "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "繳費情形",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
                 }
             }
         ]
@@ -205,13 +209,13 @@ def main():
                     "data": "action=switch_to_page1"
                 }
             },
-            # 上排左: 開始新課程
+            # 上排左: 開始新課程 (專屬 LIFF ID: 2011164851-id3vAnRx)
             {
                 "bounds": { "x": 0, "y": 286, "width": 833, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "開始新課程",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/newclass/oldstudent_newclass.html"
+                    "uri": f"https://liff.line.me/{LIFF_COURSES}"
                 }
             },
             # 上排中: 分享MusiMate
@@ -220,7 +224,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "分享MusiMate",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/index.html"
+                    "uri": "https://musimate.nex-us.workers.dev/"
                 }
             },
             # 上排右: 音樂社群(待開發)
@@ -232,13 +236,13 @@ def main():
                     "text": "🎵 MusiMate 音樂社群正在全力開發中，敬請期待！"
                 }
             },
-            # 下排左: 扣款申訴
+            # 下排左: 扣款申訴 (LIFF ID: 2011164851-lGsEnQWB)
             {
                 "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "扣款申訴",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/src/test_uiredesign/student_schedule.html"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
                 }
             },
             # 下排中: 聯繫系統客服
@@ -257,7 +261,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "FAQ",
-                    "uri": f"https://liff.line.me/{LIFF_ID}/index.html"
+                    "uri": "https://musimate.nex-us.workers.dev/"
                 }
             }
         ]
