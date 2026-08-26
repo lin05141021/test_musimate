@@ -1,0 +1,60 @@
+{
+  "size": {
+    "width": 2500,
+    "height": 1686
+  },
+  "selected": true,
+  "name": "MusiMate_Page_1",
+  "chatBarText": "開啟選單",
+  "areas": [
+    {
+      "bounds": { "x": 1250, "y": 0, "width": 1250, "height": 286 },
+      "action": {
+        "type": "richmenuswitch",
+        "richMenuAliasId": "richmenu-alias-page2",
+        "data": "action=switch_to_page2"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 286, "width": 1250, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "我的課表",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=schedule"
+      }
+    },
+    {
+      "bounds": { "x": 1250, "y": 286, "width": 1250, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "我要請假/調課",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=leave"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "智慧聯絡簿",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=contact-book"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 986, "width": 834, "height": 700 },
+      "action": {
+        "type": "postback",
+        "label": "練習打卡",
+        "data": "action=practice_checkin",
+        "displayText": "我要練習打卡"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "繳費情形",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=billing"
+      }
+    }
+  ]
+}

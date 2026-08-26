@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的課表 (老師端管理工作台) - MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 統一共用樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="schedule_styles.css">
+    <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
+    <script src="../data/musimate_db.js"></script>
+    <style>
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .drawer-card {
+            width: 100%;
+            max-width: 520px;
+            background: white;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 20px 48px rgba(43, 48, 73, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            animation: drawerFadeIn 0.2s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes drawerFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .btn-link-action {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .lesson-card {
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .card-leave {
+            background: #FFF8E1 !important;
+            border: 1.5px dashed #FFE082 !important;
+            opacity: 0.9;
+        }
+        .card-teacher-cancelled {
+            background: #FBE9E7 !important;
+            border: 1.5px dashed #FFAB91 !important;
+        }
+        .slot-card-released {
+            background: #E8F5E9 !important;
+            border: 1.5px solid #81C784 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='../newclass/newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="schedule.html" class="nav-item active" data-property-1="active">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿總覽模組開發中，課堂專屬聯絡簿請點擊課表卡片查看！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡總覽開發中，各堂課打卡記錄請點擊課表卡片查看！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="../money/overview_checked.html" class="nav-item" data-property-1="defult">薪資看板</a>
+            <a href="../newclass/teacher_info.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師檔案" onclick="location.href='../newclass/teacher_info.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. 主內容區塊 (Content Area) -->
+    <div class="content-area">
+        <!-- 2.1 標題與週次切換列 -->
+        <div class="header-card">
+            <div class="page-title">張老師 · 課表總覽</div>
+            <div class="week-switcher">
+                <button class="btn-week-nav" onclick="changeWeek(-1)">◀ 上一週</button>
+                <div id="weekLabelBadge" class="week-label-badge" onclick="resetToCurrentWeek()" style="cursor: pointer;" title="點擊回到本週">
+                    2026 年<br>08月24日 至 08月30日
+                </div>
+                <button class="btn-week-nav" onclick="changeWeek(1)">下一週 ▶</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-add-slot" onclick="focusQuickAdd()" style="background: #2B3049; color: white;">+ 快速排課</button>
+                <button class="btn-add-slot" onclick="location.href='student_schedule.html'" style="display: none;">👁️ 切換學生視角</button>
+            </div>
+        </div>
+
+        <!-- 2.2 課表快速排定設定列 -->
+        <div class="setting-card">
+            <div class="setting-title">快速排課 / 週期排定 / 時段開放</div>
+            <form class="setting-form" onsubmit="return false;">
+                <!-- 學生對象選單 (由資料庫動態載入) -->
+                <div class="form-group">
+                    <label class="form-label">學生對象 (student)</label>
+                    <select id="quickStudent" class="form-select">
+                        <option value="">載入學生名冊中...</option>
+                    </select>
+                </div>
+
+                <!-- 選擇日期 -->
+                <div class="form-group">
+                    <label class="form-label">上課首堂日期 (start_date)</label>
+                    <input type="date" id="quickDate" class="form-input" value="2026-08-26" style="cursor: pointer;">
+                </div>
+
+                <!-- 上課時間 -->
+                <div class="form-group">
+                    <label class="form-label">上課時間 (時段)</label>
+                    <div class="time-range-group">
+                        <input type="text" id="quickStartTime" class="form-input" value="10:00" placeholder="10:00">
+                        <input type="text" id="quickEndTime" class="form-input" value="12:00" placeholder="12:00">
+                    </div>
+                </div>
+
+                <!-- 週期排課堂數 -->
+                <div class="form-group">
+                    <label class="form-label">週期排課 (自動順延每週)</label>
+                    <select id="quickRepeatCount" class="form-select">
+                        <option value="1" selected>排定單堂 (1 堂)</option>
+                        <option value="4">連排 1 個月 (4 堂)</option>
+                        <option value="10">整期包堂 (10 堂)</option>
+                    </select>
+                </div>
+
+                <!-- 上課地點 -->
+                <div class="form-group">
+                    <label class="form-label">上課地點</label>
+                    <input type="text" id="quickLocation" class="form-input" value="音符琴房 A303" placeholder="音符琴房 A303">
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="btn-action-group">
+                    <button type="button" class="btn-save-recurring" onclick="handleAddAppointment()">+ 排定課程</button>
+                    <button type="button" class="btn-save-slot" onclick="handleAddOpenSlot()">+ 開放自選時段</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 2.3 七天課表格狀排程 -->
+        <div class="grid-card">
+            <!-- 星期標題列 -->
+            <div id="dayHeaderRow" class="day-header-row">
+                <div class="time-block-label-col"></div>
+                <!-- 由 JS 動態依當前週次計算生成 7 天 -->
+            </div>
+
+            <!-- 課表主表格 (由 JS 動態渲染) -->
+            <div class="grid-body">
+                <div class="time-icon-col">
+                    <div class="time-icon-block">
+                        <span>☀️</span>
+                        <span class="time-icon-text">上午</span>
+                    </div>
+                    <div class="time-icon-block">
+                        <span>🌅</span>
+                        <span class="time-icon-text">下午</span>
+                    </div>
+                    <div class="time-icon-block">
+                        <span>🌙</span>
+                        <span class="time-icon-text">晚間</span>
+                    </div>
+                </div>
+
+                <!-- 7 天欄位由 JS 動態填入 -->
+                <div id="timetableGridBody" style="display: flex; gap: 12px; flex: 1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     4. 課堂管理與備忘抽屜 / 彈窗
+     ============================================================ -->
+<div id="lessonDrawer" class="drawer-overlay" onclick="handleOverlayClick(event)">
+    <div class="drawer-card" onclick="event.stopPropagation()">
+        <!-- 頂部資訊 -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div id="drawerCourseTitle" style="font-size: 20px; font-weight: 700; color: #2B3049; font-family: 'Noto Serif TC', serif;">
+                    Lin · 鋼琴個別課
+                </div>
+                <div id="drawerTimeAndPlace" style="font-size: 13px; color: #7A736E; margin-top: 4px;">
+                    2026/08/26 (三) 10:00 - 12:00 · 音符琴房 A303
+                </div>
+            </div>
+            <button onclick="closeLessonDrawer()" style="width: 32px; height: 32px; border-radius: 50%; background: #FAF6F0; border: none; cursor: pointer; font-size: 14px; color: #2B3049;">
+                ✕
+            </button>
+        </div>
+
+        <!-- 狀態標籤與出席打卡 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #FAF6F0; border-radius: 16px;">
+            <div>
+                <div style="font-size: 11px; color: #8C827A; font-weight: 700;">繳費與排課狀態</div>
+                <div id="drawerPaymentStatus" style="font-size: 13px; font-weight: 700; color: #2B3049; margin-top: 2px;">
+                    💳 單堂後付 (NT$ 2,000)
+                </div>
+            </div>
+            <div id="attendanceToggleBtnWrap">
+                <!-- 由 JS 渲染出席狀態按鈕 -->
+            </div>
+        </div>
+
+        <!-- 課堂備忘與教學進度紀錄 -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label style="font-size: 13px; font-weight: 700; color: #2B3049;">📝 課堂備忘 / 重點摘要 (同步至聯絡簿)</label>
+            <textarea id="drawerMemoText" rows="3" style="width: 100%; padding: 12px; border-radius: 14px; border: 1.5px solid #EFECE6; background: #FDFBF7; font-size: 13px; outline: none; box-sizing: border-box;" placeholder="記錄本堂課教學重點、指法糾正、作業指派..."></textarea>
+            <button onclick="saveLessonMemo()" style="align-self: flex-end; padding: 6px 14px; background: #CEAB98; color: white; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer;">
+                儲存備忘
+            </button>
+        </div>
+
+        <!-- 兩大智慧延伸按鈕 -->
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-link-action" style="background: rgba(181, 142, 190, 0.15); color: #7B1FA2; border-color: #B58EBE;" onclick="openContactBookModal()">
+                <span>📖</span>
+                <span>智慧聯絡簿記錄</span>
+            </button>
+            <button class="btn-link-action" style="background: rgba(104, 197, 171, 0.15); color: #00796B; border-color: #68C5AB;" onclick="openPracticeCheckModal()">
+                <span>🎯</span>
+                <span>學生打卡練習成果</span>
+            </button>
+        </div>
+
+        <!-- 老師調課 / 停課操作 -->
+        <div style="border-top: 1px solid #F0EAE1; padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: #8C827A;">課堂異動管理 (連動 LINE LIFF 推播)</div>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="handleTeacherCancelLesson()" style="flex: 1; padding: 10px; background: #FFF3E0; color: #E65100; border: 1px solid #FFE082; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                    🛑 老師請假/停課 (自動退回時數)
+                </button>
+                <button onclick="handleTeacherHelpReschedule()" style="flex: 1; padding: 10px; background: #FAF6F0; color: #2B3049; border: 1px solid #E0E0E0; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                    🔄 協助學生調課改期
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     JavaScript 核心邏輯
+     ============================================================ -->
+<script>
+let currentWeekOffset = 0; // 0: 2026-08-24 週
+const BASE_MONDAY = new Date('2026-08-24T00:00:00+08:00');
+let activeDrawerAppt = null;
+
+function getMondayOfOffset(offsetWeeks) {
+    return new Date(BASE_MONDAY.getTime() + offsetWeeks * 7 * 24 * 60 * 60 * 1000);
+}
+
+function formatDateISO(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function getTimeBlockKey(isoStr) {
+    const hour = new Date(isoStr).getHours();
+    if (hour >= 8 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 18) return 'afternoon';
+    return 'evening';
+}
+
+function formatTime(startIso, endIso) {
+    const s = new Date(startIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const e = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${s} - ${e}`;
+}
+
+function getStudentCardClass(studentName) {
+    if (studentName.includes('Lin') || studentName.includes('林')) return 'card-lin';
+    if (studentName.includes('Charles') || studentName.includes('查爾斯')) return 'card-charles';
+    if (studentName.includes('Johnny') || studentName.includes('強尼')) return 'card-johnny';
+    if (studentName.includes('小明') || studentName.includes('Ming')) return 'card-ming';
+    if (studentName.includes('小華') || studentName.includes('Hua')) return 'card-hua';
+    return 'card-lin';
+}
+
+// 渲染當前週次之 7 天
+function renderTimetable() {
+    const monday = getMondayOfOffset(currentWeekOffset);
+    const sunday = new Date(monday.getTime() + 6 * 24 * 60 * 60 * 1000);
+    
+    // 更新週次標籤
+    const m1 = monday.getMonth() + 1;
+    const d1 = monday.getDate();
+    const m2 = sunday.getMonth() + 1;
+    const d2 = sunday.getDate();
+    document.getElementById('weekLabelBadge').innerHTML = `${monday.getFullYear()} 年<br>${String(m1).padStart(2, '0')}月${String(d1).padStart(2, '0')}日 至 ${String(m2).padStart(2, '0')}月${String(d2).padStart(2, '0')}日`;
+
+    const weekdays = ['週一 (Mon)', '週二 (Tue)', '週三 (Wed) 🌟', '週四 (Thu)', '週五 (Fri)', '週六 (Sat) 🌟', '週日 (Sun)'];
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(monday.getTime() + i * 24 * 60 * 60 * 1000);
+        const dateStr = formatDateISO(d);
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dayNum = String(d.getDate()).padStart(2, '0');
+        days.push({
+            dateStr,
+            dateLabel: `${m}/${dayNum}`,
+            weekdayLabel: weekdays[i],
+            isActive: (i === 2 || i === 5) // 週三、週六標記重點日
+        });
+    }
+
+    // 渲染星期 Header
+    const headerRow = document.getElementById('dayHeaderRow');
+    headerRow.innerHTML = `
+        <div class="time-block-label-col"></div>
+        ${days.map(d => `
+            <div class="day-header-cell ${d.isActive ? 'active-day' : ''}">
+                <div class="day-date">${d.dateLabel}</div>
+                <div class="day-name">${d.weekdayLabel}</div>
+            </div>
+        `).join('')}
+    `;
+
+    // 取得資料庫資料
+    if (!window.MusiMateDB) return;
+    const { appointments, schedule_slots } = window.MusiMateDB.getTeacherSchedule();
+
+    const blocks = ['morning', 'afternoon', 'evening'];
+    const container = document.getElementById('timetableGridBody');
+
+    container.innerHTML = days.map(day => {
+        const colActiveStyle = day.isActive ? 'active-col' : '';
+
+        const blockCellsHtml = blocks.map(blockKey => {
+            const dayApps = appointments.filter(a => {
+                return a.start_time.startsWith(day.dateStr) && getTimeBlockKey(a.start_time) === blockKey;
+            });
+
+            const daySlots = schedule_slots.filter(s => {
+                return s.is_available && s.start_time.startsWith(day.dateStr) && getTimeBlockKey(s.start_time) === blockKey;
+            });
+
+            let itemsHtml = '';
+
+            // 渲染預約課程
+            dayApps.forEach(app => {
+                const cardClass = getStudentCardClass(app.student_name);
+                const timeSpan = formatTime(app.start_time, app.end_time);
+                const payLabel = app.payment_status === 'paid' ? '已預付' : '現金後付';
+                const isLeave = app.status === 'rescheduled';
+                const isCancelled = app.status === 'teacher_cancelled';
+
+                let cardStyleClass = cardClass;
+                let statusBadge = `💳 ${payLabel}`;
+                if (isLeave) {
+                    cardStyleClass = 'card-leave';
+                    statusBadge = '📌 已請假 (時數已保留)';
+                } else if (isCancelled) {
+                    cardStyleClass = 'card-teacher-cancelled';
+                    statusBadge = '⚠️ 老師停課 (已退回時數)';
+                }
+
+                itemsHtml += `
+                <div class="lesson-card ${cardStyleClass}" onclick="openLessonDrawer('${app.id}')">
+                    <div class="card-title">${app.student_name} ${isLeave ? '<span style="font-size: 11px; color: #E65100;">(請假)</span>' : ''}</div>
+                    <div class="card-subtitle">${timeSpan} · ${app.instrument ? app.instrument.split(' ')[0] : '個別課'}</div>
+                    <div class="card-meta">📍 ${app.location || '音符琴房 A303'} · ${statusBadge}</div>
+                </div>
+                `;
+            });
+
+            // 渲染開放時段 (包含因請假自動釋放的時段)
+            daySlots.forEach(slot => {
+                const timeSpan = formatTime(slot.start_time, slot.end_time);
+                itemsHtml += `
+                <div class="slot-card slot-card-released" onclick="quickBookForOpenSlot('${slot.start_time}', '${slot.end_time}', '${slot.location}')" title="點擊快速安排學生">
+                    <div class="slot-title" style="color: #2E7D32;">✨ 開放預約時段</div>
+                    <div class="slot-time">${timeSpan}</div>
+                    <div class="slot-location">📍 ${slot.location || '音符琴房 A303'}</div>
+                </div>
+                `;
+            });
+
+            return `
+            <div class="cell-block">
+                <div class="cell-items-wrapper">${itemsHtml}</div>
+                <button class="btn-plus-slot" onclick="quickAddSlotForDay('${day.dateStr}', '${blockKey}')" title="快速新增此時段">+</button>
+            </div>
+            `;
+        }).join('');
+
+        return `
+        <div class="day-column ${colActiveStyle}">
+            ${blockCellsHtml}
+        </div>
+        `;
+    }).join('');
+}
+
+function changeWeek(diff) {
+    currentWeekOffset += diff;
+    renderTimetable();
+}
+
+function resetToCurrentWeek() {
+    currentWeekOffset = 0;
+    renderTimetable();
+}
+
+function populateStudentDropdown() {
+    const studentSelect = document.getElementById('quickStudent');
+    if (!studentSelect || !window.MusiMateDB) return;
+
+    const students = window.MusiMateDB.getStudents();
+    studentSelect.innerHTML = students.map(s => `
+        <option value="${s.student_id}|${s.name}|${s.default_instrument}|${s.default_location}|pay_per_lesson">
+            ${s.name} (${s.default_instrument.split(' ')[0]})
+        </option>
+    `).join('');
+}
+
+function handleAddAppointment() {
+    const studentInfo = document.getElementById('quickStudent').value.split('|');
+    const studentId = studentInfo[0];
+    const studentName = studentInfo[1];
+    const instrument = studentInfo[2];
+    const defaultLocation = studentInfo[3];
+    const paymentStatus = studentInfo[4] || 'pay_per_lesson';
+
+    const dateStr = document.getElementById('quickDate').value;
+    const startTime = document.getElementById('quickStartTime').value;
+    const endTime = document.getElementById('quickEndTime').value;
+    const repeatCount = Number(document.getElementById('quickRepeatCount').value || 1);
+    const location = document.getElementById('quickLocation').value || defaultLocation;
+
+    const startIso = `${dateStr}T${startTime}:00+08:00`;
+    const endIso = `${dateStr}T${endTime}:00+08:00`;
+
+    const baseAppt = {
+        student_id: studentId,
+        student_name: studentName,
+        instrument: instrument,
+        start_time: startIso,
+        end_time: endIso,
+        location: location,
+        payment_status: paymentStatus
+    };
+
+    if (window.MusiMateDB) {
+        if (repeatCount > 1) {
+            window.MusiMateDB.addRecurringAppointments(baseAppt, repeatCount);
+            alert(`🎉 已成功連排 ${repeatCount} 堂常態課表！\n學生：${studentName}\n首堂：${dateStr} ${startTime}-${endTime}\n地點：${location}`);
+        } else {
+            window.MusiMateDB.addAppointment(baseAppt);
+            alert(`🎉 已成功排定課表！\n學生：${studentName}\n時間：${dateStr} ${startTime}-${endTime}\n地點：${location}`);
+        }
+        renderTimetable();
+    }
+}
+
+function handleAddOpenSlot() {
+    const dateStr = document.getElementById('quickDate').value;
+    const startTime = document.getElementById('quickStartTime').value;
+    const endTime = document.getElementById('quickEndTime').value;
+    const location = document.getElementById('quickLocation').value || '音符琴房 A303';
+
+    const startIso = `${dateStr}T${startTime}:00+08:00`;
+    const endIso = `${dateStr}T${endTime}:00+08:00`;
+
+    if (window.MusiMateDB) {
+        window.MusiMateDB.addOpenSlot({
+            start_time: startIso,
+            end_time: endIso,
+            location: location
+        });
+        alert(`✨ 已成功開放自選時段！\n時間：${dateStr} ${startTime}-${endTime}\n地點：${location}\n\n學生端（加選、調課、新生試上）下拉選單現已即時同步此時段！`);
+        renderTimetable();
+    }
+}
+
+// 課堂抽屜操作
+function openLessonDrawer(appointmentId) {
+    if (!window.MusiMateDB) return;
+    const { appointments } = window.MusiMateDB.getTeacherSchedule();
+    const appt = appointments.find(a => a.id === appointmentId);
+    if (!appt) return;
+
+    activeDrawerAppt = appt;
+
+    const timeSpan = formatTime(appt.start_time, appt.end_time);
+    const d = new Date(appt.start_time);
+    const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+
+    document.getElementById('drawerCourseTitle').innerText = `${appt.student_name} · ${appt.instrument || '鋼琴課'}`;
+    document.getElementById('drawerTimeAndPlace').innerText = `${dateStr} ${timeSpan} · ${appt.location || '音符琴房 A303'}`;
+    document.getElementById('drawerPaymentStatus').innerText = appt.payment_status === 'paid' ? '✅ 已預付 / 包堂扣抵' : '💳 單堂後付 (NT$ 2,000)';
+    document.getElementById('drawerMemoText').value = appt.memo_notes || '';
+
+    // 出席打卡按鈕
+    const isAttended = appt.attendance === 'attended';
+    document.getElementById('attendanceToggleBtnWrap').innerHTML = `
+        <button onclick="toggleAttendance('${appt.id}', '${isAttended ? 'pending' : 'attended'}')" style="padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; border: none; cursor: pointer; background: ${isAttended ? '#E8F5E9' : '#EDE7F6'}; color: ${isAttended ? '#2E7D32' : '#512DA8'};">
+            ${isAttended ? '✅ 已簽到出席' : '⏱️ 標記簽到出席'}
+        </button>
+    `;
+
+    document.getElementById('lessonDrawer').style.display = 'flex';
+}
+
+function closeLessonDrawer() {
+    document.getElementById('lessonDrawer').style.display = 'none';
+    activeDrawerAppt = null;
+}
+
+function handleOverlayClick(e) {
+    if (e.target.id === 'lessonDrawer') {
+        closeLessonDrawer();
+    }
+}
+
+function saveLessonMemo() {
+    if (!activeDrawerAppt || !window.MusiMateDB) return;
+    const text = document.getElementById('drawerMemoText').value.trim();
+    window.MusiMateDB.updateLessonMemo(activeDrawerAppt.id, text);
+    alert('💾 課堂備忘已成功儲存並同步至智慧聯絡簿！');
+}
+
+function toggleAttendance(appointmentId, newStatus) {
+    if (window.MusiMateDB) {
+        window.MusiMateDB.markAttendance(appointmentId, newStatus);
+        alert(newStatus === 'attended' ? '✅ 已成功完成課堂簽到！' : '已取消簽到狀態。');
+        openLessonDrawer(appointmentId);
+        renderTimetable();
+    }
+}
+
+function handleTeacherCancelLesson() {
+    if (!activeDrawerAppt || !window.MusiMateDB) return;
+    const reason = prompt('請輸入老師停課原因（將自動發送 LINE 通知提醒學生）：', '老師臨時受邀出國演出，暫停乙次');
+    if (!reason) return;
+
+    window.MusiMateDB.cancelByTeacher(activeDrawerAppt.id, reason);
+    alert(`🛑 已完成停課處理！\n\n1. 該堂課時數已完整退回至 ${activeDrawerAppt.student_name} 的帳戶中\n2. 系統已模擬透過 LINE LIFF 推播停課與重新預約補課通知！`);
+    closeLessonDrawer();
+    renderTimetable();
+}
+
+function handleTeacherHelpReschedule() {
+    if (!activeDrawerAppt) return;
+    location.href = `student_changeclass.html?lesson_id=${activeDrawerAppt.id}`;
+}
+
+function openContactBookModal() {
+    if (!activeDrawerAppt) return;
+    alert(`📖 【${activeDrawerAppt.student_name} · 智慧聯絡簿】\n\n【上課時間】${formatTime(activeDrawerAppt.start_time, activeDrawerAppt.end_time)}\n【授課樂器】${activeDrawerAppt.instrument || '鋼琴'}\n【課堂重點】${activeDrawerAppt.memo_notes || '請加強右手斷音彈奏與踏板輕踩控制'}\n【作業指派】巴哈創意曲 No.8 慢速對拍 5 遍\n\n（可至聯絡簿模組進行音檔語音錄製與 AI 重點自動摘要）`);
+}
+
+function openPracticeCheckModal() {
+    if (!activeDrawerAppt) return;
+    alert(`🎯 【${activeDrawerAppt.student_name} · 學生打卡練習成果】\n\n【本週累計自主練習】180 分鐘 (達標 120%)\n【最新打卡錄音】2026/08/25 20:30 上傳\n【AI 音準與節奏分析評分】94 分 🌟\n【AI 評語】右手第 16 小節十六分音符節奏穩定，音色明亮！`);
+}
+
+function quickAddSlotForDay(dateStr, blockKey) {
+    document.getElementById('quickDate').value = dateStr;
+    if (blockKey === 'morning') {
+        document.getElementById('quickStartTime').value = '10:00';
+        document.getElementById('quickEndTime').value = '11:00';
+    } else if (blockKey === 'afternoon') {
+        document.getElementById('quickStartTime').value = '14:00';
+        document.getElementById('quickEndTime').value = '15:00';
+    } else {
+        document.getElementById('quickStartTime').value = '19:00';
+        document.getElementById('quickEndTime').value = '20:00';
+    }
+    focusQuickAdd();
+}
+
+function quickBookForOpenSlot(startIso, endIso, loc) {
+    const d = new Date(startIso);
+    document.getElementById('quickDate').value = formatDateISO(d);
+    document.getElementById('quickStartTime').value = d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    document.getElementById('quickEndTime').value = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    document.getElementById('quickLocation').value = loc || '音符琴房 A303';
+    focusQuickAdd();
+}
+
+function focusQuickAdd() {
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    populateStudentDropdown();
+    renderTimetable();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+{
+  "size": {
+    "width": 2500,
+    "height": 1686
+  },
+  "selected": false,
+  "name": "MusiMate_Page_2",
+  "chatBarText": "更多功能",
+  "areas": [
+    {
+      "bounds": { "x": 0, "y": 0, "width": 1250, "height": 286 },
+      "action": {
+        "type": "richmenuswitch",
+        "richMenuAliasId": "richmenu-alias-page1",
+        "data": "action=switch_to_page1"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 286, "width": 833, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "開始新課程",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=courses"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 286, "width": 834, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "分享MusiMate",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=share"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 286, "width": 833, "height": 700 },
+      "action": {
+        "type": "message",
+        "label": "音樂社群(待開發)",
+        "text": "🎵 MusiMate 音樂社群正在全力開發中，敬請期待！"
+      }
+    },
+    {
+      "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "扣款申訴",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=refund"
+      }
+    },
+    {
+      "bounds": { "x": 833, "y": 986, "width": 834, "height": 700 },
+      "action": {
+        "type": "postback",
+        "label": "聯繫系統客服",
+        "data": "action=contact_support",
+        "displayText": "我想聯繫系統客服"
+      }
+    },
+    {
+      "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
+      "action": {
+        "type": "uri",
+        "label": "FAQ",
+        "uri": "https://liff.line.me/2011164851-ycZLTOJv?page=faq"
+      }
+    }
+  ]
+}

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusiMate | 獨立音樂教育者的智慧 Studio OS</title>
+    <meta name="description" content="專為獨立音樂教師量身打造的私域運營作業系統：LINE 智慧排課、30s 語音 AI 週報聯絡簿、15s 練琴打卡聲學分析與雙軌履約信託金流。">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700;900&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- MusiMate 全站標準樣式庫 -->
+    <link rel="stylesheet" href="UI/style_0824.css">
+    
+    <!-- LINE LIFF 智慧路由分發器 (自動將 ?page=schedule 等導向專屬頁面) -->
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const page = urlParams.get('page');
+            if (page === 'schedule') {
+                window.location.replace('src/test_uiredesign/student_schedule.html');
+            } else if (page === 'leave' || page === 'reschedule') {
+                window.location.replace('src/test_uiredesign/student_changeclass.html');
+            } else if (page === 'courses' || page === 'newclass') {
+                window.location.replace('src/newclass/oldstudent_newclass.html');
+            } else if (page === 'teachers' || page === 'homepage') {
+                window.location.replace('src/newclass/newclass_homepage.html');
+            } else if (page === 'billing') {
+                window.location.replace('src/test_uiredesign/student_schedule.html');
+            } else if (page === 'contact-book') {
+                window.location.replace('src/test_uiredesign/student_schedule.html');
+            }
+        })();
+    </script>
+    
+    <style>
+        /* 基礎重設與色彩體系 (對齊 style_0824.css) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #FAF6F0;
+            color: #2B3049;
+            font-family: var(--font-family-sans, 'Noto Sans TC', sans-serif);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 導航列容器 */
+        .landing-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 88px;
+            background: rgba(250, 246, 240, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #F0EAE1;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 80px;
+        }
+
+        .landing-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .landing-logo img {
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: #6F6F6F;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #2B3049;
+        }
+
+        .nav-btn-login {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            background: #2B3049;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 100px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(43, 48, 73, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .nav-btn-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(43, 48, 73, 0.22);
+        }
+
+        /* 主內容容器 */
+        .landing-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 120px 40px 80px 40px;
+        }
+
+        /* Hero 區塊 */
+        .hero-section {
+            padding: 40px 0 60px 0;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: rgba(130, 170, 216, 0.15);
+            border: 1px solid rgba(130, 170, 216, 0.4);
+            color: #2B3049;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 100px;
+            margin-bottom: 20px;
+        }
+
+        .hero-title {
+            font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+            font-size: 46px;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #2B3049;
+            margin-bottom: 20px;
+        }
+
+        .hero-title span {
+            color: #CEAB98;
+        }
+
+        .hero-desc {
+            font-size: 16px;
+            color: #6F6F6F;
+            line-height: 1.7;
+            margin-bottom: 32px;
+        }
+
+        .hero-action-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 32px;
+            background: #2B3049;
+            color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 100px;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(43, 48, 73, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(43, 48, 73, 0.28);
+        }
+
+        .btn-hero-line {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: #FFFFFF;
+            color: #06C755;
+            border: 1px solid #06C755;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 100px;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-hero-line:hover {
+            background: #F0FFF4;
+            transform: translateY(-2px);
+        }
+
+        /* 學生掃碼加入專區 (QR Code Card) */
+        .student-qr-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #F0EAE1;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(44, 42, 41, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            max-width: 520px;
+        }
+
+        .qr-img-box {
+            width: 110px;
+            height: 110px;
+            background: #FAF6F0;
+            border-radius: 16px;
+            padding: 8px;
+            border: 1px solid #EFECE6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .qr-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-info-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .qr-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            background: #E8F5E9;
+            color: #2E7D32;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 100px;
+            width: fit-content;
+        }
+
+        .qr-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2B3049;
+        }
+
+        .qr-subtitle {
+            font-size: 12px;
+            color: #6F6F6F;
+            line-height: 1.5;
+        }
+
+        /* 手機 Mockup 視覺展示 */
+        .mockup-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 320px;
+            background: #1E293B;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 4px solid #334155;
+        }
+
+        .phone-screen {
+            background: #F8F9FA;
+            border-radius: 28px;
+            overflow: hidden;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .phone-header {
+            background: #06C755;
+            color: white;
+            margin: -14px -14px 0 -14px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .phone-card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid #EFECE6;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        /* 通用純靜態區塊樣式 (無點擊/無 Hover) */
+        .static-section {
+            padding: 60px 0;
+            border-top: 1px solid #F0EAE1;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 720px;
+            margin: 0 auto 48px auto;
+        }
+
+        .section-title {
+            font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+            font-size: 32px;
+            font-weight: 700;
+            color: #2B3049;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: #6F6F6F;
+            line-height: 1.6;
+        }
+
+        /* 靜態卡片網格 (純展示，無游標指標與 Hover 縮放) */
+        .static-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .static-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+        }
+
+        .static-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #F0EAE1;
+            padding: 28px;
+            box-shadow: 0 4px 16px rgba(44, 42, 41, 0.03);
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+        }
+
+        .static-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: #FAF6F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .static-card-title {
+            font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+            font-size: 20px;
+            font-weight: 700;
+            color: #2B3049;
+            margin-bottom: 10px;
+        }
+
+        .static-card-text {
+            font-size: 14px;
+            color: #6F6F6F;
+            line-height: 1.65;
+        }
+
+        /* 傳統私訊 vs MusiMate 比較表 */
+        .compare-box-bad {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #FDE2E2;
+            padding: 32px;
+        }
+
+        .compare-box-good {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 2px solid #82AAD8;
+            padding: 32px;
+        }
+
+        .compare-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .compare-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 30秒聯絡簿純展示區 */
+        .demo-showcase-box {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #F0EAE1;
+            padding: 36px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            box-shadow: 0 4px 20px rgba(44, 42, 41, 0.04);
+        }
+
+        /* 價格表 */
+        .pricing-card {
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #F0EAE1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 2px solid #2B3049;
+            box-shadow: 0 8px 30px rgba(43, 48, 73, 0.08);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2B3049;
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 100px;
+        }
+
+        /* 頁尾 */
+        .landing-footer {
+            background: #2B3049;
+            color: #FAF6F0;
+            padding: 48px 80px 32px 80px;
+            font-size: 13px;
+        }
+
+        .footer-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        /* RWD 適配 */
+        @media (max-width: 992px) {
+            .landing-navbar {
+                padding: 0 24px;
+            }
+            .nav-menu {
+                display: none;
+            }
+            .hero-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+            .hero-action-group {
+                justify-content: center;
+            }
+            .student-qr-card {
+                margin: 0 auto;
+            }
+            .static-grid-3, .static-grid-2, .demo-showcase-box {
+                grid-template-columns: 1fr;
+            }
+            .landing-wrapper {
+                padding: 100px 20px 60px 20px;
+            }
+            .landing-footer {
+                padding: 40px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 頂部固定導航列 -->
+    <header class="landing-navbar">
+        <a href="#" class="landing-logo">
+            <img src="UI/logo.png" alt="MusiMate" onerror="this.src='src/logo.png'" />
+        </a>
+
+        <!-- 導覽錨點選單 (單純頁面滾動，無外部跳轉) -->
+        <nav class="nav-menu">
+            <a href="#features" class="nav-link">五大教學幫手</a>
+            <a href="#demo" class="nav-link">語音聯絡簿展示</a>
+            <a href="#trust" class="nav-link">三大安心保障</a>
+            <a href="#pricing" class="nav-link">方案費用</a>
+            <a href="#testimonials" class="nav-link">老師真實評價</a>
+        </nav>
+
+        <!-- 右上角唯一定義的登入按鈕 -->
+        <div>
+            <a href="src/test_uiredesign/login.html" class="nav-btn-login">
+                👩‍🏫 老師登入
+            </a>
+        </div>
+    </header>
+
+    <!-- 主體內容區 -->
+    <main class="landing-wrapper">
+        
+        <!-- 2. Hero 區塊 -->
+        <section class="hero-section">
+            <div>
+                <div class="hero-badge">
+                    ✨ 專為獨立音樂老師量身打造的私域運營作業系統
+                </div>
+                <h1 class="hero-title">
+                    把排課、催繳與放鳥交給系統，<br>
+                    把<span>優雅與時間</span>留給音樂。
+                </h1>
+                <p class="hero-desc">
+                    家長與學生 <strong>完全不用額外下載 App</strong>，打開日常最熟悉的 LINE 就能自助預約與調課。老師下課只需對著手機講 30 秒，AI 自動生成精美週報，家長傳轉帳截圖也能秒級對帳！
+                </p>
+
+                <!-- Hero 區塊登入按鈕 -->
+                <div class="hero-action-group">
+                    <a href="src/test_uiredesign/login.html" class="btn-hero-primary">
+                        🚀 老師登入 / 建立專屬工作室
+                    </a>
+                </div>
+
+                <!-- 學生 / 家長 掃碼加入 LINE 官方帳號 QR Code 卡片 -->
+                <div class="student-qr-card">
+                    <div class="qr-img-box">
+                        <img src="UI/component/musimate_line_liff_qrcode.png" alt="MusiMate LINE LIFF QR Code" />
+                    </div>
+                    <div class="qr-info-box">
+                        <span class="qr-badge">📲 學生 / 家長 專屬體驗</span>
+                        <div class="qr-title">掃碼加入 LINE 官方帳號</div>
+                        <div class="qr-subtitle">
+                            免下載 App！在 LINE 點開即可預約體驗課、自主排課、接收每週 AI 聯絡簿回饋。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：手機 LINE 成果純視覺展示 (靜態，無點擊跳轉) -->
+            <div class="mockup-container">
+                <div class="phone-frame">
+                    <div class="phone-screen">
+                        <div class="phone-header">
+                            <span>💬 LINE 官方通知</span>
+                            <span style="font-size: 10px; opacity: 0.9;">@張芷嫣鋼琴工作室</span>
+                        </div>
+                        <div class="phone-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F0EAE1; padding-bottom: 6px;">
+                                <span style="font-weight: 700; color: #CEAB98; font-size: 12px;">✨ 本週課後學習回饋</span>
+                                <span style="font-size: 10px; color: #8C827A;">今日 17:30</span>
+                            </div>
+                            <div style="font-size: 11px; color: #6F6F6F;">
+                                <strong style="color: #2B3049;">【學生】Lin (林同學) ｜ 鋼琴個別課</strong>
+                                <p style="margin-top: 4px; line-height: 1.5; color: #4A3A31;">
+                                    今日徹爾尼599第19首觸鍵音色非常乾淨，左手伴奏控制良好！
+                                </p>
+                            </div>
+                            <div style="background: #FAF6F0; padding: 8px 10px; border-radius: 10px; font-size: 11px; color: #84421D; border: 1px solid #EBD9C6;">
+                                🎯 <strong>練習目標：</strong>Op.599 No.19 (第9-16小節) 目標速度 80
+                            </div>
+                        </div>
+                        <div class="phone-card" style="flex-direction: row; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 12px; font-weight: 700; color: #2B3049;">📅 下週空檔自主選課</span>
+                            <span style="background: #2B3049; color: white; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;">LINE 點開即用</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 五大教學幫手 (純展示介紹，無 hover / 點擊跳轉) -->
+        <section id="features" class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">五大教學幫手，串起完整的教學事業循環</h2>
+                <p class="section-subtitle">把每天最耗神的三件事交給系統，讓每一次教學都化為個人品牌積累</p>
+            </div>
+
+            <div class="static-grid-3">
+                <!-- 01 智慧課表 -->
+                <div class="static-card">
+                    <div class="static-card-icon">📅</div>
+                    <h3 class="static-card-title">01 智慧課表 ＋ 請假防放鳥</h3>
+                    <p class="static-card-text">
+                        學生上課在 LINE 點擊報到。內建上課前 24 小時內臨時取消自動依規則扣抵時數補償，由系統客觀執行，保障老師收入。
+                    </p>
+                </div>
+
+                <!-- 02 語音 AI 聯絡簿 -->
+                <div class="static-card">
+                    <div class="static-card-icon">🎙️</div>
+                    <h3 class="static-card-title">02 30 秒語音 AI 聯絡簿</h3>
+                    <p class="static-card-text">
+                        老師下課口述 30 秒，AI 結合經典音樂教材知識與私房教學心法，自動產出含摘要、技巧與作業速度的精緻週報發送至家長 LINE。
+                    </p>
+                </div>
+
+                <!-- 03 練琴打卡 -->
+                <div class="static-card">
+                    <div class="static-card-icon">🎹</div>
+                    <h3 class="static-card-title">03 15 秒練琴打卡 ＋ 節奏分析</h3>
+                    <p class="static-card-text">
+                        學生隨手錄音 15 秒上傳打卡，系統自動辨識演奏速度與節奏穩定度，生成琴藝進步曲線，激勵學員每日練琴養成好習慣。
+                    </p>
+                </div>
+
+                <!-- 04 截圖對帳 -->
+                <div class="static-card">
+                    <div class="static-card-icon">💳</div>
+                    <h3 class="static-card-title">04 截圖對帳 ＋ 智慧薪資看板</h3>
+                    <p class="static-card-text">
+                        支援 ATM 轉帳截圖自動辨識末五碼與金額。已入帳、待確認、催款清單清晰呈現，依學生學費貢獻度自動排行統計。
+                    </p>
+                </div>
+
+                <!-- 05 個人專屬官網 -->
+                <div class="static-card" style="grid-column: span 2;">
+                    <div class="static-card-icon">🌐</div>
+                    <h3 class="static-card-title">05 個人專屬名師形象官網 ＋ 體驗課招生</h3>
+                    <p class="static-card-text">
+                        3 分鐘自動建立高質感個人官網，展示個人學經歷、演奏影音與招生預約表單，新生填單後立刻透過 LINE 通知老師，輕鬆拓展生源！
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 語音聯絡簿展示 (純靜態示意展示) -->
+        <section id="demo" class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">語音 AI 聯絡簿：下課講 30 秒，AI 產出專業報告</h2>
+                <p class="section-subtitle">不必再利用休息時間打字！老師口述重點，系統自動整理成家長看得懂的漂亮圖文報告</p>
+            </div>
+
+            <div class="demo-showcase-box">
+                <!-- 左欄：口述示範 -->
+                <div style="display: flex; flex-direction: column; gap: 16px; cursor: default;">
+                    <div style="font-size: 13px; font-weight: 700; color: #84421D;">
+                        🎤 老師下課口述示範錄音內容：
+                    </div>
+                    <div style="background: #FAF6F0; border-radius: 16px; padding: 20px; border: 1px solid #EFECE6;">
+                        <div style="font-weight: 700; font-size: 14px; color: #2B3049; margin-bottom: 8px;">
+                            🎹 鋼琴個別課教學重點紀錄
+                        </div>
+                        <p style="font-size: 13px; color: #6F6F6F; line-height: 1.7;">
+                            「今天子翔徹爾尼第 19 首左手分解和弦進步很多，右手十六分音符要注意第四、五指抬指獨立性，回家開節拍器慢練速度 60，目標速度 80...」
+                        </p>
+                    </div>
+                    <div style="font-size: 12px; color: #8C827A;">
+                        ⚡ 系統透過專屬音樂知識模型，自動提取彈奏曲目、指法要點與目標節拍。
+                    </div>
+                </div>
+
+                <!-- 右欄：家長端收到成品 -->
+                <div style="background: #FAF6F0; border-radius: 16px; padding: 20px; border: 1px solid #EFECE6; display: flex; flex-direction: column; gap: 12px; cursor: default;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E8E5DF; padding-bottom: 8px;">
+                        <span style="font-weight: 700; font-size: 13px; color: #2B3049;">📱 家長在 LINE 收到的精緻回饋卡片</span>
+                        <span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; padding: 2px 8px; border-radius: 100px; font-weight: 700;">LINE 直閱</span>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 12px; color: #84421D; margin-bottom: 2px;">📌 今日課堂摘要</div>
+                        <p style="font-size: 12px; color: #4A3A31; line-height: 1.6;">
+                            子翔今天的觸鍵音色非常乾淨，左手伴奏的音量控制良好，彈奏很有層次感。
+                        </p>
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 12px; color: #2B3049; margin-bottom: 2px;">🎹 老師叮嚀與技巧重點</div>
+                        <p style="font-size: 12px; color: #4A3A31; line-height: 1.6;">
+                            練習右手第 9~16 小節時，請務必先開節拍器慢練，確認第四、五指獨立站穩，不要黏鍵。
+                        </p>
+                    </div>
+                    <div style="background: #FFFFFF; padding: 8px 12px; border-radius: 10px; border: 1px dashed #CEAB98; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; font-weight: 700; color: #2B3049;">徹爾尼 Op.599 No.19</span>
+                        <span style="font-size: 11px; font-weight: 800; color: #2E7D32;">🎯 目標速度 80</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 傳統私訊 vs 自動化營運對比 -->
+        <section class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">為什麼全台超過 500+ 位獨立音樂老師選擇 MusiMate？</h2>
+                <p class="section-subtitle">告別混亂的人工行政，用清晰的系統規則維護獨立教師的專業威望與時間價值</p>
+            </div>
+
+            <div class="static-grid-2">
+                <!-- 傳統私訊痛點 -->
+                <div class="compare-box-bad">
+                    <div style="display: inline-block; padding: 4px 12px; background: #FDE2E2; color: #D9668C; font-size: 12px; font-weight: 700; border-radius: 100px;">
+                        ❌ 傳統私訊與手動管理
+                    </div>
+                    <ul class="compare-list">
+                        <li class="compare-item">
+                            <span style="color: #D9668C; font-weight: 700;">✗</span>
+                            <div><strong>臨時請假不好意思扣款：</strong> 上課前 1 小時臨時請假，礙於人情不好意思收費，只能默默吞下損失。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #D9668C; font-weight: 700;">✗</span>
+                            <div><strong>LINE 私訊對時對到眼花：</strong> 每到調課或月初排課，訊息來回幾十則還常常撞期記錯。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #D9668C; font-weight: 700;">✗</span>
+                            <div><strong>課後疲累難以及時回饋：</strong> 連上好幾堂課後筋疲力竭，沒時間每一位都打字寫長篇回饋給家長。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #D9668C; font-weight: 700;">✗</span>
+                            <div><strong>尷尬催款與對帳地獄：</strong> 學費快到期不好意思催繳，還要一張張核對家長的網銀轉帳末五碼。</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- MusiMate 自動化優雅營運 -->
+                <div class="compare-box-good">
+                    <div style="display: inline-block; padding: 4px 12px; background: rgba(130, 170, 216, 0.2); color: #2B3049; font-size: 12px; font-weight: 700; border-radius: 100px;">
+                        ✨ MusiMate 自動化優雅營運
+                    </div>
+                    <ul class="compare-list">
+                        <li class="compare-item">
+                            <span style="color: #2E7D32; font-weight: 700;">✓</span>
+                            <div><strong>客觀的 24h 請假防放鳥機制：</strong> 系統扮演客觀第三方！臨時取消自動依規則補償，保障老師鐘點費。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #2E7D32; font-weight: 700;">✓</span>
+                            <div><strong>LINE 日曆自助選課與調課：</strong> 家長直接點開 LINE 查看老師開放的空檔自主選課，系統自動防撞期。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #2E7D32; font-weight: 700;">✓</span>
+                            <div><strong>30 秒語音生成專業週報：</strong> 下課口述半分鐘，AI 自動整理結合技巧與作業的精美週報送至家長 LINE。</div>
+                        </li>
+                        <li class="compare-item">
+                            <span style="color: #2E7D32; font-weight: 700;">✓</span>
+                            <div><strong>轉帳截圖智慧自動對帳：</strong> 家長回傳 ATM 截圖，系統自動辨識金額與末五碼，老師一鍵確認入帳。</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 三大安心保障 (純展示介紹) -->
+        <section id="trust" class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">化解顧慮：三大安心保障</h2>
+                <p class="section-subtitle">我們深知獨立樂器教師對親師信任、個人隱私與教學自主權的高度重視</p>
+            </div>
+
+            <div class="static-grid-3">
+                <div class="static-card" style="text-align: center; align-items: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">📱</div>
+                    <h3 class="static-card-title">家長 100% 零下載門檻</h3>
+                    <p class="static-card-text">
+                        家長端完全在 LINE 內點開即用，無需註冊新密碼、無需下載任何 App，使用意願高達 98.2%。
+                    </p>
+                </div>
+                <div class="static-card" style="text-align: center; align-items: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">🛡️</div>
+                    <h3 class="static-card-title">100% 老師親自確認掌控</h3>
+                    <p class="static-card-text">
+                        所有 AI 生成的週報與催繳提醒，均需老師親自確認後才會發出，絕不會有機器人自作主張打擾家長。
+                    </p>
+                </div>
+                <div class="static-card" style="text-align: center; align-items: center;">
+                    <div style="font-size: 36px; margin-bottom: 12px;">🔒</div>
+                    <h3 class="static-card-title">銀行級資料加密與個資保護</h3>
+                    <p class="static-card-text">
+                        符合個資法最高標準，學生與家長通訊透過 LINE 官方管道代理，老師與學生的私人手機號碼不外洩。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 方案費用 (純展示介紹，無點擊按鈕) -->
+        <section id="pricing" class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">透明合理的訂閱費用（平台 0 抽成）</h2>
+                <p class="section-subtitle">所有學費 100% 歸老師所有！一堂課被臨時放鳥的補償金，就足以支付整整 3 個月的 Pro 方案</p>
+            </div>
+
+            <div class="static-grid-3">
+                <!-- Free 體驗版 -->
+                <div class="pricing-card">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 700; color: #8C827A; text-transform: uppercase;">Free 體驗版</span>
+                        <div style="font-family: var(--font-family-serif); font-size: 36px; font-weight: 700; color: #2B3049; margin: 12px 0 4px 0;">
+                            NT$ 0 <span style="font-size: 13px; font-family: var(--font-family-sans); color: #8C827A; font-weight: 500;">/ 永久免費</span>
+                        </div>
+                        <p style="font-size: 13px; color: #6F6F6F; margin-bottom: 20px;">適合剛起步、兼職或測試系統的新手教師</p>
+                        <hr style="border: 0; border-top: 1px solid #F0EAE1; margin-bottom: 16px;" />
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #4A3A31;">
+                            <li>✅ 活躍學生人數：5 位</li>
+                            <li>✅ 每堂課 30 秒語音 AI 聯絡簿</li>
+                            <li>✅ LINE 日曆排課與課前 24h 自動提醒</li>
+                            <li style="color: #A09890;">❌ 個人名師專屬形象官網</li>
+                            <li style="color: #A09890;">❌ 轉帳截圖智慧自動對帳</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Pro 專業版 -->
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">🔥 90% 全職老師選擇</div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: 700; color: #84421D; text-transform: uppercase;">Pro 專業版</span>
+                        <div style="font-family: var(--font-family-serif); font-size: 36px; font-weight: 700; color: #2B3049; margin: 12px 0 4px 0;">
+                            NT$ 199 <span style="font-size: 13px; font-family: var(--font-family-sans); color: #8C827A; font-weight: 500;">/ 月</span>
+                        </div>
+                        <p style="font-size: 13px; color: #6F6F6F; margin-bottom: 20px;">適合課量穩定、學生數 10~20 位的全職音樂教師</p>
+                        <hr style="border: 0; border-top: 1px solid #F0EAE1; margin-bottom: 16px;" />
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #2B3049;">
+                            <li>✅ 活躍學生人數：20 位</li>
+                            <li>✅ 30 秒語音 AI 週報（無堂數上限）</li>
+                            <li>✅ <strong>個人專屬名師形象官網（無平台廣告）</strong></li>
+                            <li>✅ 老師排休協調自動調課功能</li>
+                            <li>✅ 轉帳截圖智慧自動辨識與對帳</li>
+                            <li>✅ 學生 15 秒練琴打卡與老師審核</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Master 大師版 -->
+                <div class="pricing-card">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 700; color: #82AAD8; text-transform: uppercase;">Master 大師版</span>
+                        <div style="font-family: var(--font-family-serif); font-size: 36px; font-weight: 700; color: #2B3049; margin: 12px 0 4px 0;">
+                            NT$ 299 <span style="font-size: 13px; font-family: var(--font-family-sans); color: #8C827A; font-weight: 500;">/ 月</span>
+                        </div>
+                        <p style="font-size: 13px; color: #6F6F6F; margin-bottom: 20px;">適合滿課名師、微型工作室主理人 (&gt;35位學生)</p>
+                        <hr style="border: 0; border-top: 1px solid #F0EAE1; margin-bottom: 16px;" />
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: #4A3A31;">
+                            <li>✅ 活躍學生人數：50 位</li>
+                            <li>✅ 涵蓋 Pro 方案所有完整功能</li>
+                            <li>✅ <strong>名師私房教學法 AI 學習與客製語氣</strong></li>
+                            <li>✅ 演奏速度 (BPM) 與節奏穩定度深度分析</li>
+                            <li>✅ 官網體驗課預約名單 LINE 即時通知</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. 老師真實評價 -->
+        <section id="testimonials" class="static-section">
+            <div class="section-header">
+                <h2 class="section-title">來自一線音樂老師的真實推薦</h2>
+            </div>
+
+            <div class="static-grid-3">
+                <div class="static-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #FAF6F0; color: #84421D; font-weight: 700; display: flex; align-items: center; justify-content: center;">林</div>
+                        <div>
+                            <div style="font-weight: 700; color: #2B3049; font-size: 14px;">林佩芬 老師</div>
+                            <div style="font-size: 11px; color: #8C827A;">台北藝術大學碩士 ｜ 鋼琴教學 12 年</div>
+                        </div>
+                    </div>
+                    <p class="static-card-text">
+                        「以往學生臨時請假我都只能認賠，MusiMate 的 24 小時請假補償規則由系統依約執行，讓我不必再礙於人情不好意思收費！第一個月就幫我挽回兩次臨時請假損失 NT$ 2,800。」
+                    </p>
+                </div>
+
+                <div class="static-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #FAF6F0; color: #84421D; font-weight: 700; display: flex; align-items: center; justify-content: center;">張</div>
+                        <div>
+                            <div style="font-weight: 700; color: #2B3049; font-size: 14px;">張芷嫣 老師</div>
+                            <div style="font-size: 11px; color: #8C827A;">國立維也納音樂學院 ｜ 學生 26 位</div>
+                        </div>
+                    </div>
+                    <p class="static-card-text">
+                        「30 秒語音 AI 聯絡簿是我最喜歡的功能！下課對著手機講半分鐘，系統就自動幫我整理好發到家長 LINE，家長都誇獎老師非常有條理與專業！」
+                    </p>
+                </div>
+
+                <div class="static-card">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: #FAF6F0; color: #84421D; font-weight: 700; display: flex; align-items: center; justify-content: center;">陳</div>
+                        <div>
+                            <div style="font-weight: 700; color: #2B3049; font-size: 14px;">陳柏翰 老師</div>
+                            <div style="font-size: 11px; color: #8C827A;">維也納市立音樂院文憑 ｜ 自由接案</div>
+                        </div>
+                    </div>
+                    <p class="static-card-text">
+                        「轉帳截圖自動對帳幫我每週省下 3 個多小時對末五碼的時間，現在系統比對好金額後我只需要按確認入帳，整個教學事業變得非常優雅。」
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 9. 頁尾 -->
+    <footer class="landing-footer">
+        <div class="footer-inner">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 700; color: #FFFFFF; font-size: 16px;">MusiMate</span>
+                <span>· 專為獨立音樂教育者打造的教學秘書與私域運營作業系統</span>
+            </div>
+            <div>
+                © 2026 MusiMate Platform. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

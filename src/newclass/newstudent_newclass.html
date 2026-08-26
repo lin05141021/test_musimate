@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新生預約試上 - 張芷嫣老師 | MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="newclass_styles.css">
+    <script src="../data/musimate_db.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #EAE6DF;
+            font-family: 'Sora', 'Noto Sans TC', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 24px 12px;
+        }
+        .app-wrapper {
+            width: 100%;
+            max-width: 402px;
+            min-height: 950px;
+            position: relative;
+            background: #F8F5F0;
+            overflow: hidden;
+            border-radius: 40px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+        .btn-action {
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1.5px solid #FAF6F0;
+            background: #FDFBF7;
+            color: #2B3049;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            border-color: #CEAB98;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- 1. 底層背景：張芷嫣老師個人簡介卡片 -->
+    <div style="width: 100%; min-height: 950px; background: #FAF6F0; display: flex; flex-direction: column;">
+        <!-- 頂部導航列 -->
+        <div style="align-self: stretch; height: 64px; padding: 12px 16px; border-bottom: 1px #F0EAE1 solid; background: #FAF6F0 url('../../UI/water_color.png') center/cover no-repeat; justify-content: space-between; align-items: center; display: inline-flex;">
+            <img style="height: 32px; object-fit: contain; cursor: pointer;" src="../../UI/logo.png" alt="MusiMate" onclick="location.href='newclass_homepage.html'" onerror="this.src='../logo.png'" />
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div onclick="location.href='teacher_info.html'" title="返回師資介紹" style="width: 36px; height: 36px; border-radius: 50%; background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.08); display: flex; justify-content: center; align-items: center; cursor: pointer; color: #2B3049; font-size: 14px;">
+                    ✕
+                </div>
+            </div>
+        </div>
+
+        <!-- 教師內容卡片區 -->
+        <div style="align-self: stretch; padding: 20px 16px 40px 16px; display: flex; flex-direction: column; gap: 16px;">
+            <!-- 標籤 -->
+            <div style="align-self: stretch; display: flex; justify-content: center;">
+                <div style="padding: 6px 12px; background: rgba(77, 173, 184, 0.10); border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                    <span style="color: #4DADB8; font-size: 12px; font-weight: 700;">✦</span>
+                    <span style="color: #4DADB8; font-size: 11px; font-weight: 600; letter-spacing: 0.11px;">PIANO MATE 指導師資</span>
+                </div>
+            </div>
+
+            <!-- 教師大頭照與姓名領域 -->
+            <div style="align-self: stretch; border-radius: 24px; display: flex; justify-content: flex-start; align-items: flex-start; gap: 14px; background: white; padding: 16px; box-shadow: 0 4px 16px rgba(44, 42, 41, 0.03);">
+                <img style="width: 140px; height: 140px; border-radius: 20px; object-fit: cover; border: 2px solid #FAF6F0;" src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="color: #2B3049; font-size: 24px; font-family: 'Noto Serif TC', serif; font-weight: 700;">張芷嫣</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <span style="display: inline-block; width: fit-content; padding: 3px 10px; background: rgba(181, 142, 190, 0.20); border-radius: 10px; border: 1px #B58EBE solid; color: #B58EBE; font-size: 11px; font-weight: 600;">伴奏鋼琴</span>
+                        <span style="display: inline-block; width: fit-content; padding: 3px 10px; background: rgba(181, 142, 190, 0.20); border-radius: 10px; border: 1px #B58EBE solid; color: #B58EBE; font-size: 11px; font-weight: 600;">音樂理論教學</span>
+                        <span style="display: inline-block; width: fit-content; padding: 3px 10px; background: rgba(181, 142, 190, 0.20); border-radius: 10px; border: 1px #B58EBE solid; color: #B58EBE; font-size: 11px; font-weight: 600;">室內樂鋼琴</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 教師簡歷 -->
+            <div style="align-self: stretch; padding: 20px; background: white; box-shadow: 0px 4px 16px rgba(44, 42, 41, 0.03); border-radius: 24px; display: flex; flex-direction: column; gap: 16px;">
+                <div style="color: #6F6F6F; font-size: 13px; line-height: 1.6; font-weight: 400;">
+                    國立師大音樂系碩士，主修鋼琴，副修豎笛。<br />
+                    音樂教學資歷 10 年，培養超過 30 位學生錄取音樂專班。<br />
+                    曾擔任國內多所音樂廳特約首席伴奏，擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的合奏藝術。
+                </div>
+
+                <div style="height: 1px; background: #F0EAE1;"></div>
+
+                <!-- 社群關注 -->
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="color: #B58EBE; font-size: 14px; font-family: 'Noto Serif TC', serif; font-weight: 600;">社群關注</div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="https://instagram.com" target="_blank" style="width: 36px; height: 36px; background: rgba(181, 142, 190, 0.20); border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; color: #B58EBE; font-size: 14px;">📸</a>
+                        <a href="https://facebook.com" target="_blank" style="width: 36px; height: 36px; background: rgba(181, 142, 190, 0.20); border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; color: #B58EBE; font-size: 14px;">📘</a>
+                        <a href="https://youtube.com" target="_blank" style="width: 36px; height: 36px; background: rgba(181, 142, 190, 0.20); border-radius: 50%; display: flex; justify-content: center; align-items: center; text-decoration: none; color: #B58EBE; font-size: 14px;">▶️</a>
+                    </div>
+                </div>
+
+                <div class="btn-action" onclick="openModal()" style="align-self: stretch; padding: 14px; background: #B58EBE; border-radius: 16px; display: flex; justify-content: center; align-items: center; color: white; font-size: 15px; font-weight: 600;">
+                    預約試上課程
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁尾 -->
+        <div style="align-self: stretch; padding: 20px 16px 24px 16px; border-top: 1px #F0EAE1 solid; margin-top: auto; display: flex; justify-content: center; align-items: center;">
+            <div style="color: #8C827A; font-size: 11px; text-align: center;">© 2026 MusiMate. All rights reserved.</div>
+        </div>
+    </div>
+
+    <!-- 2. 頂層 Modal：新生預約試上彈窗 -->
+    <div id="trialModalOverlay" style="width: 100%; height: 100%; padding: 16px; left: 0px; top: 0px; position: absolute; background: rgba(0, 0, 0, 0.50); backdrop-filter: blur(2px); display: flex; justify-content: center; align-items: center; z-index: 100; overflow-y: auto;">
+        <div style="width: 100%; max-width: 370px; padding: 20px; background: white; box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25); border-radius: 24px; display: flex; flex-direction: column; gap: 14px; margin: auto;">
+            <!-- 彈窗 Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 10px; height: 10px; background: linear-gradient(180deg, rgba(201, 162, 89, 0.8) 0%, rgba(213, 204, 105, 0.8) 24%, rgba(104, 197, 171, 0.8) 50%, rgba(97, 147, 203, 0.8) 77%, rgba(187, 101, 178, 0.8) 100%); border-radius: 5px;"></div>
+                    <div style="color: #2B3049; font-size: 17px; font-weight: 700;">新生預約試上 (LINE 免帳密)</div>
+                </div>
+                <div class="btn-action" onclick="handleCancel()" style="width: 30px; height: 30px; background: #FAF6F0; border-radius: 15px; justify-content: center; align-items: center; display: flex; cursor: pointer; color: #2B3049; font-size: 13px;">
+                    ✕
+                </div>
+            </div>
+
+            <!-- 新生填寫資料 -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; gap: 8px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 700; color: #6F6F6F;">學員姓名 *</label>
+                        <input type="text" id="trialStudentName" class="form-input" placeholder="例如：林小雨" value="林小雨" required />
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 12px; font-weight: 700; color: #6F6F6F;">聯絡手機 *</label>
+                        <input type="tel" id="trialStudentPhone" class="form-input" placeholder="0912-345-678" value="0912-345-678" required />
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 12px; font-weight: 700; color: #6F6F6F;">目前學習基礎</label>
+                    <select id="trialLevel" class="form-input" style="cursor: pointer;">
+                        <option value="beginner">零基礎入門體驗</option>
+                        <option value="elementary">初學 1 年以內</option>
+                        <option value="intermediate">有 2-3 年經驗 / 想進階精修</option>
+                        <option value="exam">音樂班備考 / 比賽指導</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 選擇試上時間 -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="color: #6F6F6F; font-size: 12px; font-weight: 700;">選擇張老師開放時段 (30分鐘)</div>
+                <select id="trialTimeSelect" class="form-input" style="cursor: pointer;">
+                    <!-- JS 動態填入 -->
+                </select>
+            </div>
+
+            <!-- 試上費用提示 -->
+            <div style="padding: 10px 12px; background: rgba(206, 171, 152, 0.12); border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #6F6F6F; font-size: 12px; font-weight: 600;">初次試上體驗費用</span>
+                <div>
+                    <span style="color: #CEAB98; font-size: 15px; font-weight: 800;">免費 </span>
+                    <span style="color: #8C827A; font-size: 11px; text-decoration: line-through;">(原價 NT$ 800)</span>
+                </div>
+            </div>
+
+            <!-- 按鈕區 -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 2px;">
+                <div class="btn-action" onclick="handleSubmit()" style="padding: 12px; background: #CEAB98; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: white; font-size: 14px; font-weight: 700;">
+                    立即送出預約
+                </div>
+                <div class="btn-action" onclick="handleCancel()" style="padding: 10px; background: #FAF6F0; border-radius: 12px; display: flex; justify-content: center; align-items: center; color: #6F6F6F; font-size: 13px; font-weight: 700;">
+                    取消返回
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Home Bar -->
+    <div style="width: 100%; height: 34px; margin-top: auto; display: flex; justify-content: center; align-items: center;">
+        <div style="width: 140px; height: 5px; background: #1E2238; border-radius: 10px;"></div>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById('trialModalOverlay').style.display = 'flex';
+}
+
+function handleCancel() {
+    location.href = 'teacher_info.html';
+}
+
+function handleSubmit() {
+    const name = document.getElementById('trialStudentName').value.trim() || '新生學員';
+    const phone = document.getElementById('trialStudentPhone').value.trim();
+    const timeSelect = document.getElementById('trialTimeSelect');
+    const selectedSlotIso = timeSelect.value;
+    const timeText = timeSelect.selectedOptions[0]?.text || '';
+
+    if (!selectedSlotIso) {
+        alert('請先選擇試上時段！');
+        return;
+    }
+
+    if (window.MusiMateDB) {
+        // 1. 模擬 LINE LIFF 自動註冊或比對此新生
+        const liffProfile = {
+            userId: 'U-trial-' + Date.now(),
+            displayName: name,
+            pictureUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
+        };
+        const authResult = window.MusiMateDB.authLiffUser(liffProfile);
+
+        // 2. 寫入預約課表
+        const start = new Date(selectedSlotIso);
+        const trialEnd = new Date(start.getTime() + 30 * 60 * 1000); // 30分鐘
+        
+        const y = start.getFullYear();
+        const m = String(start.getMonth() + 1).padStart(2, '0');
+        const d = String(start.getDate()).padStart(2, '0');
+        const sh = String(start.getHours()).padStart(2, '0');
+        const sm = String(start.getMinutes()).padStart(2, '0');
+        const eh = String(trialEnd.getHours()).padStart(2, '0');
+        const em = String(trialEnd.getMinutes()).padStart(2, '0');
+
+        window.MusiMateDB.addAppointment({
+            student_id: authResult.student.id,
+            student_name: name,
+            start_time: `${y}-${m}-${d}T${sh}:${sm}:00+08:00`,
+            end_time: `${y}-${m}-${d}T${eh}:${em}:00+08:00`,
+            instrument: '鋼琴 (Piano) · 試上',
+            location: '音符琴房 A301',
+            payment_status: 'paid', // 試上免費已預付
+            payment_type: 'trial_free',
+            memo_notes: `新生預約試上 (電話: ${phone})`
+        });
+    }
+
+    alert(`🎉 恭喜 ${name}！新生試上預約成功！\n\n【張芷嫣老師 · 鋼琴一對一試上體驗】\n預約時段：${timeText}\n\n系統已自動為您建立學員檔案，試上確認通知與琴房指引已傳送至您的 LINE！\n上完試上課後將收到專屬聯絡簿與續課建議！`);
+    location.href = '../test_uiredesign/schedule.html';
+}
+
+function formatTrialSlotOption(startIso, endIso, loc) {
+    const d = new Date(startIso);
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const w = weekdays[d.getDay()];
+    const s = new Date(startIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const trialEnd = new Date(new Date(startIso).getTime() + 30 * 60 * 1000);
+    const e = trialEnd.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${String(month).padStart(2, '0')}/${String(date).padStart(2, '0')} (${w}) ${s} - ${e} (${loc || '音符琴房 A301'})`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const select = document.getElementById('trialTimeSelect');
+    if (window.MusiMateDB) {
+        const slots = window.MusiMateDB.getAvailableSlots();
+        if (slots.length > 0) {
+            select.innerHTML = slots.map(s => `
+                <option value="${s.start_time}">${formatTrialSlotOption(s.start_time, s.end_time, s.location)}</option>
+            `).join('');
+        } else {
+            select.innerHTML = '<option value="">本週開放時段已滿，請洽張老師</option>';
+        }
+    }
+});
+</script>
+
+</body>
+</html>

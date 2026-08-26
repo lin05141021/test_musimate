@@ -1,0 +1,967 @@
+/* ============================================================
+   MusiMate 課表系統共用樣式庫 (Schedule Stylesheet)
+   整合: 老師端每週課表 (schedule.html)
+        學生端課表 (student_schedule.html)
+        學生端調課 Modal (student_changeclass.html)
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. 基礎重設與全域設定 (Global & Base)
+   ------------------------------------------------------------ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #FAF6F0;
+    font-family: var(--font-family-sans, 'Noto Sans TC', -apple-system, sans-serif);
+    color: #2B3049;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    min-height: 100vh;
+}
+
+body.mobile-view {
+    background: #EAE6DF;
+    padding: 24px 12px;
+    align-items: flex-start;
+}
+
+/* ------------------------------------------------------------
+   2. 老師端桌面外框 (Desktop Teacher Layout - 1440px)
+   ------------------------------------------------------------ */
+.main-container {
+    width: 1440px;
+    min-height: 1280px;
+    padding-bottom: 60px;
+    background: #FAF6F0;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.content-area {
+    padding: 0 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ------------------------------------------------------------
+   3. 導航列組件 (Navbar Components - 對齊 UI/component/navbar.html)
+   ------------------------------------------------------------ */
+.navbar-container {
+    width: 1440px;
+    height: 88px;
+    padding-left: 80px;
+    padding-right: 80px;
+    border-bottom: 1px #F0EAE1 solid;
+    background: #FAF6F0 url('../../UI/water_color.png') center/cover no-repeat;
+    justify-content: space-between;
+    align-items: center;
+    display: inline-flex;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.navbar-logo-img {
+    height: 42px;
+    width: auto;
+    border-radius: 100px;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nav-links {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 28px;
+    display: flex;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.nav-item {
+    padding: 8px 18px;
+    border-radius: 100px;
+    color: #2B3049;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.85);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(43, 48, 73, 0.08);
+    backdrop-filter: blur(4px);
+}
+
+.nav-avatar-box {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    border-radius: 100px;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background: #FAF6F0;
+    cursor: pointer;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.nav-avatar-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ------------------------------------------------------------
+   4. 老師端標題卡與週次切換 (Header & Date Switcher)
+   ------------------------------------------------------------ */
+.header-card {
+    width: 100%;
+    padding: 14px 32px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #EFECE6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-title {
+    color: #CEAB98;
+    font-size: 28px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+}
+
+.week-switcher {
+    padding: 6px;
+    background: #FAF6F0;
+    border-radius: 24px;
+    border: 1px solid #EFECE6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-week-nav {
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4A3A31;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.week-label-badge {
+    padding: 8px 20px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.3;
+}
+
+.btn-add-slot {
+    padding: 12px 24px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(206, 171, 152, 0.25);
+    transition: background 0.2s;
+}
+
+.btn-add-slot:hover {
+    background: #C29D89;
+}
+
+/* ------------------------------------------------------------
+   5. 課表設定表單 (Schedule Setting Form)
+   ------------------------------------------------------------ */
+.setting-card {
+    width: 100%;
+    padding: 20px 32px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #EFECE6;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.setting-title {
+    color: #2B3049;
+    font-size: 22px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+}
+
+.setting-form {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    color: #7A736E;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-select,
+.form-input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    border: 1px solid #EFECE6;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2B3049;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-select:focus,
+.form-input:focus {
+    border-color: #CEAB98;
+}
+
+.time-range-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 150px;
+}
+
+.btn-save-recurring {
+    padding: 10px 18px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.btn-save-recurring:hover {
+    background: #C29D89;
+}
+
+.btn-save-slot {
+    padding: 10px 18px;
+    background: #FAF6F0;
+    color: #2B3049;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid #EFECE6;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.btn-save-slot:hover {
+    background: #EFECE6;
+}
+
+/* ------------------------------------------------------------
+   6. 7-Day 課表格狀矩陣 (7-Day Timetable Grid)
+   ------------------------------------------------------------ */
+.grid-card {
+    width: 100%;
+    min-height: 680px;
+    padding: 24px 32px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #FAF6F0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.day-header-row {
+    display: flex;
+    gap: 12px;
+}
+
+.time-block-label-col {
+    width: 44px;
+}
+
+.day-header-cell {
+    flex: 1;
+    padding: 8px 0;
+    background: #FAF6F0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.day-header-cell.active-day {
+    background: #CEAB98;
+}
+
+.day-header-cell.active-day .day-date,
+.day-header-cell.active-day .day-name {
+    color: white;
+}
+
+.day-date {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2B3049;
+}
+
+.day-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7A736E;
+}
+
+.grid-body {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+}
+
+.time-icon-col {
+    width: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.time-icon-block {
+    flex: 1;
+    min-height: 170px;
+    background: #FAF6F0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font-size: 18px;
+    color: #CEAB98;
+}
+
+.time-icon-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #7A736E;
+    writing-mode: vertical-rl;
+}
+
+.day-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.day-column.active-col {
+    border-radius: 16px;
+    outline: 2px solid rgba(206, 171, 152, 0.6);
+    outline-offset: -2px;
+}
+
+.cell-block {
+    flex: 1;
+    min-height: 170px;
+    padding: 8px;
+    background: #FAF6F0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.cell-block:hover {
+    background: #F4EFE6;
+}
+
+.cell-items-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.btn-plus-slot {
+    width: 100%;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #8C827A;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-plus-slot:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: #2B3049;
+}
+
+/* ------------------------------------------------------------
+   7. 學生色彩規範卡片 (Student Card Palette - 對齊 style_0824.css)
+   ------------------------------------------------------------ */
+.lesson-card {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border-left: 4px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* Lin (林同學): 薰衣草淡紫 */
+.card-lin { background: #F3E5F5; border-color: #9C27B0; }
+.card-lin .card-title { color: #6A1B9A; font-weight: 800; font-size: 12px; }
+.card-lin .card-subtitle { color: #8E24AA; font-size: 11px; font-weight: 600; }
+.card-lin .card-meta { color: #7B1FA2; font-size: 10px; font-weight: 500; }
+
+/* Charles (查爾斯): 薄荷嫩綠 */
+.card-charles { background: #E8F5E9; border-color: #4CAF50; }
+.card-charles .card-title { color: #1B5E20; font-weight: 800; font-size: 12px; }
+.card-charles .card-subtitle { color: #2E7D32; font-size: 11px; font-weight: 600; }
+.card-charles .card-meta { color: #388E3C; font-size: 10px; font-weight: 500; }
+
+/* Johnny (強尼): 溫潤暖橙 */
+.card-johnny { background: #FFF3E0; border-color: #FF9800; }
+.card-johnny .card-title { color: #E65100; font-weight: 800; font-size: 12px; }
+.card-johnny .card-subtitle { color: #F57C00; font-size: 11px; font-weight: 600; }
+.card-johnny .card-meta { color: #EF6C00; font-size: 10px; font-weight: 500; }
+
+/* 小明: 天藍 */
+.card-ming { background: #E3F2FD; border-color: #2196F3; }
+.card-ming .card-title { color: #0D47A1; font-weight: 800; font-size: 12px; }
+.card-ming .card-subtitle { color: #1565C0; font-size: 11px; font-weight: 600; }
+.card-ming .card-meta { color: #1976D2; font-size: 10px; font-weight: 500; }
+
+/* 小華: 靛紫 */
+.card-hua { background: #EDE7F6; border-color: #673AB7; }
+.card-hua .card-title { color: #311B92; font-weight: 800; font-size: 12px; }
+.card-hua .card-subtitle { color: #4527A0; font-size: 11px; font-weight: 600; }
+.card-hua .card-meta { color: #512DA8; font-size: 10px; font-weight: 500; }
+
+/* 開放自選時段卡片 */
+.slot-card {
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.75);
+    border-left: 4px solid #CEAB98;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.slot-title { color: #6F6F6F; font-size: 11px; font-weight: 700; }
+.slot-time { color: #2B3049; font-size: 11px; font-weight: 600; }
+.slot-location { color: #8C827A; font-size: 10px; font-weight: 500; }
+
+/* ------------------------------------------------------------
+   8. 學生端手機外框與課表卡片 (Mobile RWD Layout & Cards)
+   ------------------------------------------------------------ */
+.mobile-frame {
+    width: 402px;
+    min-height: 874px;
+    background: #FAF6F0;
+    border-radius: 40px;
+    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #FAF6F0;
+}
+
+.status-bar {
+    width: 100%;
+    height: 44px;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2B3049;
+}
+
+.nav-header {
+    width: 100%;
+    height: 64px;
+    padding: 0 20px;
+    background: #FAF6F0;
+    border-bottom: 1px solid #F0EBE1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+    font-size: 16px;
+    color: #2B3049;
+}
+
+.brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #CEAB98;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.student-select {
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #E5DEC9;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #2B3049;
+    outline: none;
+    cursor: pointer;
+}
+
+.main-content {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-header {
+    text-align: center;
+}
+
+.page-subtitle {
+    font-size: 12px;
+    color: #8C827A;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lesson-item {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #F0EAE1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.lesson-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.date-badge {
+    min-width: 50px;
+    text-align: center;
+    font-family: var(--font-family-sans, 'Noto Sans TC', sans-serif);
+    color: #2B3049;
+    font-weight: 700;
+}
+
+.date-badge .day-number { font-size: 16px; line-height: 1.1; }
+.date-badge .day-weekday { font-size: 12px; color: #7A7471; }
+
+.lesson-card-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-card {
+    width: 100%;
+    padding: 12px;
+    background: rgba(130, 170, 216, 0.25);
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.info-card-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.time-text {
+    color: #2B3049;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Sora', sans-serif;
+}
+
+.course-title {
+    color: #2B3049;
+    font-size: 14px;
+    font-weight: 800;
+    font-family: 'Sora', sans-serif;
+}
+
+.location-text {
+    color: #556080;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Sora', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.payment-pill {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: white;
+    border: 1px solid #C8D8EC;
+    color: #2B3049;
+}
+
+.music-gradient-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #C9A259 0%, #D5CC69 24%, #68C5AB 50%, #6193CB 77%, #BB65B2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-reschedule {
+    width: 100%;
+    padding: 8px 12px;
+    background: #FAF6F0;
+    border-radius: 8px;
+    text-align: center;
+    color: #6F6F6F;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid #E5DEC9;
+    transition: all 0.2s;
+}
+
+.btn-reschedule:hover {
+    background: #F0EAE1;
+    color: #2B3049;
+}
+
+.list-end-hint {
+    text-align: center;
+    padding: 8px 0;
+    color: #8C827A;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.btn-book-new {
+    width: 100%;
+    padding: 12px 14px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(206, 171, 152, 0.35);
+    transition: background 0.2s;
+}
+
+.btn-book-new:hover {
+    background: #C29D89;
+}
+
+.home-bar-wrapper {
+    width: 100%;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+.home-bar {
+    width: 140px;
+    height: 5px;
+    background: #2B3049;
+    border-radius: 10px;
+}
+
+/* ------------------------------------------------------------
+   9. 調課確認 Modal (Reschedule Modal Overlay)
+   ------------------------------------------------------------ */
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 370px;
+    background: white;
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    animation: modalSlideUp 0.25s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #F0EBE1;
+    padding-bottom: 8px;
+}
+
+.modal-title {
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: #2B3049;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-modal {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    background: #FAF6F0;
+    border: none;
+    color: #2B3049;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-close-modal:hover {
+    background: #EFECE6;
+}
+
+.form-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.original-lesson-box {
+    padding: 12px;
+    background: #FAF6F0;
+    border-radius: 12px;
+    color: #2B3049;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid #EFECE6;
+    line-height: 1.4;
+}
+
+.slot-select-box {
+    width: 100%;
+    padding: 12px;
+    background: white;
+    border-radius: 12px;
+    border: 1.5px solid #E5DEC9;
+    color: #2B3049;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-submit-reschedule {
+    flex: 1;
+    padding: 12px 6px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(206, 171, 152, 0.3);
+    transition: background 0.2s;
+}
+
+.btn-submit-reschedule:hover {
+    background: #C29D89;
+}
+
+.btn-take-leave {
+    flex: 1;
+    padding: 12px 6px;
+    background: #FAF6F0;
+    color: #6F6F6F;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid #E5DEC9;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.2s;
+}
+
+.btn-take-leave:hover {
+    background: #F0EAE1;
+    color: #2B3049;
+}
+
+.alert-msg {
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.alert-success {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #C8E6C9;
+}
+
+/* ------------------------------------------------------------
+   10. 頁尾組件 (Footer)
+   ------------------------------------------------------------ */
+.footer {
+    width: 1440px;
+    padding: 32px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #F0EAE1;
+    font-size: 13px;
+    color: #6F6F6F;
+}
+
+/* ------------------------------------------------------------
+   11. 動畫 (Keyframes)
+   ------------------------------------------------------------ */
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}

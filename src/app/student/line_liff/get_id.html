@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MusiMate 學生 ID 查詢工具</title>
+  <!-- LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl shadow-xl p-7 max-w-sm w-full text-center border border-slate-100">
+    <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-inner">
+      🎵
+    </div>
+    <h2 class="text-xl font-bold text-slate-800 mb-1">MusiMate 學生身分查詢</h2>
+    <p class="text-xs text-slate-500 mb-5">透過 LINE LIFF 自動讀取您的專屬 ID</p>
+
+    <!-- Loading 狀態 -->
+    <div id="loading" class="py-8 text-slate-400 text-sm animate-pulse flex flex-col items-center gap-2">
+      <div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      <span>正在連線 LINE 讀取您的身分...</span>
+    </div>
+
+    <!-- 讀取成功結果 -->
+    <div id="result" class="hidden">
+      <img id="avatar" class="w-20 h-20 rounded-full mx-auto mb-3 border-2 border-emerald-500 shadow-md object-cover" src="" />
+      <h3 id="name" class="font-bold text-lg text-slate-800 mb-2"></h3>
+      
+      <div class="bg-slate-100 p-3 rounded-2xl mb-4 text-left border border-slate-200">
+        <div class="text-xs text-slate-500 font-semibold mb-1">您的專屬 LINE User ID：</div>
+        <div id="userId" class="text-xs font-mono font-bold text-emerald-700 break-all select-all bg-white p-2 rounded-lg border border-slate-200"></div>
+      </div>
+
+      <button id="copyBtn" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2">
+        <span>📋 點我複製 User ID</span>
+      </button>
+      <div id="copiedNotice" class="text-xs text-emerald-600 font-bold mt-2 hidden">✅ 已成功複製到剪貼簿！</div>
+    </div>
+  </div>
+
+  <script>
+    // 您的專屬 LIFF ID
+    const LIFF_ID = "2011164851-ycZLTOJv";
+
+    async function main() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+        const profile = await liff.getProfile();
+        document.getElementById("loading").classList.add("hidden");
+        document.getElementById("result").classList.remove("hidden");
+        
+        document.getElementById("avatar").src = profile.pictureUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150";
+        document.getElementById("name").innerText = profile.displayName;
+        document.getElementById("userId").innerText = profile.userId;
+
+        document.getElementById("copyBtn").onclick = () => {
+          navigator.clipboard.writeText(profile.userId).then(() => {
+            document.getElementById("copiedNotice").classList.remove("hidden");
+            setTimeout(() => {
+              document.getElementById("copiedNotice").classList.add("hidden");
+            }, 3000);
+          });
+        };
+      } catch (err) {
+        document.getElementById("loading").innerHTML = "<span class='text-red-500 font-bold text-xs'>讀取失敗: " + err.message + "</span>";
+      }
+    }
+    main();
+  </script>
+</body>
+</html>
