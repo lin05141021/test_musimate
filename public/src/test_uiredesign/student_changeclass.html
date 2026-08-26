@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>調課確認 (學生端 Modal) - MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 統一共用樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="schedule_styles.css">
+    <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
+    <script src="../data/musimate_db.js"></script>
+</head>
+<body class="mobile-view">
+
+<div class="mobile-frame">
+    <div>
+        <!-- 頂部 iOS 狀態列 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 導航列 -->
+        <div class="nav-header">
+            <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'" style="cursor: pointer;">
+                <div class="brand-icon">🎵</div>
+                <span>MusiMate</span>
+            </div>
+            <span id="studentNamePill" style="font-size: 12px; font-weight: bold; color: #7B1FA2; background: #F3E5F5; padding: 4px 10px; border-radius: 12px;">Lin (林同學)</span>
+        </div>
+
+        <!-- 頁面主內容 (底層課表) -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">我的課表</h1>
+                <p id="changeClassSubtitle" class="page-subtitle">張老師 · 預約課堂清單 (點擊可調課)</p>
+            </div>
+
+            <!-- 課表清單 (由 JS 動態渲染) -->
+            <div id="appointmentListContainer" class="lesson-list"></div>
+
+            <div style="text-align: center; color: #8C827A; font-size: 12px; font-weight: 700; padding: 6px 0;">無新的預約課程了</div>
+        </div>
+    </div>
+
+    <!-- 底部 Home Bar -->
+    <div class="home-bar-wrapper">
+        <div class="home-bar"></div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 調課確認 Modal (由 JS 控制動態開啟/關閉與欄位填充)       -->
+    <!-- ======================================================== -->
+    <div id="rescheduleModal" class="modal-overlay">
+        <div class="modal-card">
+            <!-- Modal 標題與關閉按鈕 -->
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🔄</span>
+                    <span>調課 / 請假確認</span>
+                </div>
+                <button class="btn-close-modal" onclick="closeRescheduleModal()">✖</button>
+            </div>
+
+            <!-- 即時操作提示 -->
+            <div id="feedbackBox" style="display: none;"></div>
+
+            <!-- 原課程資訊 (JS 動態填入) -->
+            <div class="form-block">
+                <label class="form-label">原預約課程資訊</label>
+                <div id="originalLessonInfo" class="original-lesson-box">
+                    載入中...
+                </div>
+            </div>
+
+            <!-- 可調課時段下拉選單 (JS 動態填入張老師開放時段) -->
+            <div class="form-block">
+                <label class="form-label">直接改調其他開放時段</label>
+                <select id="slotSelector" class="slot-select-box"></select>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="modal-buttons">
+                <button class="btn-submit-reschedule" onclick="submitReschedule()">確認直接調課</button>
+                <button class="btn-take-leave" onclick="submitLeave()">先請假 (時數自動保留待補課)</button>
+            </div>
+
+            <div style="text-align: center; color: #999999; font-size: 11px; line-height: 1.4;">
+                💡 依教室規範，開課 24 小時前可免費線上調課或請假，請假後原時段將釋放，時數保留無期限。
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSelectedAppointment = null;
+let currentStudentId = 's0000000-0000-0000-0000-000000000005';
+
+function formatDate(isoStr) {
+    const d = new Date(isoStr);
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const w = weekdays[d.getDay()];
+    return {
+        monthDay: `${month}/${date}`,
+        weekday: `(${w})`,
+        fullStr: `${String(month).padStart(2, '0')}/${String(date).padStart(2, '0')} (週${w})`
+    };
+}
+
+function formatTime(startIso, endIso) {
+    const s = new Date(startIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const e = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${s} - ${e}`;
+}
+
+function renderSchedule() {
+    if (!window.MusiMateDB) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const lessonId = urlParams.get('lesson_id');
+    const teacherSchedule = window.MusiMateDB.getTeacherSchedule();
+    
+    let targetAppt = teacherSchedule.appointments.find(a => a.id === lessonId);
+    if (!targetAppt) {
+        targetAppt = teacherSchedule.appointments.find(a => a.student_name.includes('Lin') || a.student_id.includes('5')) || teacherSchedule.appointments[0];
+    }
+
+    if (targetAppt) {
+        currentStudentId = targetAppt.student_id;
+        document.getElementById('studentNamePill').innerText = targetAppt.student_name;
+        document.getElementById('changeClassSubtitle').innerText = `張老師 · ${targetAppt.student_name} 課堂清單`;
+    }
+
+    const appts = window.MusiMateDB.getAppointmentsByStudent(currentStudentId);
+
+    const container = document.getElementById('appointmentListContainer');
+    container.innerHTML = appts.map(appt => {
+        const dateObj = formatDate(appt.start_time);
+        const timeSpan = formatTime(appt.start_time, appt.end_time);
+        const isLeave = appt.status === 'rescheduled';
+
+        return `
+        <div class="lesson-item">
+            <div class="date-badge" style="${isLeave ? 'background: #FFF8E1; border-color: #FFE082;' : ''}">
+                <div class="day-number" style="${isLeave ? 'color: #F57F17;' : ''}">${dateObj.monthDay}</div>
+                <div class="day-weekday" style="${isLeave ? 'color: #F57F17;' : ''}">${dateObj.weekday}</div>
+            </div>
+            <div class="lesson-card-right">
+                <div class="info-card" style="${isLeave ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
+                    <div class="info-card-left">
+                        <div class="time-text">${timeSpan}</div>
+                        <div class="course-title">${appt.student_name} - 張老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
+                        <div class="location-text">${appt.location || '音符琴房 A303'} · ${isLeave ? '📌 已請假 (時數保留)' : '✅ 正常上課'}</div>
+                    </div>
+                    <div class="music-gradient-icon">${isLeave ? '⏳' : '🎵'}</div>
+                </div>
+                <button class="btn-reschedule" style="${isLeave ? 'background: #FFF3E0; color: #E65100; border-color: #FFE082;' : ''}" onclick="openRescheduleModal('${appt.id}')">
+                    ${isLeave ? '重新安排補課時段' : '我要請假/調課'}
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function openRescheduleModal(appointmentId) {
+    if (!window.MusiMateDB) return;
+    const teacherSchedule = window.MusiMateDB.getTeacherSchedule();
+    const appt = teacherSchedule.appointments.find(a => a.id === appointmentId) || teacherSchedule.appointments[0];
+    if (!appt) return;
+
+    currentSelectedAppointment = appt;
+    currentStudentId = appt.student_id;
+
+    const dateObj = formatDate(appt.start_time);
+    const timeSpan = formatTime(appt.start_time, appt.end_time);
+
+    document.getElementById('originalLessonInfo').innerHTML = `
+        <div style="color: #2B3049; font-weight: 700; font-size: 14px;">${dateObj.fullStr} ${timeSpan}</div>
+        <div style="font-size: 12px; color: #7A7471; margin-top: 4px;">學員：${appt.student_name} · 地點：${appt.location} · 課程：${appt.instrument || '鋼琴'}</div>
+    `;
+
+    // 動態讀取張老師行事曆即時開放的空閒時段
+    const activeSlots = window.MusiMateDB.getAvailableSlots();
+
+    const select = document.getElementById('slotSelector');
+    if (activeSlots.length > 0) {
+        select.innerHTML = activeSlots.map(slot => {
+            const slotDate = formatDate(slot.start_time);
+            const slotTime = formatTime(slot.start_time, slot.end_time);
+            return `<option value="${slot.start_time}|${slot.end_time}|${slot.location}">${slotDate.fullStr} ${slotTime} (${slot.location})</option>`;
+        }).join('');
+    } else {
+        select.innerHTML = '<option value="">目前暫無其他開放時段，建議選擇先請假</option>';
+    }
+
+    document.getElementById('feedbackBox').style.display = 'none';
+    document.getElementById('rescheduleModal').style.display = 'flex';
+}
+
+function closeRescheduleModal() {
+    document.getElementById('rescheduleModal').style.display = 'none';
+    location.href = `student_schedule.html?student_id=${currentStudentId}`;
+}
+
+function submitReschedule() {
+    if (!currentSelectedAppointment || !window.MusiMateDB) return;
+
+    const select = document.getElementById('slotSelector');
+    if (!select.value) {
+        alert('請先選擇欲調整的新時段！');
+        return;
+    }
+
+    const [newStart, newEnd, newLocation] = select.value.split('|');
+
+    window.MusiMateDB.rescheduleAppointment(currentSelectedAppointment.id, {
+        start_time: newStart,
+        end_time: newEnd,
+        location: newLocation
+    });
+
+    const feedback = document.getElementById('feedbackBox');
+    feedback.className = 'alert-msg alert-success';
+    feedback.innerText = '✅ 調課已成功送出！原時段已釋放，新時段已同步更新至張老師課表。';
+    feedback.style.display = 'block';
+
+    setTimeout(() => {
+        closeRescheduleModal();
+    }, 1000);
+}
+
+function submitLeave() {
+    if (!currentSelectedAppointment || !window.MusiMateDB) return;
+
+    window.MusiMateDB.requestLeave(currentSelectedAppointment.id);
+
+    const feedback = document.getElementById('feedbackBox');
+    feedback.className = 'alert-msg alert-success';
+    feedback.innerText = '📌 請假已送出！該堂課時數已完整存入您的「已繳費未排時數」，原時段已釋放回開放時段池。';
+    feedback.style.display = 'block';
+
+    setTimeout(() => {
+        closeRescheduleModal();
+    }, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetLessonId = urlParams.get('lesson_id') || 'app-l1';
+    renderSchedule();
+    openRescheduleModal(targetLessonId);
+});
+</script>
+
+</body>
+</html>

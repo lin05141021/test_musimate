@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>發送催款通知 - 王大同 | MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="money_styles.css">
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='../newclass/newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡簽到功能即將推出！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="overview_checked.html" class="nav-item active" data-property-1="active">薪資看板</a>
+            <a href="../newclass/teacher_info.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師" onclick="location.href='../newclass/teacher_info.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. 主內容區 -->
+    <div class="content-area">
+        <!-- 頂部路徑與標題 -->
+        <div class="breadcrumb-group">
+            <div class="breadcrumb-path">
+                <span>繳費核銷中心</span>
+                <span>/</span>
+                <span style="color: #2B3049;">王大同 催款通知確認</span>
+            </div>
+            <div class="header-row">
+                <h1 class="page-title">發送繳費催款通知</h1>
+                <div class="badge-tag" style="color: #D9668C; background: #FDE2E2; font-size: 14px; font-weight: 700; padding: 6px 14px; border-radius: 100px;">
+                    ⚠️ 已逾期 5 天 (應繳日：2026/08/20)
+                </div>
+            </div>
+        </div>
+
+        <!-- 左右雙欄卡片 -->
+        <div class="detail-grid">
+            <!-- 左欄：逾期帳款紀錄 -->
+            <div class="detail-card-box">
+                <div class="detail-card-title">學生待繳學費明細</div>
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">學生姓名</div>
+                        <div class="info-pair-val">王大同 (成人古典班)</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">應繳費用項目</div>
+                        <div class="info-pair-val">8 月份成人鋼琴古典個別課 (4堂)</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">未繳金額</div>
+                        <div class="info-pair-val" style="font-size: 22px; color: #D9668C; font-family: var(--font-family-serif, serif);">NT$ 3,000</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">約定繳費期限</div>
+                        <div class="info-pair-val">2026 / 08 / 20</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">推播接收管道</div>
+                        <div class="info-pair-val">📱 LINE 官方帳號一對一推播</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右欄：LINE 智慧推播訊息預覽 -->
+            <div class="detail-card-box">
+                <div class="detail-header-row">
+                    <div class="detail-card-title">LINE 催款推播卡片預覽</div>
+                    <div style="font-size: 12px; color: #8C827A;">自動帶入學生專屬繳費代碼</div>
+                </div>
+                <div style="background: #F8F5F0; border-radius: 16px; padding: 20px; border: 1px solid #EFECE6; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="font-weight: 700; color: #2B3049; font-size: 15px;">【MusiMate 溫馨繳費提醒】</div>
+                    <div style="font-size: 13px; line-height: 1.6; color: #4A3A31;">
+                        親愛的 王大同 您好：<br>
+                        感謝您在張老師教室的用心練習！提醒您 8 月份「成人古典班」學費 <strong>NT$ 3,000</strong> 已到期。若您已匯款，請點擊下方按鈕上傳後五碼以利核銷；若尚未繳費，請於近日完成轉帳，謝謝您！
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 12px; border: 1px dashed #CEAB98; font-size: 12px; color: #6F6F6F;">
+                        🏦 教室匯款帳戶：國泰世華銀行 (013) 123-456-789012<br>
+                        戶名：張芷嫣
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作列 -->
+        <div class="action-bar">
+            <a href="overview_delay.html" class="btn-outline-back">◀ 返回尚未繳費清單</a>
+            <div style="display: flex; gap: 14px;">
+                <button class="btn-outline-back" onclick="handlePostpone()">寬限延期至 08/30</button>
+                <button class="btn-primary-confirm" style="background: #D9668C;" onclick="handleSendAlert()">立即發送 LINE 催款提醒</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     JavaScript 催款發送互動邏輯
+     ============================================================ -->
+<script>
+function handleSendAlert() {
+    localStorage.setItem('musimate_delayed_alerted_wang', 'true');
+    alert('📲 催款通知已成功發送！\n系統已透過 LINE 官方帳號將專屬繳費提醒卡片推播給 王大同。');
+    location.href = 'overview_delay.html';
+}
+
+function handlePostpone() {
+    alert('⏳ 已成功為 王大同 設定繳費寬限期至 2026/08/30！');
+    location.href = 'overview_delay.html';
+}
+</script>
+
+</body>
+</html>

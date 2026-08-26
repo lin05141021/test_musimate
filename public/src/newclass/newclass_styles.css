@@ -1,0 +1,413 @@
+/* ============================================================
+   MusiMate 新課程與名師專區共用樣式庫 (NewClass Stylesheet)
+   整合: 樂器選課首頁 (newclass_homepage.html)
+        師資詳細介紹 (teacher_info.html)
+        鋼琴專屬課程 (teacher_piano.html)
+        小提琴專屬課程 (teacher_violin.html)
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. 基礎重設與主容器 (Global & Layout)
+   ------------------------------------------------------------ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #FAF6F0;
+    font-family: var(--font-family-sans, 'Noto Sans TC', -apple-system, sans-serif);
+    color: #2B3049;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.main-container {
+    width: 1440px;
+    min-height: 1024px;
+    position: relative;
+    background: #FAF6F0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ------------------------------------------------------------
+   2. 導航列組件 (對齊 UI/component/navbar.html)
+   ------------------------------------------------------------ */
+.navbar-container {
+    width: 1440px;
+    height: 88px;
+    padding-left: 80px;
+    padding-right: 80px;
+    border-bottom: 1px #F0EAE1 solid;
+    background: #FAF6F0 url('../../UI/water_color.png') center/cover no-repeat;
+    justify-content: space-between;
+    align-items: center;
+    display: inline-flex;
+}
+
+.logo-box {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.navbar-logo-img {
+    height: 42px;
+    width: auto;
+    border-radius: 100px;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nav-links {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 36px;
+    display: flex;
+}
+
+.nav-item {
+    padding: 8px 18px;
+    border-radius: 100px;
+    color: #2B3049;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.85);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(43, 48, 73, 0.08);
+    backdrop-filter: blur(4px);
+}
+
+.nav-avatar-box {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    background: #CEAB98;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    overflow: hidden;
+}
+
+.nav-avatar-box:hover {
+    transform: scale(1.05);
+}
+
+/* ------------------------------------------------------------
+   3. Hero 區域 (Hero Section)
+   ------------------------------------------------------------ */
+.hero-section {
+    align-self: stretch;
+    padding-top: 72px;
+    padding-bottom: 20px;
+    padding-left: 80px;
+    padding-right: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+.badge-tag {
+    padding: 8px 16px;
+    background: rgba(77, 173, 184, 0.10);
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #4DADB8;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.hero-title {
+    width: 800px;
+    color: #2B3049;
+    font-size: 52px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.hero-desc {
+    width: 640px;
+    color: #2B3049;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.section-container {
+    align-self: stretch;
+    padding: 32px 80px 72px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+}
+
+.section-heading {
+    color: #2B3049;
+    font-size: 32px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ------------------------------------------------------------
+   4. 樂器選擇卡片網格 (Instrument Cards Grid)
+   ------------------------------------------------------------ */
+.instrument-grid {
+    align-self: stretch;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.instrument-card {
+    width: 302px;
+    height: 420px;
+    padding: 24px;
+    background: white;
+    box-shadow: 0px 8px 24px rgba(44, 42, 41, 0.03);
+    border-radius: 24px;
+    border: 1px solid #F0EAE1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.25s, box-shadow 0.25s;
+    cursor: pointer;
+}
+
+.instrument-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0px 12px 32px rgba(44, 42, 41, 0.08);
+}
+
+.instrument-img-box {
+    width: 254px;
+    height: 240px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-size: 64px;
+}
+
+.instrument-title {
+    color: #2B3049;
+    font-size: 24px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+}
+
+.btn-learn {
+    padding: 8px 20px;
+    border-radius: 16px;
+    border: 1px solid;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+/* ------------------------------------------------------------
+   5. 師資名卡卡片網格 (Teacher Cards Grid)
+   ------------------------------------------------------------ */
+.teacher-grid {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.teacher-card {
+    align-self: stretch;
+    padding: 28px;
+    background: white;
+    box-shadow: 0px 8px 24px rgba(44, 42, 41, 0.04);
+    border-radius: 24px;
+    border: 1px solid #FAF6F0;
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    transition: box-shadow 0.25s;
+}
+
+.teacher-card:hover {
+    box-shadow: 0px 12px 32px rgba(44, 42, 41, 0.08);
+}
+
+.teacher-avatar-box {
+    width: 312px;
+    height: 312px;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+    flex-shrink: 0;
+}
+
+.teacher-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.teacher-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.teacher-name {
+    color: #2B3049;
+    font-size: 26px;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    font-weight: 700;
+}
+
+.tag-pill {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+.teacher-bio {
+    color: #2B3049;
+    font-size: 14px;
+    line-height: 1.65;
+    font-weight: 500;
+}
+
+.btn-book-course {
+    padding: 12px 28px;
+    background: #CEAB98;
+    color: white;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(206, 171, 152, 0.3);
+    transition: background 0.2s, transform 0.1s;
+    align-self: flex-start;
+}
+
+.btn-book-course:hover {
+    background: #C29D89;
+    transform: translateY(-1px);
+}
+
+/* ------------------------------------------------------------
+   6. 師資個人詳細介紹頁專用 (Teacher Detail Info Page)
+   ------------------------------------------------------------ */
+.detail-card {
+    width: 100%;
+    padding: 32px;
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #EFECE6;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.experience-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.experience-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2B3049;
+    font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+    border-left: 4px solid #CEAB98;
+    padding-left: 10px;
+}
+
+.experience-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14px;
+    color: #4A3A31;
+    line-height: 1.6;
+}
+
+.experience-list li {
+    position: relative;
+    padding-left: 18px;
+}
+
+.experience-list li::before {
+    content: "•";
+    color: #CEAB98;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* ------------------------------------------------------------
+   7. 頁尾組件 (Footer)
+   ------------------------------------------------------------ */
+.footer {
+    width: 1440px;
+    padding: 48px 80px 32px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #F0EAE1;
+    font-size: 13px;
+    color: #6F6F6F;
+    background: #FAF6F0;
+}

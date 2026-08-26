@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>張芷嫣老師 - 師資詳細介紹與課程預約 | MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="newclass_styles.css">
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡簽到功能即將推出！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="../money/overview_checked.html" class="nav-item" data-property-1="defult">薪資看板</a>
+            <a href="teacher_info_edit.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師檔案 (點擊編輯)" onclick="location.href='teacher_info_edit.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. Hero 區塊 -->
+    <div class="hero-section" style="padding-top: 40px; padding-bottom: 16px;">
+        <div class="badge-tag">
+            <span>✦</span>
+            <span>PIANO & VIOLIN MASTER</span>
+        </div>
+        <h1 id="teacherNameBanner" class="hero-title" style="font-size: 38px;">張芷嫣 · 名師專欄介紹</h1>
+        
+        <!-- 核心切換模式膠囊 (View ⇄ Edit Mode Switcher) -->
+        <div id="modeSwitcherWrap" style="display: flex; justify-content: center; margin-top: 16px;">
+            <div style="background: white; border-radius: 100px; padding: 6px 8px; box-shadow: 0 4px 16px rgba(44, 42, 41, 0.06); display: inline-flex; gap: 8px; align-items: center; border: 1px solid #F0EAE1;">
+                <button style="padding: 8px 20px; border-radius: 100px; background: #2B3049; color: white; font-size: 14px; font-weight: 700; border: none; cursor: default; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(43, 48, 73, 0.2);">
+                    👁️ 預覽檢視模式
+                </button>
+                <button onclick="location.href='teacher_info_edit.html'" style="padding: 8px 20px; border-radius: 100px; background: transparent; color: #7A736E; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#F3E5F5'; this.style.color='#7B1FA2';" onmouseout="this.style.background='transparent'; this.style.color='#7A736E';">
+                    ✏️ 切換編輯檔案
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 教師詳細名片區塊 (由 JS 自動讀取資料庫渲染) -->
+    <div class="section-container" style="padding-top: 10px;">
+        <div id="teacherProfileCardContainer" style="width: 100%; max-width: 1280px;">
+            <!-- JS 動態渲染區塊 -->
+        </div>
+    </div>
+
+    <!-- 4. 教學理念與經歷區塊 -->
+    <div class="section-container" style="padding-top: 0;">
+        <div class="detail-card" style="max-width: 1280px;">
+            <div class="experience-block">
+                <div class="experience-title">學歷背景與演奏文憑 (Education & Diplomas)</div>
+                <ul class="experience-list">
+                    <li>奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)</li>
+                    <li>國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)</li>
+                    <li>曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧</li>
+                </ul>
+            </div>
+
+            <div class="experience-block">
+                <div class="experience-title">教學成果與教學特色 (Teaching Highlights)</div>
+                <ul class="experience-list">
+                    <li>10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所</li>
+                    <li>特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材</li>
+                    <li>結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確</li>
+                </ul>
+            </div>
+
+            <!-- 開放預約時段快速入口 -->
+            <div style="padding-top: 16px; border-top: 1px solid #F0EAE1; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-weight: 700; font-size: 16px; color: #2B3049;">想與張芷嫣老師一起展開音樂旅程？</div>
+                    <div style="font-size: 13px; color: #7A736E; margin-top: 2px;">本週尚有開放試聽與預約名額，歡迎線上預約。</div>
+                </div>
+                <button class="btn-book-course" onclick="location.href='newstudent_newclass.html'">
+                    <span>立即免費預約試上體驗</span>
+                    <span>➔</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     JavaScript 動態資料庫欄位綁定與渲染引擎
+     ============================================================ -->
+<script>
+// 1. 教師資料庫資料模型
+const teacherProfile = {
+    id: 't-chang',
+    name: '張芷嫣',
+    user_id: 'u0000000-0000-0000-0000-000000000002',
+    instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
+    tags: ['伴奏鋼琴', '音樂班專業', '音樂素養'],
+    tag_color: '#B58EBE',
+    tag_bg: 'rgba(181, 142, 190, 0.15)',
+    avatar_url: '../../UI/teacher_avatar.png',
+    bio: '國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。',
+    social_links: [
+        { label: 'Instagram', icon: '📷', url: 'https://instagram.com/chihyen_piano' },
+        { label: 'Facebook', icon: '📘', url: 'https://facebook.com/chihyen.piano' },
+        { label: 'YouTube', icon: '▶️', url: 'https://youtube.com/c/chihyen_studio' }
+    ]
+};
+
+// 2. 動態渲染教師卡片
+function renderTeacherProfile() {
+    // 優先讀取使用者於 teacher_info_edit.html 儲存的客製檔案
+    const saved = localStorage.getItem('musimate_teacher_profile');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.name) teacherProfile.name = data.name;
+            if (data.instruments) teacherProfile.instrument = data.instruments;
+            if (data.bio) teacherProfile.bio = data.bio;
+            if (data.avatar) teacherProfile.avatar_url = data.avatar;
+            if (data.tags && data.tags.length > 0) teacherProfile.tags = data.tags;
+            if (data.socials) {
+                if (data.socials.ig) teacherProfile.social_links[0].url = data.socials.ig;
+                if (data.socials.fb) teacherProfile.social_links[1].url = data.socials.fb;
+                if (data.socials.yt) teacherProfile.social_links[2].url = data.socials.yt;
+            }
+        } catch (e) {
+            console.error('Error parsing saved teacher profile:', e);
+        }
+    }
+
+    const container = document.getElementById('teacherProfileCardContainer');
+    container.innerHTML = `
+        <div class="teacher-card" style="padding: 32px; position: relative;">
+            <div style="width: 140px; height: 140px; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.08); flex-shrink: 0; border: 2px solid white;">
+                <img src="${teacherProfile.avatar_url}" alt="${teacherProfile.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='../teacher_avatar.png'" />
+            </div>
+            <div class="teacher-info-col">
+                <div class="teacher-header-row" style="justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="teacher-name" style="font-size: 30px;">${teacherProfile.name}</div>
+                        ${teacherProfile.tags.map(tag => `
+                            <div class="tag-pill" style="color: ${teacherProfile.tag_color}; background: ${teacherProfile.tag_bg}; border: 1px solid ${teacherProfile.tag_color};">
+                                ${tag}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <!-- 右上角快捷編輯按鈕 -->
+                    <button onclick="location.href='teacher_info_edit.html'" style="padding: 8px 16px; background: rgba(181, 142, 190, 0.15); border: 1px solid #B58EBE; color: #7B1FA2; border-radius: 100px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#B58EBE'; this.style.color='white';" onmouseout="this.style.background='rgba(181, 142, 190, 0.15)'; this.style.color='#7B1FA2';">
+                        <span>✏️</span>
+                        <span>編輯個人介紹</span>
+                    </button>
+                </div>
+                <div style="font-size: 13px; font-weight: 700; color: #8C827A;">授課樂器：${teacherProfile.instrument}</div>
+                <p class="teacher-bio" style="font-size: 15px;">${teacherProfile.bio}</p>
+                <div style="display: flex; align-items: center; gap: 16px; margin-top: 6px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #B58EBE;">社群關注：</span>
+                    <div style="display: flex; gap: 8px;">
+                        ${teacherProfile.social_links.map(s => `
+                            <a href="${s.url}" target="_blank" title="${s.label}: ${s.url}" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(181, 142, 190, 0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                ${s.icon}
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderTeacherProfile();
+});
+</script>
+
+</body>
+</html>

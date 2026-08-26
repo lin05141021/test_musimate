@@ -1,0 +1,258 @@
+:root {
+    /* ============================================================
+       1. Font Families (字型家族)
+       ============================================================ */
+    --font-family-serif: 'Noto Serif TC', serif;                    /* 標題專用 (Hero / H1~H4 / Card Title) */
+    --font-family-sans: 'Noto Sans TC', -apple-system, sans-serif; /* 內文 / UI / 按鈕 / 標籤 專用 */
+
+    /* ============================================================
+       2. Font Weights (字重規範)
+       ============================================================ */
+    --font-weight-regular: 400;                                     /* 一般內文 (備用) */
+    --font-weight-medium: 500;                                      /* UI 預設標準字重 (Nav / 按鈕 / 標籤 / 內文 / Footer) */
+    --font-weight-bold: 700;                                        /* 標題與強調字重 (H1~H4 / 表單 Label / 日期) */
+
+    /* ============================================================
+       3. Typography Scale (標準字級階層)
+       ============================================================ */
+
+    /* Hero / Display (56px) - 首頁大標 */
+    --font-hero-family: var(--font-family-serif);
+    --font-hero-weight: var(--font-weight-bold);
+    --font-hero-size: 56px;
+    --font-hero-line-height: 70px; /* 1.25 */
+
+    /* H2 (32px) - 頁面主要標題 / Section 標題 (如：我的課表、名師陣容) */
+    --font-h2-family: var(--font-family-serif);
+    --font-h2-weight: var(--font-weight-bold);
+    --font-h2-size: 32px;
+    --font-h2-line-height: 40px;
+
+    /* H3 (24px) - 卡片主要標題 (統一教師卡、樂器卡標題為 24px) */
+    --font-h3-family: var(--font-family-serif);
+    --font-h3-weight: var(--font-weight-bold);
+    --font-h3-size: 24px;
+    --font-h3-line-height: 32px;
+
+    /* H4 (20px) - 次要區塊標題 / 小型標題 */
+    --font-h4-family: var(--font-family-serif);
+    --font-h4-weight: var(--font-weight-bold);
+    --font-h4-size: 20px;
+    --font-h4-line-height: 28px;
+
+    /* Subtitle / Lead (18px) - 副標題 / 前導說明文字 */
+    --font-subtitle-family: var(--font-family-sans);
+    --font-subtitle-weight: var(--font-weight-medium);
+    --font-subtitle-size: 18px;
+    --font-subtitle-line-height: 28px; /* ~1.6 */
+
+    /* Body Large / Nav (16px) - 導航列項目 / 大號內文 */
+    --font-body-lg-family: var(--font-family-sans);
+    --font-body-lg-weight: var(--font-weight-medium);
+    --font-body-lg-size: 16px;
+    --font-body-lg-line-height: 24px;
+
+    /* Body (14px) - 標準內文 (教師介紹、Footer 說明文字、大按鈕文字) */
+    --font-body-family: var(--font-family-sans);
+    --font-body-weight: var(--font-weight-medium);
+    --font-body-size: 14px;
+    --font-body-line-height: 24px; /* ~1.7 */
+
+    /* Caption / Small (12px) - 輔助文字 / 標籤 / 小按鈕 / 表單 / 版權文字 */
+    --font-caption-family: var(--font-family-sans);
+    --font-caption-weight: var(--font-weight-medium);
+    --font-caption-size: 12px;
+    --font-caption-line-height: 16px;
+
+    /* ------------------------------------------------------------
+       業務分類與元件對應映射 (Business Context Mapping Reference)
+       - 導航項目 (Nav Item):       var(--font-body-lg-family), 16px, 500
+       - 卡片標題 (Card Title):     var(--font-h3-family), 24px, 700 (統一為 24px)
+       - 大按鈕 (Button Lg):        var(--font-body-family), 14px, 500
+       - 標準/小按鈕 (Button Sm):   var(--font-caption-family), 12px, 500 (統一為 500)
+       - 標籤 (Tag):               var(--font-caption-family), 12px, 500
+       - 徽章 (Badge):             var(--font-caption-family), 12px, 500, letter-spacing: 0.5px
+       - 表單標籤 (Form Label):     var(--font-caption-family), 12px, 700
+       - 表單數值 (Form Value):     var(--font-caption-family), 12px, 500
+       - 日曆日期 (Calendar Date):  var(--font-body-family), 14px, 700
+       - 日曆星期 (Calendar Day):   var(--font-caption-family), 12px, 500
+       - 時段標籤 (Slot Label):     var(--font-caption-family), 12px, 700
+       - 時段時間 (Slot Time):      var(--font-caption-family), 12px, 500
+       - 頁尾內文 (Footer Body):    var(--font-body-family), 14px, 500 (統一為 500)
+       - 頁尾版權 (Footer Caption): var(--font-caption-family), 12px, 500 (統一為 500)
+       ------------------------------------------------------------ */
+
+    /* 徽章字距 (已統一為 0.5px，取代 0.12px) */
+    --font-badge-letter-spacing: 0.5px;
+
+    /* ============================================================
+       4. Spacing Scale (間距與內距規範 - 統一 4/8 基準網格)
+       ============================================================ */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;  /* 原 10px 特例全數統一為 12px */
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-2xl: 32px; /* 原 36px 統一為 32px */
+    --space-3xl: 48px;
+    --space-4xl: 60px;
+    --space-5xl: 80px;
+
+    /* 頁面層級間距 */
+    --page-margin-x: var(--space-5xl);              /* 80px */
+    --section-gap: var(--space-2xl);                /* 32px */
+
+    /* Hero 區塊間距 */
+    --hero-inner-gap: 20px;
+    --hero-padding-top: var(--space-4xl);           /* 60px */
+    --hero-padding-bottom: var(--space-xl);         /* 24px */
+
+    /* 頁尾區塊間距 (已統一為 32px) */
+    --footer-padding-top: var(--space-3xl);         /* 48px */
+    --footer-padding-bottom: var(--space-2xl);      /* 32px (原 36px 修正) */
+
+    /* ============================================================
+       5. Component Tokens (元件規範)
+       ============================================================ */
+
+    /* 卡片規範 (Card - 統一間距 24px、內距 24px、圓角 24px) */
+    --card-padding: var(--space-xl);                /* 24px */
+    --card-gap: var(--space-xl);                    /* 24px (統一教師卡與樂器卡間距) */
+    --card-radius: var(--radius-lg);                /* 24px */
+
+    /* 按鈕規範 (Button - 文字統一 12px / 14px，字重統一 500) */
+    --btn-font-size: var(--font-caption-size);      /* 12px (按鈕文字統一 12px) */
+    --btn-font-weight: var(--font-weight-medium);   /* 500 (字重統一 500) */
+    --btn-padding-x-lg: var(--space-xl);            /* 24px */
+    --btn-padding-y-lg: var(--space-md);            /* 12px */
+    --btn-padding-x-sm: var(--space-xl);            /* 24px */
+    --btn-padding-y-sm: var(--space-md);            /* 12px (原 10px 修正) */
+
+    /* 標籤與徽章 (Tag & Badge) */
+    --tag-padding-x: var(--space-md);               /* 12px */
+    --tag-padding-y: var(--space-xs);               /* 4px */
+    --badge-padding-x: var(--space-lg);             /* 16px */
+    --badge-padding-y: var(--space-sm);             /* 8px */
+
+    /* 導航列 (Navbar) */
+    --nav-item-padding-x: var(--space-md);          /* 12px */
+    --nav-item-padding-y: var(--space-sm);          /* 8px */
+
+    /* 課表矩陣面板 (Schedule / Calendar - 10px 統一換成 12px) */
+    --panel-padding: var(--space-2xl);              /* 32px */
+    --slot-padding: var(--space-md);                /* 12px (原 10px 修正) */
+    --slot-add-btn-padding-x: var(--space-md);      /* 12px (原 10px 修正) */
+    --slot-add-btn-padding-y: var(--space-sm);      /* 8px */
+
+    /* ============================================================
+       6. Border Radius Scale (圓角規範)
+       ============================================================ */
+    --radius-pill: 100px;
+    --radius-lg: 24px;
+    --radius-md: 20px;
+    --radius-sm: 16px;
+    --radius-xs: 12px;
+}
+
+/* ============================================================
+   常用元件樣式封裝範例 (Component Classes Reference)
+   ============================================================ */
+
+/* 卡片容器 */
+.ui-card {
+    padding: var(--card-padding);
+    background: #FFFFFF;
+    border-radius: var(--card-radius);
+    outline: 1px #F0EAE1 solid;
+    outline-offset: -1px;
+    box-shadow: 0px 8px 24px rgba(44, 42, 41, 0.03);
+}
+
+/* 卡片標題 (統一 H3 24px Serif Bold) */
+.ui-card-title {
+    font-family: var(--font-h3-family);
+    font-weight: var(--font-h3-weight);
+    font-size: var(--font-h3-size);
+    line-height: var(--font-h3-line-height);
+    color: #2B3049;
+}
+
+/* 按鈕 (統一 12px Medium 500) */
+.ui-btn {
+    font-family: var(--font-caption-family);
+    font-weight: var(--btn-font-weight);
+    font-size: var(--btn-font-size);
+    padding: var(--btn-padding-y-sm) var(--btn-padding-x-sm);
+    border-radius: var(--radius-lg);
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* 徽章 (Badge - 0.5px letter-spacing) */
+.ui-badge {
+    font-family: var(--font-caption-family);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-caption-size);
+    letter-spacing: var(--font-badge-letter-spacing);
+    padding: var(--badge-padding-y) var(--badge-padding-x);
+    border-radius: var(--radius-md);
+    background: rgba(77, 173, 184, 0.10);
+    color: #4DADB8;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* 頁尾 (Footer - 32px padding-bottom) */
+.ui-footer {
+    padding-top: var(--footer-padding-top);
+    padding-bottom: var(--footer-padding-bottom);
+    padding-left: var(--page-margin-x);
+    padding-right: var(--page-margin-x);
+}
+
+/* ============================================================
+   7. Mobile & LIFF RWD (iPhone 16/17 & 手機端適配規範)
+   ============================================================ */
+@media (max-width: 768px) {
+    :root {
+        /* 手機端水平邊距由 80px 收斂為 16px (符合 iPhone 17 / 393px~402px 寬度) */
+        --page-margin-x: var(--space-lg);               /* 16px */
+        --section-gap: var(--space-xl);                 /* 24px */
+
+        /* 標題字級適應手機寬度 */
+        --font-hero-size: 32px;
+        --font-hero-line-height: 40px;
+        --font-h2-size: 24px;
+        --font-h2-line-height: 32px;
+        --font-h3-size: 20px;                           /* 樂器卡標題手機版自適應為 20px */
+        --font-h3-line-height: 28px;
+
+        /* Hero / 卡片內距微調 */
+        --hero-padding-top: var(--space-2xl);           /* 32px */
+        --hero-padding-bottom: var(--space-lg);         /* 16px */
+        --card-padding: var(--space-lg);                /* 16px */
+        --card-gap: var(--space-lg);                    /* 16px */
+
+        /* iOS Safe Area 適配 (動態島與 Home Indicator) */
+        --safe-area-top: env(safe-area-inset-top, 44px);
+        --safe-area-bottom: env(safe-area-inset-bottom, 34px);
+    }
+
+    .main-container {
+        width: 100% !important;
+        max-width: 430px;
+        min-height: 100vh;
+        margin: 0 auto;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .content-area {
+        padding-left: var(--page-margin-x) !important;
+        padding-right: var(--page-margin-x) !important;
+    }
+}

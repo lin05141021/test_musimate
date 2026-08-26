@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧薪資對帳 - 尚未繳費與催款清單 | MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="money_styles.css">
+    <script src="../data/musimate_db.js"></script>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='../newclass/newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡簽到功能即將推出！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="overview_checked.html" class="nav-item active" data-property-1="active">薪資看板</a>
+            <a href="../newclass/teacher_info.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師" onclick="location.href='../newclass/teacher_info.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. 主內容區 -->
+    <div class="content-area">
+        <!-- 頂部標題與檢視維度切換 -->
+        <div class="header-row">
+            <div class="breadcrumb-group">
+                <div class="breadcrumb-path">
+                    <span>智慧薪資對帳</span>
+                    <span>/</span>
+                    <span style="color: #2B3049;">2026 年 8 月</span>
+                </div>
+                <h1 class="page-title">智慧帳款總覽</h1>
+            </div>
+            <div class="filter-pill-box">
+                <div class="filter-pill active" onclick="switchViewMode('status')">依狀態</div>
+                <div class="filter-pill" onclick="switchViewMode('student')">依學生</div>
+            </div>
+        </div>
+
+        <!-- 應收總額統計卡片 (動態計算顯示) -->
+        <div class="summary-card">
+            <div class="summary-top-row">
+                <div class="total-receivable-box">
+                    <div class="total-label">應收總額 (Total Accounts Receivable)</div>
+                    <div id="totalReceivableText" class="total-amount">NT$ 86,400</div>
+                </div>
+                <div class="legend-group">
+                    <div class="legend-item">
+                        <div class="legend-dot dot-paid"></div>
+                        <div id="paidLegendText" class="text-paid">已入帳 NT$62,000 (72%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot dot-pending"></div>
+                        <div id="pendingLegendText" class="text-pending">待確認 NT$8,400 (10%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot dot-unpaid"></div>
+                        <div id="unpaidLegendText" class="text-unpaid">尚未繳費 NT$16,000 (18%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-meta-row">
+                <div>統計區間：2026年8月1日 - 8月31日</div>
+                <div id="totalTxCountText">共 4 筆尚未繳費交易 (可發送 LINE 提醒)</div>
+            </div>
+
+            <!-- 動態比例長條圖 -->
+            <div class="progress-bar-track">
+                <div id="barPaid" class="bar-paid" style="width: 72%;"></div>
+                <div id="barPending" class="bar-pending" style="width: 10%;"></div>
+                <div id="barUnpaid" class="bar-unpaid" style="width: 18%;"></div>
+            </div>
+        </div>
+
+        <!-- 狀態分頁標籤列 (已入帳 / 待確認 / 尚未繳費) -->
+        <div class="status-tab-bar">
+            <a href="overview_checked.html" class="status-tab">已入帳</a>
+            <a href="overview_unknown.html" class="status-tab">待確認</a>
+            <a href="overview_delay.html" class="status-tab active">尚未繳費</a>
+        </div>
+
+        <!-- 尚未繳費對帳表格 (由 JS 自動讀取資料庫陣列渲染) -->
+        <div class="table-card">
+            <div class="table-header-row">
+                <div style="width: 140px;">學生對象</div>
+                <div style="flex: 1;">對帳識別內容 (AI Smart Match)</div>
+                <div style="width: 120px;">狀態</div>
+                <div style="width: 140px; text-align: right;">操作對帳</div>
+            </div>
+            <div id="delayTableBody">
+                <!-- JS 動態渲染尚未繳費項目 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     JavaScript 動態資料庫欄位綁定與尚未繳費清單渲染引擎
+     ============================================================ -->
+<script>
+// 1. 尚未繳費交易資料庫模型
+const delayDatabase = [
+    {
+        id: 'tx-wang-d',
+        student_name: '王大同',
+        course_name: '成人古典班 (8月學費)',
+        amount: 3000,
+        due_date: '2026/08/20',
+        delay_days: 5,
+        status: 'unpaid',
+        status_label: '尚未繳費',
+        alert_url: 'delay_alert.html?student=wang'
+    },
+    {
+        id: 'tx-chao',
+        student_name: '趙小強',
+        course_name: '智慧家長基礎班 (8月學費)',
+        amount: 2800,
+        due_date: '2026/08/22',
+        delay_days: 3,
+        status: 'unpaid',
+        status_label: '尚未繳費',
+        alert_url: 'delay_alert.html?student=chao'
+    },
+    {
+        id: 'tx-chen-v',
+        student_name: '陳同學',
+        course_name: '小提琴初階班 (8月學費)',
+        amount: 4200,
+        due_date: '2026/08/23',
+        delay_days: 2,
+        status: 'unpaid',
+        status_label: '尚未繳費',
+        alert_url: 'delay_alert.html?student=chen'
+    },
+    {
+        id: 'tx-kuo',
+        student_name: '郭佩珊',
+        course_name: '長笛重奏班 (8月學費)',
+        amount: 6000,
+        due_date: '2026/08/19',
+        delay_days: 6,
+        status: 'unpaid',
+        status_label: '尚未繳費',
+        alert_url: 'delay_alert.html?student=kuo'
+    }
+];
+
+function renderFinancialKPI() {
+    if (!window.MusiMateDB) return;
+    const summary = window.MusiMateDB.getFinanceSummary();
+    
+    document.getElementById('totalReceivableText').innerText = `NT$ ${summary.totalReceivable.toLocaleString()}`;
+    document.getElementById('paidLegendText').innerText = `已入帳 NT$${summary.paidAmount.toLocaleString()} (${summary.paidPct}%)`;
+    document.getElementById('pendingLegendText').innerText = `待確認 NT$${summary.pendingAmount.toLocaleString()} (${summary.pendingPct}%)`;
+    document.getElementById('unpaidLegendText').innerText = `尚未繳費 NT$${summary.unpaidAmount.toLocaleString()} (${summary.unpaidPct}%)`;
+
+    document.getElementById('barPaid').style.width = `${summary.paidPct}%`;
+    document.getElementById('barPending').style.width = `${summary.pendingPct}%`;
+    document.getElementById('barUnpaid').style.width = `${summary.unpaidPct}%`;
+}
+
+function renderDelayTable() {
+    const isWangAlerted = localStorage.getItem('musimate_delayed_alerted_wang') === 'true';
+
+    const container = document.getElementById('delayTableBody');
+    container.innerHTML = delayDatabase.map(tx => {
+        const isAlerted = (tx.id === 'tx-wang-d' && isWangAlerted);
+        const actionBtn = isAlerted ? 
+            `<span style="padding: 6px 12px; background: #E8F5E9; color: #2E7D32; font-size: 12px; font-weight: 700; border-radius: 8px; border: 1px solid #A5D6A7;">✅ 今日已推播</span>` :
+            `<a href="${tx.alert_url}" class="btn-table-remind">發送催款通知</a>`;
+
+        return `
+        <div class="table-row">
+            <div class="student-col">
+                <div class="student-name">${tx.student_name}</div>
+                <div class="student-course">${tx.course_name}</div>
+            </div>
+            <div class="match-info-col">
+                <div class="match-item">
+                    <div class="match-value">NT$ ${tx.amount.toLocaleString()}</div>
+                    <div class="match-label">應繳學費金額</div>
+                </div>
+                <div class="match-item">
+                    <div class="match-value" style="color: #D98C8C;">逾期 ${tx.delay_days} 天</div>
+                    <div class="match-label">約定期限：${tx.due_date}</div>
+                </div>
+                <div class="match-item">
+                    <div class="match-value">${isAlerted ? 'LINE (已送達)' : 'LINE 智慧管家'}</div>
+                    <div class="match-label">推播提醒管道</div>
+                </div>
+            </div>
+            <div class="status-col">
+                <div class="badge-unpaid" style="${isAlerted ? 'background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7;' : ''}">${isAlerted ? '已發送提醒' : tx.status_label}</div>
+            </div>
+            <div class="action-col">
+                ${actionBtn}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function switchViewMode(mode) {
+    if (mode === 'student') {
+        location.href = 'money_fromstudent.html';
+    } else {
+        location.href = 'overview_checked.html';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderFinancialKPI();
+    renderDelayTable();
+});
+</script>
+
+</body>
+</html>

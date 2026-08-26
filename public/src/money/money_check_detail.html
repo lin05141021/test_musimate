@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 智慧核對詳情 - MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="money_styles.css">
+    <script src="../data/musimate_db.js"></script>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='../newclass/newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡簽到功能即將推出！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="overview_checked.html" class="nav-item active" data-property-1="active">薪資看板</a>
+            <a href="../newclass/teacher_info.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師" onclick="location.href='../newclass/teacher_info.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. 主內容區 -->
+    <div class="content-area">
+        <!-- 頂部路徑與標題 -->
+        <div class="breadcrumb-group">
+            <div class="breadcrumb-path">
+                <span>繳費核銷中心</span>
+                <span>/</span>
+                <span id="studentDetailBreadcrumb" style="color: #2B3049; font-weight: 700;">陳小明 對帳詳情</span>
+            </div>
+            <div class="header-row">
+                <h1 id="pageTitleHeading" class="page-title">AI 智慧核對詳情</h1>
+                <div class="badge-tag" style="color: #52959D; background: #E6F3F4; font-size: 14px; font-weight: 700; padding: 6px 14px; border-radius: 100px;">
+                    ✨ AI 辨識信心度：極高 (99.8%)
+                </div>
+            </div>
+        </div>
+
+        <!-- 左右雙欄對比卡片 -->
+        <div class="detail-grid">
+            <!-- 左欄：家長上傳之匯款執據 -->
+            <div class="detail-card-box">
+                <div class="detail-header-row">
+                    <div class="detail-card-title">家長上傳之匯款執據</div>
+                    <div id="receiptUploadTime" style="color: #6F6F6F; font-size: 12px;">上傳時間：2026/08/18 14:32</div>
+                </div>
+                <div class="receipt-img-placeholder">
+                    <span style="font-size: 36px;">🧾</span>
+                    <span id="receiptBankTitle">國泰世華銀行 轉帳明細執據</span>
+                    <span id="receiptTxNumber" style="font-size: 11px; color: #8C827A;">交易序號：TX20260818-50638</span>
+                </div>
+            </div>
+
+            <!-- 右欄：AI 系統判讀帳款紀錄與比對驗證 -->
+            <div class="detail-card-box">
+                <div class="detail-card-title">AI 系統判讀帳款紀錄</div>
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">學生姓名</div>
+                        <div id="detailStudentName" class="info-pair-val">陳小明 (Ming)</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">應繳學費課程</div>
+                        <div id="detailCourseName" class="info-pair-val">週六鋼琴個別課 4堂期收 (8月)</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">系統應繳金額</div>
+                        <div id="detailAmount" class="info-pair-val" style="font-size: 20px; font-family: var(--font-family-serif, serif);">NT$ 8,000</div>
+                    </div>
+                    <div class="info-pair-row">
+                        <div class="info-pair-label">約定繳費期限</div>
+                        <div id="detailDueDate" class="info-pair-val">2026 / 08 / 20</div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid #EFECE6; margin: 4px 0;"></div>
+
+                <!-- AI 比對驗證項目 -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="color: #6F6F6F; font-size: 14px; font-weight: 700;">AI 比對結果驗證</div>
+                    <div class="verification-list">
+                        <div class="verify-badge-item">
+                            <div class="verify-icon-box">✓</div>
+                            <span id="verifyAmountLabel">金額完全一致 (NT$ 8,000)</span>
+                        </div>
+                        <div class="verify-badge-item">
+                            <div class="verify-icon-box">✓</div>
+                            <span id="verifyCodeLabel">末五碼一致 (50638)</span>
+                        </div>
+                        <div class="verify-badge-item">
+                            <div class="verify-icon-box">✓</div>
+                            <span>交易日期在合理區間內 (入帳即時核對吻合)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作列 -->
+        <div class="action-bar">
+            <a href="overview_checked.html" class="btn-outline-back">◀ 返回對帳中心</a>
+            <div style="display: flex; gap: 14px;">
+                <button class="btn-danger-reject" onclick="handleReject()">非此學生，退回</button>
+                <button class="btn-outline-back" onclick="handleManualEdit()">金額有誤，手動修正</button>
+                <button class="btn-primary-confirm" onclick="handleConfirmReconcile()">確認核銷入帳</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<!-- ============================================================
+     JavaScript 核銷互動邏輯
+     ============================================================ -->
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const txId = urlParams.get('id') || 'tx-lin';
+
+const txDataMap = {
+    'tx-lin': { name: 'Lin (林同學)', course: '週三古典鋼琴個別課 (8/26堂課)', amount: 2000, method: '現金收訖待入帳', code: '00528', note: '課後現金繳納 NT$ 2,000' },
+    'tx-mei': { name: '李美華', course: '幼兒團體音樂班', amount: 1200, method: '銀行轉帳 (末五碼 00124)', code: '00124', note: '國泰世華 08/19 匯入' },
+    'tx-wang-p': { name: '王大同', course: '成人古典班 (部分期收)', amount: 3000, method: '銀行轉帳 (末五碼 88421)', code: '88421', note: '玉山銀行 08/19 匯入' },
+    'tx-lin-lz': { name: '林莉珍', course: '國樂音樂備考班', amount: 2200, method: '執據待補件', code: '91238', note: '已上傳 ATM 交易明細單' }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const data = txDataMap[txId] || { name: '陳小明', course: '個別鋼琴大師精修班 (8月期費)', amount: 8000, code: '50638', method: '國泰世華銀行 轉帳 (末五碼 50638)', note: '已核對存摺入帳明細，款項吻合' };
+    
+    document.getElementById('studentDetailBreadcrumb').innerText = `${data.name} 對帳詳情`;
+    document.getElementById('pageTitleHeading').innerText = `${data.name} · AI 智慧核對詳情`;
+    document.getElementById('detailStudentName').innerText = data.name;
+    document.getElementById('detailCourseName').innerText = data.course;
+    document.getElementById('detailAmount').innerText = `NT$ ${data.amount.toLocaleString()}`;
+    document.getElementById('verifyAmountLabel').innerText = `金額完全一致 (NT$ ${data.amount.toLocaleString()})`;
+    document.getElementById('verifyCodeLabel').innerText = `末五碼一致 (${data.code})`;
+    document.getElementById('receiptTxNumber').innerText = `交易序號：TX20260818-${data.code}`;
+});
+
+function handleConfirmReconcile() {
+    const data = txDataMap[txId] || { name: '該學員', amount: 2000 };
+    
+    // 寫入 localStorage 已核對清單
+    const reconciledList = JSON.parse(localStorage.getItem('musimate_reconciled_ids') || '[]');
+    if (!reconciledList.includes(txId)) {
+        reconciledList.push(txId);
+        localStorage.setItem('musimate_reconciled_ids', JSON.stringify(reconciledList));
+    }
+
+    alert(`🎉 恭喜！${data.name} 學費 (NT$ ${data.amount.toLocaleString()}) 已成功完成核銷，並自動即時歸入「已入帳」薪資帳冊中！`);
+    location.href = 'overview_checked.html';
+}
+
+function handleReject() {
+    if (confirm('確定要退回此筆執據並通知家長重新上傳嗎？')) {
+        alert('已退回此執據，系統已自動透過 LINE 通知家長重新確認匯款帳號與明細。');
+        location.href = 'overview_unknown.html';
+    }
+}
+
+function handleManualEdit() {
+    const newAmount = prompt('請輸入更正後的學費金額：', '2000');
+    if (newAmount) {
+        document.getElementById('detailAmount').innerText = `NT$ ${Number(newAmount).toLocaleString()}`;
+        document.getElementById('verifyAmountLabel').innerText = `金額更正為 (NT$ ${Number(newAmount).toLocaleString()})`;
+        alert('已完成金額手動修正！');
+    }
+}
+</script>
+
+</body>
+</html>

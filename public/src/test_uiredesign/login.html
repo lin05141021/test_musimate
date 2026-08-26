@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入您的 MusiMate 帳號</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <script src="../data/musimate_db.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Noto Sans TC', 'Sora', sans-serif;
+            background: #FAF6F0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .bg-blob-1 {
+            width: 700px;
+            height: 700px;
+            left: -150px;
+            top: -100px;
+            position: absolute;
+            opacity: 0.35;
+            background: linear-gradient(180deg, rgba(201, 162, 89, 0.8) 0%, rgba(213, 204, 105, 0.8) 24%, rgba(104, 197, 171, 0.8) 50%, rgba(97, 147, 203, 0.8) 77%, rgba(187, 101, 178, 0.8) 100%);
+            box-shadow: 100px 100px 100px;
+            border-radius: 400px;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+        .bg-blob-2 {
+            width: 650px;
+            height: 650px;
+            right: -100px;
+            bottom: -80px;
+            position: absolute;
+            opacity: 0.30;
+            background: linear-gradient(180deg, rgba(201, 162, 89, 0.8) 0%, rgba(213, 204, 105, 0.8) 24%, rgba(104, 197, 171, 0.8) 50%, rgba(97, 147, 203, 0.8) 77%, rgba(187, 101, 178, 0.8) 100%);
+            box-shadow: 120px 120px 120px;
+            border-radius: 350px;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+        .login-card {
+            width: 480px;
+            max-width: 92%;
+            padding: 44px;
+            background: white;
+            box-shadow: 0px 24px 48px rgba(43, 48, 73, 0.08);
+            border-radius: 32px;
+            border: 1px solid #EFECE6;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            z-index: 10;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-label {
+            color: #7A736E;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .input-box {
+            width: 100%;
+            height: 50px;
+            padding: 0 16px;
+            background: #FDFBF7;
+            border-radius: 16px;
+            border: 1.5px solid #EFECE6;
+            font-size: 15px;
+            color: #2B3049;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .input-box:focus {
+            border-color: #B58EBE;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(181, 142, 190, 0.15);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #B58EBE 0%, #9C70A6 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(181, 142, 190, 0.35);
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .btn-submit:hover {
+            opacity: 0.95;
+        }
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+        .oauth-btn {
+            flex: 1;
+            height: 48px;
+            padding: 0 16px;
+            background: white;
+            border-radius: 14px;
+            border: 1.5px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #332C27;
+            transition: all 0.2s;
+        }
+        .oauth-btn:hover {
+            background: #FAF6F0;
+            border-color: #CEAB98;
+        }
+        /* Modal for OAuth preview */
+        .oauth-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .oauth-modal-card {
+            width: 100%;
+            max-width: 380px;
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-blob-1"></div>
+<div class="bg-blob-2"></div>
+
+<div class="login-card">
+    <div class="logo-header">
+        <img style="height: 38px; object-fit: contain; cursor: pointer;" src="../../UI/logo.png" alt="MusiMate" onclick="location.href='../newclass/newclass_homepage.html'" onerror="this.src='../logo.png'" />
+        <h1 style="color: #332C27; font-size: 26px; font-family: 'Noto Serif TC', serif; font-weight: 700;">歡迎回來</h1>
+        <p style="color: #7A736E; font-size: 13px;">請登入您的帳號以繼續使用 MusiMate 音樂教室</p>
+    </div>
+
+    <!-- 登入表單 -->
+    <form id="loginForm" onsubmit="handleLogin(event)" style="display: flex; flex-direction: column; gap: 18px;">
+        <div class="form-group">
+            <label class="form-label" for="loginEmail">電子郵件 (帳號)</label>
+            <input type="email" id="loginEmail" class="input-box" placeholder="chang.teacher@harmony.edu" value="chang.teacher@harmony.edu" required />
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="loginPassword">密碼</label>
+            <input type="password" id="loginPassword" class="input-box" placeholder="請輸入密碼" value="teacher123" required />
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #7A736E;">
+                <input type="checkbox" id="rememberMe" checked style="accent-color: #B58EBE; width: 16px; height: 16px;" />
+                記住我
+            </label>
+            <a href="javascript:void(0)" onclick="handleForgotPassword()" style="color: #CEAB98; text-decoration: none; font-weight: 600;">忘記密碼？</a>
+        </div>
+
+        <div id="loginFeedback" style="display: none; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600;"></div>
+
+        <button type="submit" class="btn-submit">
+            登入工作台
+        </button>
+    </form>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="flex: 1; height: 1px; background: #EFECE6;"></div>
+        <span style="color: #9CA3AF; font-size: 12px;">或使用以下方式快捷登入</span>
+        <div style="flex: 1; height: 1px; background: #EFECE6;"></div>
+    </div>
+
+    <!-- 第三方登入 -->
+    <div style="display: flex; gap: 12px;">
+        <div class="oauth-btn" onclick="openOAuthModal('Google')">
+            <span style="font-size: 18px;">🌐</span>
+            <span>Google</span>
+        </div>
+        <div class="oauth-btn" onclick="openOAuthModal('LINE')">
+            <span style="font-size: 18px;">💬</span>
+            <span style="color: #00C300;">LINE</span>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 6px; font-size: 13px; color: #7A736E;">
+        <span>還沒有教師帳號？</span>
+        <a href="javascript:void(0)" onclick="handleRegisterPrompt()" style="color: #B58EBE; font-weight: 700; text-decoration: none;">即刻註冊開通</a>
+    </div>
+</div>
+
+<!-- OAuth 授權模擬彈窗 -->
+<div id="oauthModal" class="oauth-modal-overlay">
+    <div class="oauth-modal-card">
+        <div id="oauthIcon" style="font-size: 40px;">💬</div>
+        <div id="oauthTitle" style="font-size: 18px; font-weight: 700; color: #2B3049;">LINE 快捷授權登入</div>
+        <p id="oauthDesc" style="font-size: 13px; color: #6F6F6F; line-height: 1.5;">
+            MusiMate 正在請求取得您的 LINE 基本個人檔案以進行智慧身分連線。
+        </p>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <button onclick="confirmOAuthLogin()" style="width: 100%; padding: 12px; background: #00C300; color: white; font-weight: 700; border: none; border-radius: 12px; cursor: pointer;">
+                同意並繼續
+            </button>
+            <button onclick="closeOAuthModal()" style="width: 100%; padding: 10px; background: #FAF6F0; color: #6F6F6F; font-weight: 600; border: none; border-radius: 12px; cursor: pointer;">
+                取消
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentOAuthProvider = 'LINE';
+
+function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const feedback = document.getElementById('loginFeedback');
+
+    if (!window.MusiMateDB) {
+        feedback.style.display = 'block';
+        feedback.style.background = '#FDE2E2';
+        feedback.style.color = '#C53030';
+        feedback.innerText = '資料庫載入中，請稍後...';
+        return;
+    }
+
+    const result = window.MusiMateDB.verifyTeacherLogin(email, password);
+    if (result.success) {
+        feedback.style.display = 'block';
+        feedback.style.background = '#E8F5E9';
+        feedback.style.color = '#2E7D32';
+        feedback.innerText = '🎉 ' + result.message;
+        localStorage.setItem('musimate_current_user', JSON.stringify(result.user));
+        setTimeout(() => {
+            location.href = 'schedule.html';
+        }, 600);
+    } else {
+        feedback.style.display = 'block';
+        feedback.style.background = '#FDE2E2';
+        feedback.style.color = '#C53030';
+        feedback.innerText = '⚠️ ' + result.message;
+    }
+}
+
+function handleForgotPassword() {
+    const email = prompt('請輸入您的註冊電子郵件，我們將傳送密碼重設連結：', 'chang.teacher@harmony.edu');
+    if (email) {
+        alert(`📧 密碼重設指示已傳送至 ${email}，請至信箱收取並重新設定密碼！`);
+    }
+}
+
+function handleRegisterPrompt() {
+    const name = prompt('請輸入教師姓名：', '張芷嫣');
+    if (!name) return;
+    const email = prompt('請輸入註冊 Email：', 'chang.new@harmony.edu');
+    if (!email) return;
+
+    if (window.MusiMateDB) {
+        const newUser = window.MusiMateDB.registerTeacherAccount({ name, email, password: 'teacher123' });
+        localStorage.setItem('musimate_current_user', JSON.stringify(newUser));
+        alert(`🎉 恭喜 ${name} 老師！您的 MusiMate 教師帳號已成功建立！\n預設密碼為 teacher123，正在前往課表工作台...`);
+        location.href = 'schedule.html';
+    }
+}
+
+function openOAuthModal(provider) {
+    currentOAuthProvider = provider;
+    const modal = document.getElementById('oauthModal');
+    const icon = document.getElementById('oauthIcon');
+    const title = document.getElementById('oauthTitle');
+    const desc = document.getElementById('oauthDesc');
+
+    if (provider === 'LINE') {
+        icon.innerText = '💬';
+        title.innerText = 'LINE 官方帳號 快捷連線授權';
+        desc.innerText = 'MusiMate 正在請求存取您的 LINE Profile (User ID, 暱稱, 頭像) 以無縫同步課表與通知。';
+    } else {
+        icon.innerText = '🌐';
+        title.innerText = 'Google 帳號 授權登入';
+        desc.innerText = '使用您的 Google 帳號 (Google Workspace) 快速登入 MusiMate 音樂教室管理工作台。';
+    }
+    modal.style.display = 'flex';
+}
+
+function closeOAuthModal() {
+    document.getElementById('oauthModal').style.display = 'none';
+}
+
+function confirmOAuthLogin() {
+    closeOAuthModal();
+    alert(`✅ 已成功透過 ${currentOAuthProvider} 完成第三方授權！\n身分驗證通過，正在前往課表工作台...`);
+    location.href = 'schedule.html';
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的課表 (手機版) - MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../test_uiredesign/schedule_styles.css">
+</head>
+<body class="mobile-view">
+
+<div class="mobile-frame">
+    <div>
+        <!-- 狀態列 -->
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- 導航列與學生切換 -->
+        <div class="nav-header">
+            <a href="new_class.html" class="brand-logo" style="text-decoration: none;">
+                <div class="brand-icon">🎵</div>
+                <span>MusiMate</span>
+            </a>
+            <select id="mobileStudentSelector" style="font-size: 12px; font-weight: bold; color: #7B1FA2; background: #F3E5F5; padding: 4px 10px; border-radius: 12px; border: none; outline: none; cursor: pointer;" onchange="renderMobileSchedule(this.value)">
+            </select>
+        </div>
+
+        <!-- 課表內容 -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">我的課表</h1>
+                <p id="mobileSubtitle" class="page-subtitle">張老師 · 預約課堂清單 (資料庫連線)</p>
+            </div>
+
+            <!-- 動態課表容器 (由 JS 依據資料庫查詢渲染) -->
+            <div id="mobileAppointmentList"></div>
+
+            <div class="list-end-hint">無新的預約課程了</div>
+            <button class="btn-book-new" onclick="location.href='../newclass/oldstudent_newclass.html'">+ 預約新課程</button>
+        </div>
+    </div>
+
+    <!-- 底部指示條 -->
+    <div class="home-bar-wrapper">
+        <div class="home-bar"></div>
+    </div>
+</div>
+
+<script>
+function formatDate(isoStr) {
+    const d = new Date(isoStr);
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const w = weekdays[d.getDay()];
+    return {
+        monthDay: `${month}/${date}`,
+        weekday: `(${w})`
+    };
+}
+
+function formatTime(startIso, endIso) {
+    const s = new Date(startIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const e = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${s} - ${e}`;
+}
+
+function renderMobileSchedule(studentId) {
+    const container = document.getElementById('mobileAppointmentList');
+    if (!window.MusiMateDB) return;
+
+    const students = window.MusiMateDB.getStudents();
+    const current = students.find(s => s.student_id === studentId) || students[0];
+    if (!current) return;
+
+    document.getElementById('mobileSubtitle').innerText = `張老師 · ${current.name} 預約課堂清單 (資料庫連線)`;
+
+    const appts = window.MusiMateDB.getAppointmentsByStudent(current.student_id);
+
+    if (appts.length === 0) {
+        container.innerHTML = '<div style="padding: 24px; text-align: center; color: #8C827A; font-weight: 700;">目前尚無已排定課程</div>';
+        return;
+    }
+
+    container.innerHTML = appts.map(appt => {
+        const dateObj = formatDate(appt.start_time);
+        const timeSpan = formatTime(appt.start_time, appt.end_time);
+        const isLeave = appt.status === 'rescheduled';
+        const isNewTag = appt.is_new_badge ? '<span style="padding: 2px 6px; background: #E8F5E9; color: #2E7D32; font-size: 10px; font-weight: 800; border-radius: 6px; margin-left: 6px;">✨ 新預約</span>' : '';
+
+        return `
+        <div class="lesson-item" style="${isLeave ? 'opacity: 0.85;' : ''}">
+            <div class="date-badge" style="${isLeave ? 'background: #FFF8E1; border-color: #FFE082;' : ''}">
+                <div class="day-number" style="${isLeave ? 'color: #F57F17;' : ''}">${dateObj.monthDay}</div>
+                <div class="day-weekday" style="${isLeave ? 'color: #F57F17;' : ''}">${dateObj.weekday}</div>
+            </div>
+            <div class="lesson-card-right">
+                <div class="info-card" style="${isLeave ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
+                    <div class="info-card-left">
+                        <div class="time-text">${timeSpan} ${isNewTag}</div>
+                        <div class="course-title">張老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
+                        <div class="location-text">${appt.location || '音符琴房 A303'} · ${isLeave ? '📌 已請假' : (appt.payment_status === 'paid' ? '✅ 已預付' : '💳 現金後付')}</div>
+                    </div>
+                    <div class="music-gradient-icon">${isLeave ? '⏳' : '🎵'}</div>
+                </div>
+                <button class="btn-reschedule" style="${isLeave ? 'background: #FFF3E0; color: #E65100; border-color: #FFE082;' : ''}" onclick="location.href='../test_uiredesign/student_changeclass.html?lesson_id=${appt.id}'">
+                    ${isLeave ? '重新安排補課時段' : '我要請假/調課'}
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.MusiMateDB) {
+        const students = window.MusiMateDB.getStudents();
+        const selector = document.getElementById('mobileStudentSelector');
+        selector.innerHTML = students.map(s => `
+            <option value="${s.student_id}">${s.name}</option>
+        `).join('');
+        renderMobileSchedule(students[0]?.student_id || 's0000000-0000-0000-0000-000000000005');
+    }
+});
+</script>
+</body>
+</html>

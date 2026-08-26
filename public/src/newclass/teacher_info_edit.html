@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>編輯個人檔案 - 張芷嫣老師 | MusiMate</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="newclass_styles.css">
+    <style>
+        .edit-card {
+            width: 100%;
+            max-width: 1280px;
+            padding: 32px;
+            background: white;
+            box-shadow: 0px 8px 24px rgba(44, 42, 41, 0.04);
+            border-radius: 24px;
+            border: 1px solid #FAF6F0;
+            display: flex;
+            gap: 36px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        .form-label {
+            color: #2B3049;
+            font-size: 15px;
+            font-family: var(--font-family-serif, 'Noto Serif TC', serif);
+            font-weight: 700;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #B58EBE;
+            color: #2B3049;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .form-textarea {
+            width: 100%;
+            height: 140px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
+            color: #2B3049;
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: inherit;
+            outline: none;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .tag-pill-edit {
+            padding: 6px 12px 6px 14px;
+            background: rgba(181, 142, 190, 0.12);
+            border-radius: 100px;
+            border: 1px solid #B58EBE;
+            color: #B58EBE;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tag-close-btn {
+            cursor: pointer;
+            color: #B58EBE;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            padding: 2px;
+            background: #B58EBE;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            cursor: pointer;
+        }
+        .toggle-knob {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="#" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="#" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="../money/overview_checked.html" class="nav-item" data-property-1="defult">薪資看板</a>
+            <a href="teacher_info_edit.html" class="nav-item active" data-property-1="active">修改個人介紹</a>
+        </div>
+        <div class="nav-avatar-box" title="張芷嫣老師檔案 (點擊切換檢視)" onclick="location.href='teacher_info.html'">
+            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        </div>
+    </div>
+
+    <!-- 2. Hero 區塊 -->
+    <div class="hero-section" style="padding-top: 40px; padding-bottom: 16px;">
+        <div class="badge-tag">
+            <span>✦</span>
+            <span>PIANO MATE / 編輯個人檔案</span>
+        </div>
+        <h1 class="hero-title" style="font-size: 36px;">編輯張芷嫣老師個人檔案</h1>
+        
+        <!-- 核心切換模式膠囊 (View ⇄ Edit Mode Switcher) -->
+        <div style="display: flex; justify-content: center; margin-top: 16px;">
+            <div style="background: white; border-radius: 100px; padding: 6px 8px; box-shadow: 0 4px 16px rgba(44, 42, 41, 0.06); display: inline-flex; gap: 8px; align-items: center; border: 1px solid #F0EAE1;">
+                <button onclick="location.href='teacher_info.html'" style="padding: 8px 20px; border-radius: 100px; background: transparent; color: #7A736E; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='#F3E5F5'; this.style.color='#7B1FA2';" onmouseout="this.style.background='transparent'; this.style.color='#7A736E';">
+                    👁️ 切換預覽檢視
+                </button>
+                <button style="padding: 8px 20px; border-radius: 100px; background: #B58EBE; color: white; font-size: 14px; font-weight: 700; border: none; cursor: default; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(181, 142, 190, 0.3);">
+                    ✏️ 編輯個人檔案中
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 編輯主表單區塊 -->
+    <div class="section-container" style="padding-top: 10px; padding-bottom: 40px;">
+        <div class="edit-card">
+            <!-- 左欄：大頭貼更換 (真實照片預覽) -->
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; width: 312px; flex-shrink: 0;">
+                <div style="width: 312px; height: 312px; border-radius: 20px; background: #F3E5F5; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 2px dashed #B58EBE; cursor: pointer;" onclick="document.getElementById('avatarUpload').click();">
+                    <img id="avatarPreview" src="../../UI/teacher_avatar.png" alt="張芷嫣老師" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='../teacher_avatar.png'" />
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.55); padding: 12px; color: white; font-size: 14px; font-weight: 600; text-align: center; backdrop-filter: blur(4px);">
+                        📷 點擊更換大頭照
+                    </div>
+                </div>
+                <input type="file" id="avatarUpload" style="display: none;" accept="image/*" onchange="previewImage(this)">
+                <div style="color: #8C827A; font-size: 12px;">建議尺寸：1:1 正方形比例高畫質照片</div>
+            </div>
+
+            <!-- 右欄：詳細資料欄位 -->
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
+                <!-- 教師姓名 -->
+                <div class="form-group">
+                    <label class="form-label">教師姓名</label>
+                    <input type="text" class="form-input" id="teacherNameInput" value="張芷嫣">
+                </div>
+
+                <!-- 授課科目/樂器 (核對補充欄位) -->
+                <div class="form-group">
+                    <label class="form-label">授課科目 / 樂器</label>
+                    <input type="text" class="form-input" id="teacherInstrumentInput" value="鋼琴 (Piano) · 小提琴 (Violin)">
+                </div>
+
+                <!-- 專業標籤 -->
+                <div class="form-group">
+                    <label class="form-label">專業標籤</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;" id="tagsContainer">
+                        <div class="tag-pill-edit">
+                            <span>伴奏鋼琴</span>
+                            <span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                        <div class="tag-pill-edit">
+                            <span>音樂班專業</span>
+                            <span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                        <div class="tag-pill-edit">
+                            <span>音樂素養</span>
+                            <span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>
+                        </div>
+                        <button type="button" style="padding: 6px 14px; background: white; border-radius: 100px; border: 1px solid #B58EBE; color: #B58EBE; font-size: 14px; font-weight: 500; cursor: pointer;" onclick="addTagPrompt()">
+                            + 新增標籤
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 個人介紹 / 教學理念 -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <label class="form-label">個人介紹 / 教學理念</label>
+                        <span style="color: #9CA3AF; font-size: 12px;" id="charCount">112 / 500 字</span>
+                    </div>
+                    <textarea class="form-textarea" id="teacherBioInput" oninput="updateCharCount(this)">國立師大音樂系碩士，主修鋼琴，副修豎笛。音樂教學資歷10年，培養超過30位學生錄取音樂專班。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的合奏藝術。</textarea>
+                </div>
+
+                <!-- 社群關注連結 -->
+                <div class="form-group">
+                    <label class="form-label">社群關注連結 (開關與網址)</label>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+                        <!-- Instagram -->
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+                            <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">Instagram</span>
+                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://instagram.com/chihyen_piano">
+                        </div>
+                        <!-- Facebook -->
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+                            <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">Facebook</span>
+                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://facebook.com/chihyen.piano">
+                        </div>
+                        <!-- YouTube -->
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
+                            <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">YouTube</span>
+                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://youtube.com/c/chihyen_studio">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div style="display: flex; gap: 14px; padding-top: 12px; border-top: 1px solid #FAF6F0;">
+                    <button class="btn-book-course" style="padding: 12px 32px; background: #B58EBE;" onclick="handleSave()">
+                        儲存變更並返回展示頁
+                    </button>
+                    <button class="btn-book-course" style="padding: 12px 32px; background: white; color: #B58EBE; border: 1.5px solid #B58EBE;" onclick="location.href='teacher_info.html'">
+                        取消返回
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 頁尾 -->
+    <div class="footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
+            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        </div>
+        <div>© 2026 MusiMate. All rights reserved.</div>
+    </div>
+</div>
+
+<script>
+function updateCharCount(el) {
+    document.getElementById('charCount').innerText = `${el.value.length} / 500 字`;
+}
+
+function toggleSwitch(el) {
+    if (el.style.justifyContent === 'flex-start') {
+        el.style.justifyContent = 'flex-end';
+        el.style.background = '#B58EBE';
+    } else {
+        el.style.justifyContent = 'flex-start';
+        el.style.background = '#D1D5DB';
+    }
+}
+
+function addTagPrompt() {
+    const newTag = prompt('請輸入欲新增的專業標籤：', '音樂素養指導');
+    if (newTag) {
+        const container = document.getElementById('tagsContainer');
+        const tagEl = document.createElement('div');
+        tagEl.className = 'tag-pill-edit';
+        tagEl.innerHTML = `<span>${newTag}</span><span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>`;
+        container.insertBefore(tagEl, container.lastElementChild);
+    }
+}
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatarPreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function handleSave() {
+    const name = document.getElementById('teacherNameInput').value;
+    const instruments = document.getElementById('teacherInstrumentInput').value;
+    const bio = document.getElementById('teacherBioInput').value;
+    const avatar = document.getElementById('avatarPreview').src;
+    
+    // 收集標籤
+    const tagElements = document.querySelectorAll('#tagsContainer .tag-pill-edit span:first-child');
+    const tags = Array.from(tagElements).map(el => el.innerText.trim());
+
+    // 收集社群
+    const inputs = document.querySelectorAll('.form-group input.form-input');
+    const ig = inputs[2]?.value || 'https://instagram.com/chihyen_piano';
+    const fb = inputs[3]?.value || 'https://facebook.com/chihyen.piano';
+    const yt = inputs[4]?.value || 'https://youtube.com/c/chihyen_studio';
+
+    const profileData = {
+        name,
+        instruments,
+        bio,
+        avatar,
+        tags,
+        socials: { ig, fb, yt }
+    };
+
+    localStorage.setItem('musimate_teacher_profile', JSON.stringify(profileData));
+    alert('✅ 個人檔案變更已成功儲存！\n已即時同步更新至資料庫與師資介紹專欄。');
+    location.href = 'teacher_info.html';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('musimate_teacher_profile');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.name) document.getElementById('teacherNameInput').value = data.name;
+            if (data.instruments) document.getElementById('teacherInstrumentInput').value = data.instruments;
+            if (data.bio) {
+                document.getElementById('teacherBioInput').value = data.bio;
+                updateCharCount(document.getElementById('teacherBioInput'));
+            }
+            if (data.avatar) document.getElementById('avatarPreview').src = data.avatar;
+            if (data.tags && data.tags.length > 0) {
+                const container = document.getElementById('tagsContainer');
+                const addBtn = container.lastElementChild;
+                container.innerHTML = '';
+                data.tags.forEach(t => {
+                    const tagEl = document.createElement('div');
+                    tagEl.className = 'tag-pill-edit';
+                    tagEl.innerHTML = `<span>${t}</span><span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>`;
+                    container.appendChild(tagEl);
+                });
+                container.appendChild(addBtn);
+            }
+        } catch(e) {
+            console.error('Error loading saved teacher profile:', e);
+        }
+    }
+});
+</script>
+
+</body>
+</html>
