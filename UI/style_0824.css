@@ -298,9 +298,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #FAF6F0;
+    border-top: 1px solid rgba(250, 246, 240, 0.6);
     margin-top: 40px;
     box-sizing: border-box;
+    background-color: #FAF6F0;
+    background-image: url('water_color.png');
+    background-repeat: repeat-x;
+    background-position: center bottom;
+    background-size: cover;
+    border-radius: 0 0 24px 24px;
 }
 
 .footer-left {

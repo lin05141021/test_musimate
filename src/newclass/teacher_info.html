@@ -12,6 +12,7 @@
     <!-- 樣式庫 -->
     <link rel="stylesheet" href="../../UI/style_0824.css">
     <link rel="stylesheet" href="newclass_styles.css">
+    <script src="../data/musimate_db.js"></script>
 </head>
 <body>
 
@@ -66,7 +67,7 @@
         <div class="detail-card" style="max-width: 1280px;">
             <div class="experience-block">
                 <div class="experience-title">學歷背景與演奏文憑 (Education & Diplomas)</div>
-                <ul class="experience-list">
+                <ul class="experience-list" id="educationList">
                     <li>奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)</li>
                     <li>國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)</li>
                     <li>曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧</li>
@@ -75,7 +76,7 @@
 
             <div class="experience-block">
                 <div class="experience-title">教學成果與教學特色 (Teaching Highlights)</div>
-                <ul class="experience-list">
+                <ul class="experience-list" id="highlightsList">
                     <li>10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所</li>
                     <li>特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材</li>
                     <li>結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確</li>
@@ -110,58 +111,68 @@
      JavaScript 動態資料庫欄位綁定與渲染引擎
      ============================================================ -->
 <script>
-// 1. 教師資料庫資料模型
-const teacherProfile = {
-    id: 't-chang',
-    name: '張芷嫣',
-    user_id: 'u0000000-0000-0000-0000-000000000002',
-    instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
-    tags: ['伴奏鋼琴', '音樂班專業', '音樂素養'],
-    tag_color: '#B58EBE',
-    tag_bg: 'rgba(181, 142, 190, 0.15)',
-    avatar_url: '../../UI/teacher_avatar.png',
-    bio: '國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。',
-    social_links: [
-        { label: 'Instagram', icon: '📷', url: 'https://instagram.com/chihyen_piano' },
-        { label: 'Facebook', icon: '📘', url: 'https://facebook.com/chihyen.piano' },
-        { label: 'YouTube', icon: '▶️', url: 'https://youtube.com/c/chihyen_studio' }
-    ]
-};
-
-// 2. 動態渲染教師卡片
+// 動態渲染教師卡片與詳細簡介
 function renderTeacherProfile() {
-    // 優先讀取使用者於 teacher_info_edit.html 儲存的客製檔案
-    const saved = localStorage.getItem('musimate_teacher_profile');
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.name) teacherProfile.name = data.name;
-            if (data.instruments) teacherProfile.instrument = data.instruments;
-            if (data.bio) teacherProfile.bio = data.bio;
-            if (data.avatar) teacherProfile.avatar_url = data.avatar;
-            if (data.tags && data.tags.length > 0) teacherProfile.tags = data.tags;
-            if (data.socials) {
-                if (data.socials.ig) teacherProfile.social_links[0].url = data.socials.ig;
-                if (data.socials.fb) teacherProfile.social_links[1].url = data.socials.fb;
-                if (data.socials.yt) teacherProfile.social_links[2].url = data.socials.yt;
-            }
-        } catch (e) {
-            console.error('Error parsing saved teacher profile:', e);
+    let profile = null;
+    if (window.MusiMateDB) {
+        profile = window.MusiMateDB.getTeacherProfile();
+    } else {
+        const saved = localStorage.getItem('musimate_teacher_profile');
+        if (saved) {
+            try { profile = JSON.parse(saved); } catch(e) {}
         }
     }
 
+    if (!profile) {
+        profile = {
+            name: '張芷嫣',
+            instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
+            tags: ['伴奏鋼琴', '音樂班專業', '音樂素養'],
+            tag_color: '#B58EBE',
+            tag_bg: 'rgba(181, 142, 190, 0.15)',
+            avatar_url: '../../UI/teacher_avatar.png',
+            bio: '國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。',
+            education: [
+                '奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)',
+                '國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)',
+                '曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧'
+            ],
+            highlights: [
+                '10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所',
+                '特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材',
+                '結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確'
+            ],
+            social_links: [
+                { label: 'Instagram', icon: '📷', url: 'https://instagram.com/chihyen_piano' },
+                { label: 'Facebook', icon: '📘', url: 'https://facebook.com/chihyen.piano' },
+                { label: 'YouTube', icon: '▶️', url: 'https://youtube.com/c/chihyen_studio' }
+            ]
+        };
+    }
+
+    // 更新標題
+    const banner = document.getElementById('teacherNameBanner');
+    if (banner) banner.innerText = `${profile.name} · 名師專欄介紹`;
+
+    // 渲染卡片
     const container = document.getElementById('teacherProfileCardContainer');
+    const tags = profile.tags || ['伴奏鋼琴', '音樂班專業', '音樂素養'];
+    const tagColor = profile.tag_color || '#B58EBE';
+    const tagBg = profile.tag_bg || 'rgba(181, 142, 190, 0.15)';
+    const avatarUrl = profile.avatar_url || '../../UI/teacher_avatar.png';
+    const socials = profile.social_links || [];
+
     container.innerHTML = `
         <div class="teacher-card" style="padding: 32px; position: relative;">
             <div style="width: 140px; height: 140px; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.08); flex-shrink: 0; border: 2px solid white;">
-                <img src="${teacherProfile.avatar_url}" alt="${teacherProfile.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='../teacher_avatar.png'" />
+                <img src="${avatarUrl}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='../teacher_avatar.png'" />
             </div>
             <div class="teacher-info-col">
                 <div class="teacher-header-row" style="justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="teacher-name" style="font-size: 30px;">${teacherProfile.name}</div>
-                        ${teacherProfile.tags.map(tag => `
-                            <div class="tag-pill" style="color: ${teacherProfile.tag_color}; background: ${teacherProfile.tag_bg}; border: 1px solid ${teacherProfile.tag_color};">
+                        <div class="teacher-name" style="font-size: 30px;">${profile.name}</div>
+                        ${tags.map(tag => `
+                            <div class="tag-pill" style="color: ${tagColor}; background: ${tagBg}; border: 1px solid ${tagColor};">
                                 ${tag}
                             </div>
                         `).join('')}
@@ -172,12 +183,12 @@ function renderTeacherProfile() {
                         <span>編輯個人介紹</span>
                     </button>
                 </div>
-                <div style="font-size: 13px; font-weight: 700; color: #8C827A;">授課樂器：${teacherProfile.instrument}</div>
-                <p class="teacher-bio" style="font-size: 15px;">${teacherProfile.bio}</p>
+                <div style="font-size: 13px; font-weight: 700; color: #8C827A;">授課樂器：${profile.instrument || '鋼琴 (Piano) · 小提琴 (Violin)'}</div>
+                <p class="teacher-bio" style="font-size: 15px;">${profile.bio || ''}</p>
                 <div style="display: flex; align-items: center; gap: 16px; margin-top: 6px;">
                     <span style="font-size: 13px; font-weight: 700; color: #B58EBE;">社群關注：</span>
                     <div style="display: flex; gap: 8px;">
-                        ${teacherProfile.social_links.map(s => `
+                        ${socials.map(s => `
                             <a href="${s.url}" target="_blank" title="${s.label}: ${s.url}" style="width: 36px; height: 36px; border-radius: 50%; background: rgba(181, 142, 190, 0.15); display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                                 ${s.icon}
                             </a>
@@ -187,6 +198,18 @@ function renderTeacherProfile() {
             </div>
         </div>
     `;
+
+    // 渲染學歷與演奏文憑
+    const eduList = document.getElementById('educationList');
+    if (eduList && profile.education && profile.education.length > 0) {
+        eduList.innerHTML = profile.education.map(e => `<li>${e}</li>`).join('');
+    }
+
+    // 渲染教學成果
+    const hlList = document.getElementById('highlightsList');
+    if (hlList && profile.highlights && profile.highlights.length > 0) {
+        hlList.innerHTML = profile.highlights.map(h => `<li>${h}</li>`).join('');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

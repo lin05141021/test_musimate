@@ -678,6 +678,58 @@ const MusiMateDB = (() => {
             });
 
             return list.sort((a, b) => b.total_amount - a.total_amount);
+        },
+
+        // 取得教師個人簡介
+        getTeacherProfile() {
+            const db = getDB();
+            const defaultProfile = {
+                id: 't-chang',
+                name: '張芷嫣',
+                user_id: 'u0000000-0000-0000-0000-000000000001',
+                instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
+                tags: ['伴奏鋼琴', '音樂班專業', '音樂素養'],
+                tag_color: '#B58EBE',
+                tag_bg: 'rgba(181, 142, 190, 0.15)',
+                avatar_url: '../../UI/teacher_avatar.png',
+                bio: '國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。',
+                education: [
+                    '奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)',
+                    '國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)',
+                    '曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧'
+                ],
+                highlights: [
+                    '10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所',
+                    '特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材',
+                    '結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確'
+                ],
+                social_links: [
+                    { label: 'Instagram', icon: '📷', url: 'https://instagram.com/chihyen_piano' },
+                    { label: 'Facebook', icon: '📘', url: 'https://facebook.com/chihyen.piano' },
+                    { label: 'YouTube', icon: '▶️', url: 'https://youtube.com/c/chihyen_studio' }
+                ]
+            };
+
+            if (db.teacher_profile) {
+                return Object.assign({}, defaultProfile, db.teacher_profile);
+            }
+            const saved = localStorage.getItem('musimate_teacher_profile');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    return Object.assign({}, defaultProfile, parsed);
+                } catch(e) {}
+            }
+            return defaultProfile;
+        },
+
+        // 儲存教師個人簡介（寫入本機與 Firebase 雲端）
+        saveTeacherProfile(profile) {
+            const db = getDB();
+            db.teacher_profile = profile;
+            saveDB(db);
+            localStorage.setItem('musimate_teacher_profile', JSON.stringify(profile));
+            return profile;
         }
     };
 })();

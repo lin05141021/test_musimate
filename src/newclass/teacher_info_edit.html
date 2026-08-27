@@ -12,6 +12,7 @@
     <!-- 樣式庫 -->
     <link rel="stylesheet" href="../../UI/style_0824.css">
     <link rel="stylesheet" href="newclass_styles.css">
+    <script src="../data/musimate_db.js"></script>
     <style>
         .edit-card {
             width: 100%;
@@ -198,7 +199,23 @@
                         <label class="form-label">個人介紹 / 教學理念</label>
                         <span style="color: #9CA3AF; font-size: 12px;" id="charCount">112 / 500 字</span>
                     </div>
-                    <textarea class="form-textarea" id="teacherBioInput" oninput="updateCharCount(this)">國立師大音樂系碩士，主修鋼琴，副修豎笛。音樂教學資歷10年，培養超過30位學生錄取音樂專班。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的合奏藝術。</textarea>
+                    <textarea class="form-textarea" id="teacherBioInput" oninput="updateCharCount(this)" rows="4">國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。</textarea>
+                </div>
+
+                <!-- 學歷背景與演奏文憑 (每行一項) -->
+                <div class="form-group">
+                    <label class="form-label">學歷背景與演奏文憑 (每行一項)</label>
+                    <textarea class="form-textarea" id="teacherEducationInput" rows="3">奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)
+國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)
+曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧</textarea>
+                </div>
+
+                <!-- 教學成果與教學特色 (每行一項) -->
+                <div class="form-group">
+                    <label class="form-label">教學成果與教學特色 (每行一項)</label>
+                    <textarea class="form-textarea" id="teacherHighlightsInput" rows="3">10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所
+特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材
+結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確</textarea>
                 </div>
 
                 <!-- 社群關注連結 -->
@@ -209,19 +226,19 @@
                         <div style="display: flex; align-items: center; gap: 14px;">
                             <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
                             <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">Instagram</span>
-                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://instagram.com/chihyen_piano">
+                            <input type="text" class="form-input" id="igUrlInput" style="padding: 8px 12px; font-size: 14px;" value="https://instagram.com/chihyen_piano">
                         </div>
                         <!-- Facebook -->
                         <div style="display: flex; align-items: center; gap: 14px;">
                             <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
                             <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">Facebook</span>
-                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://facebook.com/chihyen.piano">
+                            <input type="text" class="form-input" id="fbUrlInput" style="padding: 8px 12px; font-size: 14px;" value="https://facebook.com/chihyen.piano">
                         </div>
                         <!-- YouTube -->
                         <div style="display: flex; align-items: center; gap: 14px;">
                             <div class="toggle-switch" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div>
                             <span style="width: 84px; font-weight: 700; color: #B58EBE; font-size: 14px;">YouTube</span>
-                            <input type="text" class="form-input" style="padding: 8px 12px; font-size: 14px;" value="https://youtube.com/c/chihyen_studio">
+                            <input type="text" class="form-input" id="ytUrlInput" style="padding: 8px 12px; font-size: 14px;" value="https://youtube.com/c/chihyen_studio">
                         </div>
                     </div>
                 </div>
@@ -295,52 +312,89 @@ function handleSave() {
     const tagElements = document.querySelectorAll('#tagsContainer .tag-pill-edit span:first-child');
     const tags = Array.from(tagElements).map(el => el.innerText.trim());
 
+    // 收集學歷與亮點
+    const eduText = document.getElementById('teacherEducationInput').value;
+    const education = eduText.split('\n').map(s => s.trim()).filter(Boolean);
+
+    const highlightText = document.getElementById('teacherHighlightsInput').value;
+    const highlights = highlightText.split('\n').map(s => s.trim()).filter(Boolean);
+
     // 收集社群
-    const inputs = document.querySelectorAll('.form-group input.form-input');
-    const ig = inputs[2]?.value || 'https://instagram.com/chihyen_piano';
-    const fb = inputs[3]?.value || 'https://facebook.com/chihyen.piano';
-    const yt = inputs[4]?.value || 'https://youtube.com/c/chihyen_studio';
+    const ig = document.getElementById('igUrlInput').value || 'https://instagram.com/chihyen_piano';
+    const fb = document.getElementById('fbUrlInput').value || 'https://facebook.com/chihyen.piano';
+    const yt = document.getElementById('ytUrlInput').value || 'https://youtube.com/c/chihyen_studio';
 
     const profileData = {
         name,
-        instruments,
+        instrument: instruments,
         bio,
-        avatar,
+        avatar_url: avatar,
         tags,
-        socials: { ig, fb, yt }
+        education,
+        highlights,
+        social_links: [
+            { label: 'Instagram', icon: '📷', url: ig },
+            { label: 'Facebook', icon: '📘', url: fb },
+            { label: 'YouTube', icon: '▶️', url: yt }
+        ]
     };
 
-    localStorage.setItem('musimate_teacher_profile', JSON.stringify(profileData));
-    alert('✅ 個人檔案變更已成功儲存！\n已即時同步更新至資料庫與師資介紹專欄。');
+    if (window.MusiMateDB) {
+        window.MusiMateDB.saveTeacherProfile(profileData);
+    } else {
+        localStorage.setItem('musimate_teacher_profile', JSON.stringify(profileData));
+    }
+
+    alert('✅ 個人檔案變更已成功儲存！\n已即時同步更新至雲端資料庫與師資介紹專欄。');
     location.href = 'teacher_info.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('musimate_teacher_profile');
-    if (saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.name) document.getElementById('teacherNameInput').value = data.name;
-            if (data.instruments) document.getElementById('teacherInstrumentInput').value = data.instruments;
-            if (data.bio) {
-                document.getElementById('teacherBioInput').value = data.bio;
-                updateCharCount(document.getElementById('teacherBioInput'));
-            }
-            if (data.avatar) document.getElementById('avatarPreview').src = data.avatar;
-            if (data.tags && data.tags.length > 0) {
-                const container = document.getElementById('tagsContainer');
-                const addBtn = container.lastElementChild;
-                container.innerHTML = '';
-                data.tags.forEach(t => {
-                    const tagEl = document.createElement('div');
-                    tagEl.className = 'tag-pill-edit';
-                    tagEl.innerHTML = `<span>${t}</span><span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>`;
-                    container.appendChild(tagEl);
-                });
-                container.appendChild(addBtn);
-            }
-        } catch(e) {
-            console.error('Error loading saved teacher profile:', e);
+    let profile = null;
+    if (window.MusiMateDB) {
+        profile = window.MusiMateDB.getTeacherProfile();
+    } else {
+        const saved = localStorage.getItem('musimate_teacher_profile');
+        if (saved) {
+            try { profile = JSON.parse(saved); } catch(e) {}
+        }
+    }
+
+    if (profile) {
+        if (profile.name) document.getElementById('teacherNameInput').value = profile.name;
+        if (profile.instrument) document.getElementById('teacherInstrumentInput').value = profile.instrument;
+        if (profile.bio) {
+            document.getElementById('teacherBioInput').value = profile.bio;
+            updateCharCount(document.getElementById('teacherBioInput'));
+        }
+        if (profile.avatar_url) document.getElementById('avatarPreview').src = profile.avatar_url;
+        
+        if (profile.education && profile.education.length > 0) {
+            document.getElementById('teacherEducationInput').value = profile.education.join('\n');
+        }
+        if (profile.highlights && profile.highlights.length > 0) {
+            document.getElementById('teacherHighlightsInput').value = profile.highlights.join('\n');
+        }
+
+        if (profile.tags && profile.tags.length > 0) {
+            const container = document.getElementById('tagsContainer');
+            const addBtn = container.lastElementChild;
+            container.innerHTML = '';
+            profile.tags.forEach(t => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'tag-pill-edit';
+                tagEl.innerHTML = `<span>${t}</span><span class="tag-close-btn" onclick="this.parentElement.remove()">✕</span>`;
+                container.appendChild(tagEl);
+            });
+            container.appendChild(addBtn);
+        }
+
+        if (profile.social_links) {
+            profile.social_links.forEach(s => {
+                if (s.label === 'Instagram' && document.getElementById('igUrlInput')) document.getElementById('igUrlInput').value = s.url;
+                if (s.label === 'Facebook' && document.getElementById('fbUrlInput')) document.getElementById('fbUrlInput').value = s.url;
+                if (s.label === 'YouTube' && document.getElementById('ytUrlInput')) document.getElementById('ytUrlInput').value = s.url;
+            });
         }
     }
 });
