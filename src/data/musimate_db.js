@@ -130,6 +130,8 @@ const MusiMateDB = (() => {
         }
     }
 
+    let pendingCloudSyncData = null;
+
     // 儲存資料（同時寫入 localStorage 與 Firestore 雲端資料庫）
     function saveDB(data) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -141,6 +143,8 @@ const MusiMateDB = (() => {
                 .catch(err => {
                     console.warn('⚠️ [Firebase] 寫入失敗 (將繼續使用本機快取):', err);
                 });
+        } else {
+            pendingCloudSyncData = data;
         }
     }
 
@@ -167,11 +171,30 @@ const MusiMateDB = (() => {
                     firestoreDb = firebase.firestore();
                     console.log('🔥 [Firebase] 已成功連線至 Google Firebase Firestore (musimate-b91ff)');
 
-                    // 監聽雲端資料庫變更（支援同學手機請假、新同學加好友時，老師電腦端秒級自動更新）
+                    // 如果在連線前有待同步的本機資料，立刻補傳至雲端！
+                    if (pendingCloudSyncData) {
+                        firestoreDb.collection('musimate_store').doc('app_data').set(pendingCloudSyncData, { merge: true });
+                        pendingCloudSyncData = null;
+                    }
+
+                    // 監聽雲端資料庫變更
                     firestoreDb.collection('musimate_store').doc('app_data').onSnapshot((doc) => {
                         if (doc.exists) {
                             const cloudData = doc.data();
                             if (cloudData && Array.isArray(cloudData.users) && Array.isArray(cloudData.appointments)) {
+                                // 智慧合併本機最新綁定的 LINE User ID
+                                const localDB = getDB();
+                                localDB.users.forEach(lu => {
+                                    if (lu.line_user_id) {
+                                        const cu = cloudData.users.find(u => u.id === lu.id || u.line_user_id === lu.line_user_id);
+                                        if (cu) {
+                                            cu.line_user_id = lu.line_user_id;
+                                        } else {
+                                            cloudData.users.push(lu);
+                                        }
+                                    }
+                                });
+
                                 localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
                                 isCloudSynced = true;
                                 window.dispatchEvent(new CustomEvent('musimate_db_synced', { detail: cloudData }));

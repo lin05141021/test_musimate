@@ -213,18 +213,22 @@ async function initLiffAuth() {
     try {
         if (typeof liff !== 'undefined') {
             await liff.init({ liffId: '2011164851-lGsEnQWB' });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                console.log('✅ LINE LIFF 學生登入成功:', profile);
-                if (window.MusiMateDB && profile && profile.userId) {
-                    const result = window.MusiMateDB.authLiffUser(profile);
-                    if (result && result.student) {
-                        currentActiveStudent = result.student;
-                        populateStudentSelector();
-                        const sel = document.getElementById('studentSelector');
-                        if (sel) sel.value = result.student.id || result.student.student_id;
-                        switchStudent(result.student.id || result.student.student_id);
-                    }
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+            const profile = await liff.getProfile();
+            console.log('✅ LINE LIFF 學生登入成功:', profile);
+            if (window.MusiMateDB && profile && profile.userId) {
+                const result = window.MusiMateDB.authLiffUser(profile);
+                if (result && result.student) {
+                    currentActiveStudent = result.student;
+                    populateStudentSelector();
+                    const sel = document.getElementById('studentSelector');
+                    if (sel) sel.value = result.student.id || result.student.student_id;
+                    switchStudent(result.student.id || result.student.student_id);
+                    const sub = document.getElementById('studentBannerSubtitle');
+                    if (sub) sub.innerText = `張老師 · ${result.user.name} 專屬課表 (🟢 LINE 雲端即時連線)`;
                 }
             }
         }
