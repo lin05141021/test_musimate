@@ -27,22 +27,23 @@
             <span>📶 🔋</span>
         </div>
 
-        <!-- 導航列與學生動態切換 (由資料庫動態載入學生名單) -->
+        <!-- 導航列 (僅顯示個人學生身分徽章，無切換選單) -->
         <div class="nav-header">
             <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'" style="cursor: pointer;">
                 <div class="brand-icon">🎵</div>
                 <span>MusiMate</span>
             </div>
-            <select id="studentSelector" class="student-select" onchange="switchStudent(this.value)">
-                <option value="">載入學生名冊...</option>
-            </select>
+            <div id="studentNamePill" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; background: rgba(206, 171, 152, 0.2); border: 1px solid #CEAB98; font-size: 13px; font-weight: 700; color: #4A3A31;">
+                <span id="studentAvatarIcon">👤</span>
+                <span id="currentStudentDisplayName">載入中...</span>
+            </div>
         </div>
 
         <!-- 頁面主內容 -->
         <div class="main-content">
             <div class="page-header">
                 <h1 class="page-title">我的課表</h1>
-                <p id="studentBannerSubtitle" class="page-subtitle">張老師 · 預約課堂清單 (資料庫實時連動)</p>
+                <p id="studentBannerSubtitle" class="page-subtitle">張老師 · 個人專屬課表</p>
             </div>
 
             <!-- 已繳費未排課剩餘時數提示膠囊 -->
@@ -141,25 +142,20 @@ function createAppointmentCardHtml(appt) {
 
 let currentActiveStudent = null;
 
-function populateStudentSelector() {
-    const selector = document.getElementById('studentSelector');
-    if (!selector || !window.MusiMateDB) return;
+function updateStudentHeader(student, lineDisplayName) {
+    if (!student) return;
+    const nameEl = document.getElementById('currentStudentDisplayName');
+    const avatarEl = document.getElementById('studentAvatarIcon');
+    const subTitleEl = document.getElementById('studentBannerSubtitle');
 
-    const students = window.MusiMateDB.getStudents();
-    selector.innerHTML = students.map(s => `
-        <option value="${s.student_id}">${s.name} (${s.default_instrument.split(' ')[0]})</option>
-    `).join('');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramStudentId = urlParams.get('student_id');
-    if (paramStudentId && students.some(s => s.student_id === paramStudentId)) {
-        selector.value = paramStudentId;
-    } else {
-        // 預設 Lin
-        const lin = students.find(s => s.name.includes('Lin') || s.name.includes('林'));
-        if (lin) selector.value = lin.student_id;
+    const displayName = lineDisplayName || student.name || '學員';
+    if (nameEl) nameEl.innerText = displayName;
+    if (avatarEl && student.avatar_url) {
+        avatarEl.innerHTML = `<img src="${student.avatar_url}" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;" alt="avatar" />`;
     }
-    currentActiveStudent = students.find(s => s.student_id === selector.value) || students[0];
+    if (subTitleEl) {
+        subTitleEl.innerText = `張老師 · ${displayName} 個人專屬課表`;
+    }
 }
 
 function renderSchedule(studentId) {
@@ -167,10 +163,11 @@ function renderSchedule(studentId) {
     if (!window.MusiMateDB) return;
 
     const students = window.MusiMateDB.getStudents();
-    const targetStudent = students.find(s => s.student_id === studentId) || students[0];
+    const targetStudent = students.find(s => s.student_id === studentId) || students.find(s => s.name.includes('Lin')) || students[0];
     if (!targetStudent) return;
 
     currentActiveStudent = targetStudent;
+    updateStudentHeader(targetStudent);
     const targetStudentId = targetStudent.student_id;
 
     const appts = window.MusiMateDB.getAppointmentsByStudent(targetStudentId);
@@ -188,25 +185,19 @@ function renderSchedule(studentId) {
     }
 
     if (appts.length === 0) {
-        container.innerHTML = '<div style="padding: 30px; text-align: center; color: #8C827A; font-weight: 700;">目前無已排定的課程</div>';
+        container.innerHTML = '<div style="padding: 30px; text-align: center; color: #8C827A; font-weight: 700;">目前無已排定的個人課程</div>';
         return;
     }
 
     container.innerHTML = appts.map(appt => createAppointmentCardHtml(appt)).join('');
 }
 
-function switchStudent(studentId) {
-    const students = window.MusiMateDB.getStudents();
-    const student = students.find(s => s.student_id === studentId);
-    if (student) {
-        const subtitle = document.getElementById('studentBannerSubtitle');
-        subtitle.innerText = `張老師 · ${student.name} 預約課堂清單 (資料庫連線)`;
-        renderSchedule(studentId);
-    }
-}
-
 function handleRescheduleClick(appointmentId) {
     window.location.href = `student_changeclass.html?lesson_id=${appointmentId}`;
+}
+
+function goToBookNew() {
+    window.location.href = `../newclass/oldstudent_newclass.html`;
 }
 
 async function initLiffAuth() {
@@ -223,12 +214,10 @@ async function initLiffAuth() {
                 const result = window.MusiMateDB.authLiffUser(profile);
                 if (result && result.student) {
                     currentActiveStudent = result.student;
-                    populateStudentSelector();
-                    const sel = document.getElementById('studentSelector');
-                    if (sel) sel.value = result.student.id || result.student.student_id;
-                    switchStudent(result.student.id || result.student.student_id);
+                    updateStudentHeader(result.student, result.user ? result.user.name : profile.displayName);
+                    renderSchedule(result.student.student_id || result.student.id);
                     const sub = document.getElementById('studentBannerSubtitle');
-                    if (sub) sub.innerText = `張老師 · ${result.user.name} 專屬課表 (🟢 LINE 雲端即時連線)`;
+                    if (sub) sub.innerText = `張老師 · ${result.user ? result.user.name : profile.displayName} 個人課表 (🟢 LINE 雲端連線)`;
                 }
             }
         }
@@ -240,17 +229,15 @@ async function initLiffAuth() {
 // 監聽 Firebase 雲端即時同步
 window.addEventListener('musimate_db_synced', () => {
     console.log('⚡ 學生端收到雲端最新課表同步！');
-    populateStudentSelector();
     if (currentActiveStudent) {
         renderSchedule(currentActiveStudent.student_id || currentActiveStudent.id);
     }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    populateStudentSelector();
-    if (currentActiveStudent) {
-        switchStudent(currentActiveStudent.student_id);
-    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramStudentId = urlParams.get('student_id');
+    renderSchedule(paramStudentId);
     initLiffAuth();
 });
 </script>
