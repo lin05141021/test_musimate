@@ -511,30 +511,36 @@ body.mobile-view {
 .card-hua .card-subtitle { color: #4527A0; font-size: 11px; font-weight: 600; }
 .card-hua .card-meta { color: #512DA8; font-size: 10px; font-weight: 500; }
 
-/* 開放自選時段卡片 (改為白底卡片) */
+/* 開放自選時段卡片 (50%透明白底與100%白側邊線) */
 .slot-card {
     padding: 8px 10px;
-    background: #FFFFFF;
-    border: 1px solid #EFECE6;
-    border-left: 4px solid #CEAB98;
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+    border-left: 4px solid #FFFFFF !important;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(43, 48, 73, 0.04) !important;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .slot-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.75) !important;
+    border-left: 4px solid #FFFFFF !important;
+    box-shadow: 0 4px 12px rgba(43, 48, 73, 0.08) !important;
 }
 
 .slot-card-released {
-    background: #FFFFFF !important;
-    border: 1px solid #C8E6C9;
-    border-left: 4px solid #4CAF50 !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+    border-left: 4px solid #FFFFFF !important;
 }
 
 .slot-title { color: #6F6F6F; font-size: 11px; font-weight: 700; }
@@ -959,14 +965,18 @@ body.mobile-view {
    10. 頁尾組件 (Footer)
    ------------------------------------------------------------ */
 .footer {
-    width: 1440px;
-    padding: 32px 80px;
+    width: 100%;
+    max-width: 1440px;
+    padding: 48px 80px 32px 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #F0EAE1;
+    border-top: 1px solid rgba(250, 246, 240, 0.6);
     font-size: 13px;
     color: #6F6F6F;
+    background: #FAF6F0 url('../../UI/water_color.png') repeat-x center bottom / cover !important;
+    border-radius: 0 0 24px 24px;
+    box-sizing: border-box;
 }
 
 /* ------------------------------------------------------------

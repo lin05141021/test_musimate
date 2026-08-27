@@ -413,13 +413,16 @@ body {
    7. 頁尾組件 (Footer)
    ------------------------------------------------------------ */
 .footer {
-    width: 1440px;
+    width: 100%;
+    max-width: 1440px;
     padding: 48px 80px 32px 80px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #F0EAE1;
+    border-top: 1px solid rgba(250, 246, 240, 0.6);
     font-size: 13px;
     color: #6F6F6F;
-    background: #FAF6F0;
+    background: #FAF6F0 url('../../UI/water_color.png') repeat-x center bottom / cover !important;
+    border-radius: 0 0 24px 24px;
+    box-sizing: border-box;
 }

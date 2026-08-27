@@ -83,17 +83,21 @@
         }
         .slot-card,
         .slot-card-released {
-            background: #FFFFFF !important;
-            border: 1.5px solid #EFECE6 !important;
-            border-left: 4px solid #4CAF50 !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+            border-left: 4px solid #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(43, 48, 73, 0.04) !important;
             cursor: pointer;
             transition: all 0.2s;
         }
         .slot-card:hover,
         .slot-card-released:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+            background: rgba(255, 255, 255, 0.75) !important;
+            border-left: 4px solid #FFFFFF !important;
+            box-shadow: 0 4px 12px rgba(43, 48, 73, 0.08) !important;
         }
         .footer {
             background: #FAF6F0 url('../../UI/water_color.png') repeat-x center bottom / cover !important;
@@ -294,6 +298,10 @@
                     🔄 協助學生調課改期
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
 <!-- ============================================================
      5. 快速新增排課 / 開放時段 彈窗 (點擊時段 + 按鈕開啟)
      ============================================================ -->
