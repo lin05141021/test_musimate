@@ -1,7 +1,7 @@
 /**
  * ========================================================
  * MusiMate 整合式資料庫與 LINE LIFF 智慧身份連線核心
- * 對齊: supabase/schema.sql 與真實業務欄位
+ * 支援: Google Firebase Cloud Firestore 雲端雙向即時同步
  * ========================================================
  */
 
@@ -9,6 +9,20 @@ const MusiMateDB = (() => {
     const STORAGE_KEY = 'musimate_full_database_v1';
     const RECONCILED_KEY = 'musimate_reconciled_ids';
     const REMAINING_HOURS_PREFIX = 'musimate_remaining_hours_';
+
+    // Firebase 設定
+    const firebaseConfig = {
+        apiKey: "AIzaSyAO6mxl6EE9FMaKhCpLcX5saswLw9oHrNI",
+        authDomain: "musimate-b91ff.firebaseapp.com",
+        projectId: "musimate-b91ff",
+        storageBucket: "musimate-b91ff.firebasestorage.app",
+        messagingSenderId: "585893214915",
+        appId: "1:585893214915:web:a723e743ddcb4638a30076",
+        measurementId: "G-LRPW0GE1VS"
+    };
+
+    let firestoreDb = null;
+    let isCloudSynced = false;
 
     // 初始種子資料 (對齊 supabase/schema.sql)
     const seedData = {
@@ -36,7 +50,7 @@ const MusiMateDB = (() => {
                 name: 'Charles (查爾斯)',
                 email: 'charles.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null // 待首次 LINE LIFF 登入時自動比對綁定
+                line_user_id: null
             },
             {
                 id: 'u0000000-0000-0000-0000-000000000004',
@@ -44,7 +58,7 @@ const MusiMateDB = (() => {
                 name: 'Johnny (強尼)',
                 email: 'johnny.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null // 待首次 LINE LIFF 登入時自動比對綁定
+                line_user_id: null
             },
             {
                 id: 'u0000000-0000-0000-0000-000000000005',
@@ -52,7 +66,7 @@ const MusiMateDB = (() => {
                 name: 'Lin (林同學)',
                 email: 'lin.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-                line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c' // 已綁定
+                line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c'
             },
             {
                 id: 'u0000000-0000-0000-0000-000000000006',
@@ -73,10 +87,10 @@ const MusiMateDB = (() => {
         ],
         students: [
             { id: 's0000000-0000-0000-0000-000000000002', user_id: 'u0000000-0000-0000-0000-000000000002', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '小提琴 (Violin)', rate_per_lesson: 1200 },
-            { id: 's0000000-0000-0000-0000-000000000003', user_id: 'u0000000-0000-0000-0000-000000000003', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 }, // Charles
-            { id: 's0000000-0000-0000-0000-000000000004', user_id: 'u0000000-0000-0000-0000-000000000004', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 }, // Johnny
-            { id: 's0000000-0000-0000-0000-000000000005', user_id: 'u0000000-0000-0000-0000-000000000005', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 }, // Lin
-            { id: 's0000000-0000-0000-0000-000000000006', user_id: 'u0000000-0000-0000-0000-000000000006', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1500 }  // 小華
+            { id: 's0000000-0000-0000-0000-000000000003', user_id: 'u0000000-0000-0000-0000-000000000003', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 },
+            { id: 's0000000-0000-0000-0000-000000000004', user_id: 'u0000000-0000-0000-0000-000000000004', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 },
+            { id: 's0000000-0000-0000-0000-000000000005', user_id: 'u0000000-0000-0000-0000-000000000005', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000 },
+            { id: 's0000000-0000-0000-0000-000000000006', user_id: 'u0000000-0000-0000-0000-000000000006', teacher_id: 't0000000-0000-0000-0000-000000000001', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1500 }
         ],
         schedule_slots: [
             { id: 's1', start_time: '2026-08-24T10:00:00+08:00', end_time: '2026-08-24T11:00:00+08:00', location: '音符琴房 A301', is_available: true },
@@ -89,27 +103,20 @@ const MusiMateDB = (() => {
             { id: 's8', start_time: '2026-08-30T14:00:00+08:00', end_time: '2026-08-30T15:00:00+08:00', location: '音符琴房 A303', is_available: true }
         ],
         appointments: [
-            // Charles: 8/26起 每週一三 19:30-21:30 共10堂 (已預付 paid)
             { id: 'app-c1', student_id: 's0000000-0000-0000-0000-000000000003', student_name: 'Charles (查爾斯)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-24T19:30:00+08:00', end_time: '2026-08-24T21:30:00+08:00', location: '音符琴房 A301', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '巴哈創意曲 No.8 觸鍵訓練', attendance: 'attended' },
             { id: 'app-c2', student_id: 's0000000-0000-0000-0000-000000000003', student_name: 'Charles (查爾斯)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-26T19:30:00+08:00', end_time: '2026-08-26T21:30:00+08:00', location: '音符琴房 A301', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '貝多芬奏鳴曲 呈示部練習', attendance: 'pending' },
             { id: 'app-c3', student_id: 's0000000-0000-0000-0000-000000000003', student_name: 'Charles (查爾斯)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-31T19:30:00+08:00', end_time: '2026-08-31T21:30:00+08:00', location: '音符琴房 A301', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '', attendance: 'pending' },
-            
-            // Johnny: 每週一 17:00-19:00 與 每週四 19:30-21:30 (單堂後付 pay_per_lesson)
             { id: 'app-j1', student_id: 's0000000-0000-0000-0000-000000000004', student_name: 'Johnny (強尼)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-24T17:00:00+08:00', end_time: '2026-08-24T19:00:00+08:00', location: '音符琴房 A302', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '哈農練習曲第 1-5 首手腕放鬆', attendance: 'attended' },
             { id: 'app-j2', student_id: 's0000000-0000-0000-0000-000000000004', student_name: 'Johnny (強尼)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-27T19:30:00+08:00', end_time: '2026-08-27T21:30:00+08:00', location: '音符琴房 A302', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '徹爾尼 599 第 30 條', attendance: 'pending' },
-            
-            // Lin: 8/25起 每週三六 10:00-12:00 (單堂後付 pay_per_lesson)
             { id: 'app-l1', student_id: 's0000000-0000-0000-0000-000000000005', student_name: 'Lin (林同學)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-26T10:00:00+08:00', end_time: '2026-08-26T12:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '蕭邦夜曲 Op.9 No.2 踏板與裝飾音', attendance: 'pending' },
             { id: 'app-l2', student_id: 's0000000-0000-0000-0000-000000000005', student_name: 'Lin (林同學)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-29T10:00:00+08:00', end_time: '2026-08-29T12:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '', attendance: 'pending' },
             { id: 'app-l3', student_id: 's0000000-0000-0000-0000-000000000005', student_name: 'Lin (林同學)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-09-02T10:00:00+08:00', end_time: '2026-09-02T12:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '', attendance: 'pending' },
-            
-            // 小明 (小提琴) 與 小華 (鋼琴)
             { id: 'app-m1', student_id: 's0000000-0000-0000-0000-000000000002', student_name: '小明 (Ming)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-25T10:00:00+08:00', end_time: '2026-08-25T11:00:00+08:00', location: '音符琴房 A301', status: 'confirmed', instrument: '小提琴 (Violin)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '塞茲小提琴協奏曲 第一樂章換把位', attendance: 'attended' },
             { id: 'app-h1', student_id: 's0000000-0000-0000-0000-000000000006', student_name: '小華 (Hua)', teacher_id: 't0000000-0000-0000-0000-000000000001', start_time: '2026-08-26T15:00:00+08:00', end_time: '2026-08-26T16:00:00+08:00', location: '張老師家中', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '莫札特小奏鳴曲 K.545', attendance: 'pending' }
         ]
     };
 
-    // 初始化讀取或存檔
+    // 初始化讀取本機 DB
     function getDB() {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) {
@@ -123,13 +130,81 @@ const MusiMateDB = (() => {
         }
     }
 
+    // 儲存資料（同時寫入 localStorage 與 Firestore 雲端資料庫）
     function saveDB(data) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        if (firestoreDb) {
+            firestoreDb.collection('musimate_store').doc('app_data').set(data, { merge: true })
+                .then(() => {
+                    console.log('☁️ [Firebase Firestore] 雲端中央資料庫即時同步成功');
+                })
+                .catch(err => {
+                    console.warn('⚠️ [Firebase] 寫入失敗 (將繼續使用本機快取):', err);
+                });
+        }
+    }
+
+    // 動態載入 Firebase SDK 並啟動雙向監聽
+    function initFirebaseCloudSync() {
+        if (typeof window === 'undefined') return;
+
+        const loadScript = (src) => new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) return resolve();
+            const s = document.createElement('script');
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+
+        loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js')
+            .then(() => loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js'))
+            .then(() => {
+                if (typeof firebase !== 'undefined') {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    firestoreDb = firebase.firestore();
+                    console.log('🔥 [Firebase] 已成功連線至 Google Firebase Firestore (musimate-b91ff)');
+
+                    // 監聽雲端資料庫變更（支援同學手機請假、新同學加好友時，老師電腦端秒級自動更新）
+                    firestoreDb.collection('musimate_store').doc('app_data').onSnapshot((doc) => {
+                        if (doc.exists) {
+                            const cloudData = doc.data();
+                            if (cloudData && Array.isArray(cloudData.users) && Array.isArray(cloudData.appointments)) {
+                                localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudData));
+                                isCloudSynced = true;
+                                window.dispatchEvent(new CustomEvent('musimate_db_synced', { detail: cloudData }));
+                                console.log('⚡ [Firebase Firestore] 收到最新雲端資料推播，本機已自動同步！');
+                            }
+                        } else {
+                            // 第一次連線：將種子資料上傳至雲端資料庫
+                            console.log('🌱 [Firebase] 首次初始化：將初始課表與學生資料推送到 Firestore...');
+                            const current = getDB();
+                            firestoreDb.collection('musimate_store').doc('app_data').set(current);
+                        }
+                    }, (err) => {
+                        console.warn('⚠️ Firebase onSnapshot 連線提示:', err);
+                    });
+                }
+            })
+            .catch(err => {
+                console.warn('Firebase SDK 載入跳過:', err);
+            });
+    }
+
+    // 自動啟動雲端同步
+    if (typeof window !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFirebaseCloudSync);
+        } else {
+            initFirebaseCloudSync();
+        }
     }
 
     return {
         /**
-         * 1. LINE LIFF 智慧身份比對與新人自動建檔引擎
+         * 1. LINE LIFF 智慧身份比對與新人自動建檔引擎 (支援雲端即時註冊)
          */
         authLiffUser(liffProfile) {
             const db = getDB();
@@ -138,14 +213,20 @@ const MusiMateDB = (() => {
             // 維度 1：以 line_user_id 查詢 (最優先：已綁定舊生直接登入)
             let user = db.users.find(u => u.line_user_id === userId);
             if (user) {
+                if (pictureUrl && user.avatar_url !== pictureUrl) {
+                    user.avatar_url = pictureUrl;
+                    saveDB(db);
+                }
                 const student = db.students.find(s => s.user_id === user.id);
                 return { isNewUser: false, user, student, matchType: 'line_user_id' };
             }
 
             // 維度 2：以姓名比對 (舊生首次登入認領，如 Charles 或 Johnny)
             user = db.users.find(u => 
-                u.name.toLowerCase().includes(displayName.toLowerCase()) || 
-                displayName.toLowerCase().includes(u.name.toLowerCase())
+                (u.name && displayName && (
+                    u.name.toLowerCase().includes(displayName.toLowerCase()) || 
+                    displayName.toLowerCase().includes(u.name.toLowerCase())
+                ))
             );
 
             if (user) {
@@ -153,19 +234,21 @@ const MusiMateDB = (() => {
                 if (pictureUrl) user.avatar_url = pictureUrl;
                 saveDB(db);
                 const student = db.students.find(s => s.user_id === user.id);
+                console.log(`🎉 [雲端綁定成功] 舊生 ${user.name} 已成功綁定 LINE ID: ${userId}`);
                 return { isNewUser: false, user, student, matchType: 'auto_claimed_name' };
             }
 
-            // 維度 3：完全查無此人 ➔ 自動建立新人！
+            // 維度 3：新加入學員 ➔ 自動建立新學員檔案並同步至雲端！
             const newUserId = 'u-' + Date.now();
             const newStudentId = 's-' + Date.now();
             const newUser = {
                 id: newUserId,
                 role: 'student',
-                name: displayName,
+                name: displayName || '新加入學員',
                 email: `${newUserId}@liff.musimate.com`,
                 avatar_url: pictureUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-                line_user_id: userId
+                line_user_id: userId,
+                created_at: new Date().toISOString()
             };
             const newStudent = {
                 id: newStudentId,
@@ -179,6 +262,7 @@ const MusiMateDB = (() => {
             db.students.push(newStudent);
             saveDB(db);
 
+            console.log(`✨ [新學員自動建檔] 新同學 ${displayName} (${userId}) 已成功建立並寫入雲端資料庫！`);
             return { isNewUser: true, user: newUser, student: newStudent, matchType: 'auto_registered_new' };
         },
 
@@ -213,9 +297,11 @@ const MusiMateDB = (() => {
             const student = db.students.find(s => s.id === studentId);
             if (student) {
                 const user = db.users.find(u => u.id === student.user_id);
-                if (user) user.line_user_id = lineUserId;
-                saveDB(db);
-                return true;
+                if (user) {
+                    user.line_user_id = lineUserId;
+                    saveDB(db);
+                    return true;
+                }
             }
             return false;
         },
@@ -248,7 +334,7 @@ const MusiMateDB = (() => {
             const key = REMAINING_HOURS_PREFIX + studentId;
             const saved = localStorage.getItem(key);
             if (saved !== null) return Number(saved);
-            return 0; // 預設 0 小時
+            return 0;
         },
 
         // 增加學生已繳費未排課時數 (例如請假或老師停課時)
@@ -290,7 +376,7 @@ const MusiMateDB = (() => {
 
             // 標記該時段為已佔用
             db.schedule_slots = db.schedule_slots.map(s => {
-                if (s.start_time.slice(0, 16) === appt.start_time.slice(0, 16)) {
+                if (s.start_time && appt.start_time && s.start_time.slice(0, 16) === appt.start_time.slice(0, 16)) {
                     return { ...s, is_available: false };
                 }
                 return s;
@@ -300,7 +386,7 @@ const MusiMateDB = (() => {
             return newAppt;
         },
 
-        // 週期性批量新增課表 (例如連續排 4 堂、10 堂)
+        // 週期性批量新增課表
         addRecurringAppointments(baseAppt, repeatCount = 1) {
             const addedList = [];
             const startDate = new Date(baseAppt.start_time);
@@ -311,7 +397,6 @@ const MusiMateDB = (() => {
                 const currentStart = new Date(startDate.getTime() + i * 7 * 24 * 60 * 60 * 1000);
                 const currentEnd = new Date(currentStart.getTime() + durationMs);
 
-                // 格式化為 ISO 帶 +08:00
                 const y = currentStart.getFullYear();
                 const m = String(currentStart.getMonth() + 1).padStart(2, '0');
                 const d = String(currentStart.getDate()).padStart(2, '0');
@@ -349,7 +434,7 @@ const MusiMateDB = (() => {
             return newSlot;
         },
 
-        // 調課 (學生或老師)：新時段佔用，原時段自動釋放回開放池
+        // 調課：新時段佔用，原時段自動釋放回開放池
         rescheduleAppointment(appointmentId, newSlot) {
             const db = getDB();
             const appt = db.appointments.find(a => a.id === appointmentId);
@@ -358,14 +443,12 @@ const MusiMateDB = (() => {
                 const oldEndTime = appt.end_time;
                 const oldLocation = appt.location;
 
-                // 1. 更新預約課程之新時間
                 appt.start_time = newSlot.start_time;
                 appt.end_time = newSlot.end_time;
                 appt.location = newSlot.location || appt.location;
                 appt.status = 'confirmed';
 
-                // 2. 舊時段釋放為開放時段
-                const existingOldSlot = db.schedule_slots.find(s => s.start_time.slice(0, 16) === oldStartTime.slice(0, 16));
+                const existingOldSlot = db.schedule_slots.find(s => s.start_time && oldStartTime && s.start_time.slice(0, 16) === oldStartTime.slice(0, 16));
                 if (existingOldSlot) {
                     existingOldSlot.is_available = true;
                 } else {
@@ -378,9 +461,8 @@ const MusiMateDB = (() => {
                     });
                 }
 
-                // 3. 新時段標記為佔用
                 db.schedule_slots = db.schedule_slots.map(s => {
-                    if (s.start_time.slice(0, 16) === newSlot.start_time.slice(0, 16)) {
+                    if (s.start_time && newSlot.start_time && s.start_time.slice(0, 16) === newSlot.start_time.slice(0, 16)) {
                         return { ...s, is_available: false };
                     }
                     return s;
@@ -396,20 +478,17 @@ const MusiMateDB = (() => {
             const db = getDB();
             const appt = db.appointments.find(a => a.id === appointmentId);
             if (appt) {
-                appt.status = 'rescheduled'; // 標記已請假 (待安排補課)
+                appt.status = 'rescheduled';
 
-                // 計算該堂課時數 (小時)
                 const start = new Date(appt.start_time);
                 const end = new Date(appt.end_time);
                 const hours = Math.max(1, Math.round((end - start) / (1000 * 60 * 60)));
 
-                // 增加學生已繳費未排時數
                 if (appt.student_id) {
                     this.addRemainingHours(appt.student_id, hours);
                 }
 
-                // 將該時段自動釋放回開放時段池 (提供其他人或補課自選)
-                const existingSlot = db.schedule_slots.find(s => s.start_time.slice(0, 16) === appt.start_time.slice(0, 16));
+                const existingSlot = db.schedule_slots.find(s => s.start_time && appt.start_time && s.start_time.slice(0, 16) === appt.start_time.slice(0, 16));
                 if (existingSlot) {
                     existingSlot.is_available = true;
                 } else {
@@ -427,7 +506,7 @@ const MusiMateDB = (() => {
             return appt;
         },
 
-        // 老師主動停課 / 老師請假 (自動返還時數並釋放時段)
+        // 老師主動停課
         cancelByTeacher(appointmentId, reason = '老師臨時有事調課') {
             const db = getDB();
             const appt = db.appointments.find(a => a.id === appointmentId);
@@ -443,8 +522,7 @@ const MusiMateDB = (() => {
                     this.addRemainingHours(appt.student_id, hours);
                 }
 
-                // 釋放時段
-                const existingSlot = db.schedule_slots.find(s => s.start_time.slice(0, 16) === appt.start_time.slice(0, 16));
+                const existingSlot = db.schedule_slots.find(s => s.start_time && appt.start_time && s.start_time.slice(0, 16) === appt.start_time.slice(0, 16));
                 if (existingSlot) {
                     existingSlot.is_available = true;
                 }
@@ -493,7 +571,6 @@ const MusiMateDB = (() => {
                 }
                 return { success: true, user: teacherUser, message: '登入成功！正在前往老師課表管理工作台...' };
             }
-            // 若為首次註冊或測試老師
             if (email.includes('teacher') || email.includes('chang')) {
                 return { success: true, user: db.users[0], message: '登入成功！' };
             }
@@ -518,17 +595,14 @@ const MusiMateDB = (() => {
             return newTeacherUser;
         },
 
-        // 取得智慧薪資財務統計 (結合已核銷與待確認)
+        // 取得智慧薪資財務統計
         getFinanceSummary() {
             const reconciledList = JSON.parse(localStorage.getItem(RECONCILED_KEY) || '[]');
-            
-            // 基礎假資料基準
             let totalReceivable = 86400;
             let paidAmount = 62000;
             let pendingAmount = 8400;
             let unpaidAmount = 16000;
 
-            // 依據已核銷 ID 動態增減
             if (reconciledList.includes('tx-lin')) {
                 paidAmount += 2000;
                 pendingAmount = Math.max(0, pendingAmount - 2000);
@@ -558,15 +632,14 @@ const MusiMateDB = (() => {
             };
         },
 
-        // 依學生計算該月學費貢獻度排行 (供 money_fromstudent.html 渲染)
+        // 依學生計算該月學費貢獻度排行
         getStudentContributionList() {
             const db = getDB();
             const students = this.getStudents();
 
-            // 統計每個學生的已繳堂數與總金額
             const list = students.map(s => {
                 const appts = db.appointments.filter(a => a.student_id === s.student_id && a.payment_status === 'paid');
-                const lessonCount = Math.max(appts.length, 4); // 基礎展示堂數
+                const lessonCount = Math.max(appts.length, 4);
                 const rate = s.rate_per_lesson || 1200;
                 const totalAmount = lessonCount * rate;
 
@@ -581,7 +654,6 @@ const MusiMateDB = (() => {
                 };
             });
 
-            // 依據總貢獻金額由高到低排序
             return list.sort((a, b) => b.total_amount - a.total_amount);
         }
     };

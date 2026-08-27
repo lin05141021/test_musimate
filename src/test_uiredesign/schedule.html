@@ -630,6 +630,13 @@ function focusQuickAdd() {
     window.scrollTo({ top: 120, behavior: 'smooth' });
 }
 
+// 監聽 Firebase 雲端即時同步 (當學生請假、調課、或新學員綁定時即時自動更新課表)
+window.addEventListener('musimate_db_synced', () => {
+    console.log('⚡ [老師端] 收到雲端即時資料推播，自動刷新課表！');
+    populateStudentDropdown();
+    renderTimetable();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     populateStudentDropdown();
     renderTimetable();

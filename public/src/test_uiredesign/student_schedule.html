@@ -217,24 +217,13 @@ async function initLiffAuth() {
                 const profile = await liff.getProfile();
                 console.log('✅ LINE LIFF 學生登入成功:', profile);
                 if (window.MusiMateDB && profile && profile.userId) {
-                    const students = window.MusiMateDB.getStudents();
-                    // 1. 先用 LINE User ID 比對
-                    let matched = window.MusiMateDB.getStudentByLineUserId(profile.userId);
-                    // 2. 若尚未綁定，用 Display Name 模糊比對
-                    if (!matched && profile.displayName) {
-                        matched = students.find(s => 
-                            profile.displayName.toLowerCase().includes(s.name.toLowerCase()) ||
-                            s.name.toLowerCase().includes(profile.displayName.toLowerCase())
-                        );
-                        if (matched) {
-                            window.MusiMateDB.bindStudentLineUserId(matched.student_id, profile.userId);
-                            console.log(`🔗 自動完成 LINE ID 綁定: ${matched.name} -> ${profile.userId}`);
-                        }
-                    }
-                    if (matched) {
+                    const result = window.MusiMateDB.authLiffUser(profile);
+                    if (result && result.student) {
+                        currentActiveStudent = result.student;
+                        populateStudentSelector();
                         const sel = document.getElementById('studentSelector');
-                        if (sel) sel.value = matched.student_id;
-                        switchStudent(matched.student_id);
+                        if (sel) sel.value = result.student.id || result.student.student_id;
+                        switchStudent(result.student.id || result.student.student_id);
                     }
                 }
             }
@@ -243,6 +232,15 @@ async function initLiffAuth() {
         console.warn('LIFF Auth skipped or failed:', e);
     }
 }
+
+// 監聽 Firebase 雲端即時同步
+window.addEventListener('musimate_db_synced', () => {
+    console.log('⚡ 學生端收到雲端最新課表同步！');
+    populateStudentSelector();
+    if (currentActiveStudent) {
+        renderSchedule(currentActiveStudent.student_id || currentActiveStudent.id);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     populateStudentSelector();
