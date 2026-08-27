@@ -256,3 +256,86 @@
         padding-right: var(--page-margin-x) !important;
     }
 }
+
+/* ============================================================
+   8. Global Standard Navbar & Avatar (全域導航列與頭像標準規範)
+   ============================================================ */
+.nav-avatar-box {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #CEAB98;
+    cursor: pointer;
+}
+
+.nav-avatar-box img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
+}
+
+/* ============================================================
+   9. Standard Unified Footer (對齊 UI/component/footer.html)
+   ============================================================ */
+.footer {
+    width: 100%;
+    max-width: 1440px;
+    padding: 48px 80px 32px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #FAF6F0;
+    margin-top: 40px;
+    box-sizing: border-box;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-logo-img {
+    height: 36px;
+    width: auto;
+    border-radius: 100px;
+    display: block;
+}
+
+.footer-slogan {
+    color: #6F6F6F;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+}
+
+.footer-copy {
+    color: #4A3A31;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 32px 16px 24px 16px;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+}

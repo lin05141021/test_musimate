@@ -117,8 +117,7 @@
                 <button class="btn-week-nav" onclick="changeWeek(1)">下一週 ▶</button>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button class="btn-add-slot" onclick="focusQuickAdd()" style="background: #2B3049; color: white;">+ 快速排課</button>
-                <button class="btn-add-slot" onclick="location.href='student_schedule.html'" style="display: none;">👁️ 切換學生視角</button>
+                <!-- 已依需求刪除重複的右上快速排課按鈕 -->
             </div>
         </div>
 
@@ -204,13 +203,13 @@
         </div>
     </div>
 
-    <!-- 3. 頁尾 -->
+    <!-- 3. 頁尾 (對齊 UI/component/footer.html 標準組件) -->
     <div class="footer">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-weight: 700; color: #2B3049;">MusiMate</span>
-            <span>· 專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</span>
+        <div class="footer-left">
+            <img class="footer-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+            <div class="footer-slogan">專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</div>
         </div>
-        <div>© 2026 MusiMate. All rights reserved.</div>
+        <div class="footer-copy">© 2026 MusiMate. All rights reserved.</div>
     </div>
 </div>
 
@@ -279,7 +278,76 @@
                     🔄 協助學生調課改期
                 </button>
             </div>
+<!-- ============================================================
+     5. 快速新增排課 / 開放時段 彈窗 (點擊時段 + 按鈕開啟)
+     ============================================================ -->
+<div id="addSlotModal" class="drawer-overlay" onclick="handleAddModalOverlayClick(event)">
+    <div class="drawer-card" onclick="event.stopPropagation()" style="max-width: 520px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F0EAE1; padding-bottom: 12px;">
+            <div style="font-size: 18px; font-weight: 700; color: #2B3049; font-family: 'Noto Serif TC', serif;">
+                ✨ 新增課程 / 開放時段
+            </div>
+            <button onclick="closeAddSlotModal()" style="width: 32px; height: 32px; border-radius: 50%; background: #FAF6F0; border: none; cursor: pointer; font-size: 14px; color: #2B3049;">
+                ✕
+            </button>
         </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+            <button id="tabBtnAppointment" onclick="switchAddModalTab('appointment')" style="flex: 1; padding: 10px; border-radius: 100px; background: #2B3049; color: white; border: none; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                👤 排定學生課程
+            </button>
+            <button id="tabBtnOpenSlot" onclick="switchAddModalTab('openslot')" style="flex: 1; padding: 10px; border-radius: 100px; background: #FAF6F0; color: #7A736E; border: 1px solid #EFECE6; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                ✨ 開放自選時段
+            </button>
+        </div>
+
+        <form onsubmit="return false;" style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+            <!-- 學生選擇 (排課專用) -->
+            <div id="modalStudentGroup" class="form-group">
+                <label class="form-label">學生對象 (student)</label>
+                <select id="modalStudent" class="form-select"></select>
+            </div>
+
+            <!-- 日期 -->
+            <div class="form-group">
+                <label class="form-label">上課/開放日期 (date)</label>
+                <input type="date" id="modalDate" class="form-input" style="cursor: pointer;">
+            </div>
+
+            <!-- 時間 -->
+            <div class="form-group">
+                <label class="form-label">時段 (start - end)</label>
+                <div class="time-range-group">
+                    <input type="text" id="modalStartTime" class="form-input" placeholder="10:00">
+                    <input type="text" id="modalEndTime" class="form-input" placeholder="11:00">
+                </div>
+            </div>
+
+            <!-- 週期 (排課專用) -->
+            <div id="modalRepeatGroup" class="form-group">
+                <label class="form-label">週期排課 (自動順延每週)</label>
+                <select id="modalRepeatCount" class="form-select">
+                    <option value="1" selected>排定單堂 (1 堂)</option>
+                    <option value="4">連排 1 個月 (4 堂)</option>
+                    <option value="10">整期包堂 (10 堂)</option>
+                </select>
+            </div>
+
+            <!-- 地點 -->
+            <div class="form-group">
+                <label class="form-label">地點 (location)</label>
+                <input type="text" id="modalLocation" class="form-input" value="音符琴房 A303">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+                <button type="button" onclick="closeAddSlotModal()" style="flex: 1; padding: 12px; border-radius: 100px; background: #FAF6F0; color: #7A736E; border: 1px solid #EFECE6; font-size: 13px; font-weight: 700; cursor: pointer;">
+                    取消
+                </button>
+                <button type="button" id="modalSubmitBtn" onclick="submitAddModal()" style="flex: 2; padding: 12px; border-radius: 100px; background: #CEAB98; color: white; border: none; font-size: 13px; font-weight: 700; cursor: pointer;">
+                    + 確認排定課程
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -290,6 +358,7 @@
 let currentWeekOffset = 0; // 0: 2026-08-24 週
 const BASE_MONDAY = new Date('2026-08-24T00:00:00+08:00');
 let activeDrawerAppt = null;
+let currentAddModalTab = 'appointment'; // 'appointment' or 'openslot'
 
 function getMondayOfOffset(offsetWeeks) {
     return new Date(BASE_MONDAY.getTime() + offsetWeeks * 7 * 24 * 60 * 60 * 1000);
@@ -336,18 +405,20 @@ function renderTimetable() {
     const d2 = sunday.getDate();
     document.getElementById('weekLabelBadge').innerHTML = `${monday.getFullYear()} 年<br>${String(m1).padStart(2, '0')}月${String(d1).padStart(2, '0')}日 至 ${String(m2).padStart(2, '0')}月${String(d2).padStart(2, '0')}日`;
 
-    const weekdays = ['週一 (Mon)', '週二 (Tue)', '週三 (Wed) 🌟', '週四 (Thu)', '週五 (Fri)', '週六 (Sat) 🌟', '週日 (Sun)'];
+    const todayStr = formatDateISO(new Date());
+    const weekdays = ['週一 (Mon)', '週二 (Tue)', '週三 (Wed)', '週四 (Thu)', '週五 (Fri)', '週六 (Sat)', '週日 (Sun)'];
     const days = [];
     for (let i = 0; i < 7; i++) {
         const d = new Date(monday.getTime() + i * 24 * 60 * 60 * 1000);
         const dateStr = formatDateISO(d);
         const m = String(d.getMonth() + 1).padStart(2, '0');
         const dayNum = String(d.getDate()).padStart(2, '0');
+        const isToday = (dateStr === todayStr);
         days.push({
             dateStr,
             dateLabel: `${m}/${dayNum}`,
-            weekdayLabel: weekdays[i],
-            isActive: (i === 2 || i === 5) // 週三、週六標記重點日
+            weekdayLabel: isToday ? `${weekdays[i]} 📍今天` : weekdays[i],
+            isActive: isToday
         });
     }
 
@@ -602,32 +673,138 @@ function openPracticeCheckModal() {
     alert(`🎯 【${activeDrawerAppt.student_name} · 學生打卡練習成果】\n\n【本週累計自主練習】180 分鐘 (達標 120%)\n【最新打卡錄音】2026/08/25 20:30 上傳\n【AI 音準與節奏分析評分】94 分 🌟\n【AI 評語】右手第 16 小節十六分音符節奏穩定，音色明亮！`);
 }
 
-function quickAddSlotForDay(dateStr, blockKey) {
-    document.getElementById('quickDate').value = dateStr;
+function openAddSlotModal(dateStr, blockKey) {
+    const modal = document.getElementById('addSlotModal');
+    if (!modal) return;
+    
+    // 預設日期
+    document.getElementById('modalDate').value = dateStr || formatDateISO(new Date());
+    
+    // 預設時段
     if (blockKey === 'morning') {
-        document.getElementById('quickStartTime').value = '10:00';
-        document.getElementById('quickEndTime').value = '11:00';
+        document.getElementById('modalStartTime').value = '10:00';
+        document.getElementById('modalEndTime').value = '11:00';
     } else if (blockKey === 'afternoon') {
-        document.getElementById('quickStartTime').value = '14:00';
-        document.getElementById('quickEndTime').value = '15:00';
+        document.getElementById('modalStartTime').value = '14:00';
+        document.getElementById('modalEndTime').value = '15:00';
+    } else if (blockKey === 'evening') {
+        document.getElementById('modalStartTime').value = '19:00';
+        document.getElementById('modalEndTime').value = '20:00';
     } else {
-        document.getElementById('quickStartTime').value = '19:00';
-        document.getElementById('quickEndTime').value = '20:00';
+        document.getElementById('modalStartTime').value = '10:00';
+        document.getElementById('modalEndTime').value = '11:00';
     }
-    focusQuickAdd();
+
+    // 填入學生選單
+    if (window.MusiMateDB) {
+        const students = window.MusiMateDB.getStudents();
+        const sel = document.getElementById('modalStudent');
+        if (sel) {
+            sel.innerHTML = students.map(s => `
+                <option value="${s.student_id}">${s.name} (${s.default_instrument.split(' ')[0]}) - NT$${s.rate_per_lesson}/堂</option>
+            `).join('');
+        }
+    }
+    
+    switchAddModalTab('appointment');
+    modal.classList.add('active');
+}
+
+function closeAddSlotModal() {
+    const modal = document.getElementById('addSlotModal');
+    if (modal) modal.classList.remove('active');
+}
+
+function handleAddModalOverlayClick(e) {
+    if (e.target.id === 'addSlotModal') {
+        closeAddSlotModal();
+    }
+}
+
+function switchAddModalTab(tab) {
+    currentAddModalTab = tab;
+    const btnAppt = document.getElementById('tabBtnAppointment');
+    const btnSlot = document.getElementById('tabBtnOpenSlot');
+    const grpStudent = document.getElementById('modalStudentGroup');
+    const grpRepeat = document.getElementById('modalRepeatGroup');
+    const submitBtn = document.getElementById('modalSubmitBtn');
+
+    if (tab === 'appointment') {
+        btnAppt.style.background = '#2B3049';
+        btnAppt.style.color = 'white';
+        btnSlot.style.background = '#FAF6F0';
+        btnSlot.style.color = '#7A736E';
+        grpStudent.style.display = 'flex';
+        grpRepeat.style.display = 'flex';
+        submitBtn.style.background = '#CEAB98';
+        submitBtn.innerText = '+ 確認排定課程';
+    } else {
+        btnSlot.style.background = '#2B3049';
+        btnSlot.style.color = 'white';
+        btnAppt.style.background = '#FAF6F0';
+        btnAppt.style.color = '#7A736E';
+        grpStudent.style.display = 'none';
+        grpRepeat.style.display = 'none';
+        submitBtn.style.background = '#68C5AB';
+        submitBtn.innerText = '+ 確認開放自選時段';
+    }
+}
+
+function submitAddModal() {
+    if (!window.MusiMateDB) return;
+    const dateVal = document.getElementById('modalDate').value;
+    const startTimeVal = document.getElementById('modalStartTime').value;
+    const endTimeVal = document.getElementById('modalEndTime').value;
+    const loc = document.getElementById('modalLocation').value || '音符琴房 A303';
+
+    if (!dateVal || !startTimeVal || !endTimeVal) {
+        alert('請完整填寫日期與時間！');
+        return;
+    }
+
+    const startIso = `${dateVal}T${startTimeVal}:00+08:00`;
+    const endIso = `${dateVal}T${endTimeVal}:00+08:00`;
+
+    if (currentAddModalTab === 'appointment') {
+        const studentId = document.getElementById('modalStudent').value;
+        const repeatCount = parseInt(document.getElementById('modalRepeatCount').value || '1', 10);
+        
+        window.MusiMateDB.addAppointment({
+            student_id: studentId,
+            start_date: dateVal,
+            start_time: startTimeVal,
+            end_time: endTimeVal,
+            repeat_weeks: repeatCount,
+            location: loc
+        });
+        alert(`🎉 成功排定課程！\n已為學生安排 ${repeatCount} 堂課，資料庫已自動更新並同步。`);
+    } else {
+        window.MusiMateDB.addOpenSlot({
+            start_time: startIso,
+            end_time: endIso,
+            location: loc
+        });
+        alert(`✨ 成功開放預約時段！\n時段已公佈至學生端選課池。`);
+    }
+
+    closeAddSlotModal();
+    renderTimetable();
+}
+
+function quickAddSlotForDay(dateStr, blockKey) {
+    openAddSlotModal(dateStr, blockKey);
 }
 
 function quickBookForOpenSlot(startIso, endIso, loc) {
     const d = new Date(startIso);
-    document.getElementById('quickDate').value = formatDateISO(d);
-    document.getElementById('quickStartTime').value = d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
-    document.getElementById('quickEndTime').value = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
-    document.getElementById('quickLocation').value = loc || '音符琴房 A303';
-    focusQuickAdd();
+    openAddSlotModal(formatDateISO(d), getTimeBlockKey(startIso));
+    document.getElementById('modalStartTime').value = d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    document.getElementById('modalEndTime').value = new Date(endIso).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false });
+    document.getElementById('modalLocation').value = loc || '音符琴房 A303';
 }
 
 function focusQuickAdd() {
-    window.scrollTo({ top: 120, behavior: 'smooth' });
+    openAddSlotModal();
 }
 
 // 監聽 Firebase 雲端即時同步 (當學生請假、調課、或新學員綁定時即時自動更新課表)

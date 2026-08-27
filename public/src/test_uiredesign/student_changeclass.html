@@ -253,6 +253,22 @@ function submitLeave() {
     }, 1000);
 }
 
+function getClosestStudentAppointment(studentId) {
+    if (!window.MusiMateDB) return null;
+    const appts = window.MusiMateDB.getAppointmentsByStudent(studentId);
+    if (!appts || appts.length === 0) return null;
+    
+    // 依據時間由近到遠精準排序
+    const sorted = [...appts].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+    
+    // 優先挑選尚未請假的預約
+    const confirmedAppt = sorted.find(a => a.status === 'confirmed');
+    if (confirmedAppt) return confirmedAppt;
+    
+    // 其次選最早的一筆
+    return sorted[0];
+}
+
 async function initLiffAuth() {
     try {
         if (typeof liff !== 'undefined') {
@@ -265,6 +281,11 @@ async function initLiffAuth() {
                         currentStudentId = result.student.id || result.student.student_id;
                         document.getElementById('studentNamePill').innerText = `${result.user ? result.user.name : '學員'}`;
                         renderSchedule();
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (!urlParams.get('lesson_id')) {
+                            const closest = getClosestStudentAppointment(currentStudentId);
+                            if (closest) openRescheduleModal(closest.id);
+                        }
                     }
                 }
             }
@@ -276,9 +297,14 @@ async function initLiffAuth() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const targetLessonId = urlParams.get('lesson_id') || 'app-l1';
+    const targetLessonId = urlParams.get('lesson_id');
     renderSchedule();
-    openRescheduleModal(targetLessonId);
+    if (targetLessonId) {
+        openRescheduleModal(targetLessonId);
+    } else {
+        const closest = getClosestStudentAppointment(currentStudentId);
+        if (closest) openRescheduleModal(closest.id);
+    }
     initLiffAuth();
 });
 </script>

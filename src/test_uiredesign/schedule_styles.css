@@ -511,16 +511,32 @@ body.mobile-view {
 .card-hua .card-subtitle { color: #4527A0; font-size: 11px; font-weight: 600; }
 .card-hua .card-meta { color: #512DA8; font-size: 10px; font-weight: 500; }
 
-/* 開放自選時段卡片 */
+/* 開放自選時段卡片 (改為白底卡片) */
 .slot-card {
     padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.75);
+    background: #FFFFFF;
+    border: 1px solid #EFECE6;
     border-left: 4px solid #CEAB98;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: all 0.2s;
 }
+
+.slot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.slot-card-released {
+    background: #FFFFFF !important;
+    border: 1px solid #C8E6C9;
+    border-left: 4px solid #4CAF50 !important;
+}
+
 .slot-title { color: #6F6F6F; font-size: 11px; font-weight: 700; }
 .slot-time { color: #2B3049; font-size: 11px; font-weight: 600; }
 .slot-location { color: #8C827A; font-size: 10px; font-weight: 500; }
