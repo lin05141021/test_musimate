@@ -3,8 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { StudentTabBar } from '@/components/StudentTabBar';
 import { useDemoContext } from '@/context/DemoContext';
-import { StudentBottomNav } from '@/components/StudentBottomNav';
 import {
   Video,
   Play,
@@ -264,7 +264,7 @@ export default function StudentCompareDetailPage() {
       </div>
 
       {/* 學生專屬固定底部導航列 */}
-      <StudentBottomNav />
+      <StudentTabBar activeTab="practice" />
     </div>
   );
 }
