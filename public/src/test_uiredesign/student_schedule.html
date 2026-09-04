@@ -48,7 +48,7 @@
                     <h1 class="page-title">我的課表</h1>
                     <span id="dbStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;">🟢 Supabase 連線中</span>
                 </div>
-                <p id="studentBannerSubtitle" class="page-subtitle">林佩芬 老師 · 個人專屬課表</p>
+                <p id="studentBannerSubtitle" class="page-subtitle">張芷嫣 老師 · 劉心悅 (Lin) 個人專屬課表</p>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 12px;">
                     <span id="lineIdDisplayTag" style="font-size: 11px; color: #5B524E; background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 8px;">🆔 LINE: 載入中...</span>
                     <button onclick="promptBindMyLineId()" style="background: transparent; border: 1px dashed #CEAB98; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #8C6D58; cursor: pointer; font-weight: 700;">✏️ 綁定我的 LINE ID</button>
@@ -318,7 +318,8 @@ async function initLiffAuth() {
                         updateStudentHeader(result.student, result.user ? result.user.name : profile.displayName);
                         renderSchedule(result.student.student_id || result.student.id);
                         const sub = document.getElementById('studentBannerSubtitle');
-                        if (sub) sub.innerText = `林佩芬 老師 · ${result.user ? result.user.name : profile.displayName} 個人課表 (🟢 LINE 帳號已連線)`;
+                        const sName = result.student ? result.student.name : (result.user ? result.user.name : profile.displayName);
+                        if (sub) sub.innerText = `張芷嫣 老師 · ${sName} 個人課表 (🟢 LINE 帳號已連線)`;
                     }
                 }
             } else {

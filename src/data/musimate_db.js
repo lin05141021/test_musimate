@@ -637,7 +637,7 @@ const MusiMateDB = (() => {
                 student: matched,
                 user: {
                     id: matched.user_id || matched.student_id,
-                    name: displayName || matched.name,
+                    name: (matched.name && matched.name.includes('劉心悅')) ? '劉心悅 (Lin)' : (matched.name || displayName || '劉心悅 (Lin)'),
                     avatar_url: pictureUrl || matched.avatar_url,
                     line_user_id: userId
                 }

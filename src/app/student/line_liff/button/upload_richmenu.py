@@ -24,14 +24,9 @@ LIFF_COURSES = "2011164851-id3vAnRx"   # 新課
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# 尋找目錄下的 JPG/PNG 圖片檔
-files = os.listdir(BASE_DIR)
-p1_candidates = [os.path.join(BASE_DIR, f) for f in files if "一" in f and (f.endswith(".jpg") or f.endswith(".png"))]
-p2_candidates = [os.path.join(BASE_DIR, f) for f in files if "二" in f and (f.endswith(".jpg") or f.endswith(".png"))]
-
-# 優先使用 JPG (小於 1MB 且標準 2500x1686)
-PAGE1_IMAGE_PATH = [f for f in p1_candidates if f.endswith(".jpg")][0] if any(f.endswith(".jpg") for f in p1_candidates) else p1_candidates[0]
-PAGE2_IMAGE_PATH = [f for f in p2_candidates if f.endswith(".jpg")][0] if any(f.endswith(".jpg") for f in p2_candidates) else p2_candidates[0]
+# 優先使用標準 2500x1686 JPG 圖檔
+PAGE1_IMAGE_PATH = os.path.join(BASE_DIR, "page1.jpg")
+PAGE2_IMAGE_PATH = os.path.join(BASE_DIR, "page2.jpg")
 # ============================================================
 
 HEADERS = {
@@ -60,10 +55,18 @@ def clean_all_existing_data():
     # 2. 解除全體預設選單
     try:
         requests.delete("https://api.line.me/v2/bot/user/all/richmenu", headers=HEADERS)
+        print("  - 已解除全體預設選單")
     except Exception:
         pass
 
-    # 3. 刪除線上所有舊的 Rich Menus
+    # 3. 解除指定用戶 (Uf2457bf35e0d6d3060b60838d9a9c91c) 的獨立綁定選單
+    try:
+        requests.delete("https://api.line.me/v2/bot/user/Uf2457bf35e0d6d3060b60838d9a9c91c/richmenu", headers=HEADERS)
+        print("  - 已解除使用者 Uf2457bf35e0d6d3060b60838d9a9c91c 的舊版獨立選單鎖定")
+    except Exception as e:
+        print(f"  - 解除獨立選單錯誤: {e}")
+
+    # 4. 刪除線上所有舊的 Rich Menus
     try:
         res = requests.get("https://api.line.me/v2/bot/richmenu/list", headers=HEADERS)
         if res.status_code == 200:
