@@ -341,8 +341,45 @@ window.addEventListener('musimate_db_synced', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    populateStudentSwitcher();
+    // 檢查是否有 redirect 或 action 參數 (支援 LINE LIFF 跳轉分發)
     const urlParams = new URLSearchParams(window.location.search);
+    let redirect = urlParams.get('redirect') || urlParams.get('page');
+    const action = urlParams.get('action');
+
+    if (!redirect && urlParams.get('liff.state')) {
+        try {
+            const state = decodeURIComponent(urlParams.get('liff.state'));
+            const matchRedirect = state.match(/redirect=([^&]+)/);
+            if (matchRedirect) redirect = matchRedirect[1];
+            const matchPage = state.match(/page=([^&]+)/);
+            if (matchPage) redirect = matchPage[1];
+        } catch (e) {}
+    }
+
+    if (redirect) {
+        if (redirect.includes('billing')) {
+            window.location.replace('../money/overview_checked.html');
+            return;
+        } else if (redirect.includes('history')) {
+            window.location.replace('../money/overview_checked.html');
+            return;
+        } else if (redirect.includes('courses') || redirect.includes('newclass')) {
+            window.location.replace('../newclass/oldstudent_newclass.html');
+            return;
+        } else if (redirect.includes('faq')) {
+            window.location.replace('../../index.html#faq');
+            return;
+        } else if (redirect.includes('leave') || redirect.includes('reschedule')) {
+            window.location.replace('student_changeclass.html');
+            return;
+        }
+    }
+    if (action === 'reschedule' || action === 'leave') {
+        window.location.replace('student_changeclass.html');
+        return;
+    }
+
+    populateStudentSwitcher();
     const paramStudentId = urlParams.get('student_id') || urlParams.get('student');
     renderSchedule(paramStudentId);
     initLiffAuth();

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 export interface StudentTabBarProps {
   activeTab?: 'schedule' | 'summary' | 'practice' | 'billing' | 'more';
@@ -18,8 +18,14 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
   className = '',
 }) => {
   const pathname = usePathname() || '';
-  const searchParams = useSearchParams();
-  const action = searchParams ? searchParams.get('action') : null;
+  // 自安全環境讀取 URL search query，避免 Next.js SSG 靜態建置時拋出 Suspense 邊界錯誤
+  const [action, setAction] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      setAction(sp.get('action'));
+    }
+  }, []);
 
   // 自動依據路徑推導當前 Active Tab (也可由外部 props 強制指定)
   const currentTab =
