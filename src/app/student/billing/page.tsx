@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDemoContext } from '@/context/DemoContext';
+import { useStudentToast } from '@/context/ToastContext';
 import { StudentTabBar } from '@/components/StudentTabBar';
 import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
 import {
@@ -26,6 +27,7 @@ import {
 
 export default function StudentBillingPage() {
   const router = useRouter();
+  const { showToast } = useStudentToast();
   const {
     activeStudentId,
     allStudents,
@@ -132,6 +134,7 @@ export default function StudentBillingPage() {
     setBillingData({ ...editForm });
     setShowEditModal(false);
     setIsKeyboardOpen(false);
+    showToast('繳費資料已更新');
     if (uploadState === 'before_upload') {
       setUploadState('after_upload');
     }
@@ -608,7 +611,10 @@ export default function StudentBillingPage() {
               <>
                 <button
                   type="button"
-                  onClick={() => setShowSuccessModal(true)}
+                  onClick={() => {
+                    setShowSuccessModal(true);
+                    showToast('繳費資料已提交');
+                  }}
                   className="w-full h-12 bg-[#82AAD8] hover:bg-[#6e97c4] active:scale-[0.99] rounded-xl text-white font-bold text-[14px] flex items-center justify-center cursor-pointer transition-all shadow-xs"
                 >
                   確認核銷，資料正確

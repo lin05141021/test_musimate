@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { DemoProvider } from '@/context/DemoContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { AppLayoutWrapper } from '@/components/AppLayoutWrapper';
 
 export const metadata: Metadata = {
@@ -17,9 +18,12 @@ export default function RootLayout({
     <html lang="zh-TW">
       <body className="antialiased text-[#332C27] bg-[#FAF7F2] min-h-screen flex flex-col font-sans">
         <DemoProvider>
-          <AppLayoutWrapper>{children}</AppLayoutWrapper>
+          <ToastProvider>
+            <AppLayoutWrapper>{children}</AppLayoutWrapper>
+          </ToastProvider>
         </DemoProvider>
       </body>
     </html>
   );
 }
+

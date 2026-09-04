@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, X, ChevronDown, Check, Sparkles, Music, Youtube, Instagram, Share2 } from 'lucide-react';
 import { StudentTabBar } from '@/components/StudentTabBar';
 import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
+import { useStudentToast } from '@/context/ToastContext';
 
 // 8 大樂器資料
 interface InstrumentItem {
@@ -217,6 +218,7 @@ const TIME_SLOTS = [
 
 export default function CoursesPage() {
   const router = useRouter();
+  const { showToast } = useStudentToast();
 
   // 狀態管理：目前流程步驟
   const [step, setStep] = useState<'instruments' | 'teachers' | 'teacher_detail'>('instruments');
@@ -279,6 +281,7 @@ export default function CoursesPage() {
       const data = await res.json();
       if (data.success) {
         setIsBookingModalOpen(false);
+        showToast('試上預約成功！已加入課表');
         setBookingSuccessModal({
           bookingId: data.booking_id,
           message: data.message,
@@ -291,6 +294,7 @@ export default function CoursesPage() {
       console.error(err);
       // Fallback
       setIsBookingModalOpen(false);
+      showToast('試上預約成功！已加入課表');
       setBookingSuccessModal({
         bookingId: `TB-${Date.now().toString(36).toUpperCase()}`,
         message: `已成功預約 ${selectedTeacher.name} 老師的【${selectedInstrument.name}】免費試上課程！`,

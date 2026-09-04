@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { StudentTabBar } from '@/components/StudentTabBar';
 import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
+import { useStudentToast } from '@/context/ToastContext';
 import {
   Mic,
   Square,
@@ -25,6 +26,7 @@ import {
 
 export default function StudentPracticeAudioCheckinPage() {
   const router = useRouter();
+  const { showToast } = useStudentToast();
 
   // 打卡核心狀態
   const [streakDays, setStreakDays] = useState(7);
@@ -126,6 +128,7 @@ export default function StudentPracticeAudioCheckinPage() {
     setHasCheckedInToday(true);
     setStreakDays((prev) => prev + 1);
     setStampedCount((prev) => prev + 1);
+    showToast('自主練習打卡成功！已蓋上印章');
     setShowCelebrationModal(true);
   };
 

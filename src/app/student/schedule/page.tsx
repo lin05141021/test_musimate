@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDemoContext } from '@/context/DemoContext';
+import { useStudentToast } from '@/context/ToastContext';
 import { StudentTabBar } from '@/components/StudentTabBar';
 import { Appointment } from '@/types';
 import {
@@ -30,6 +31,7 @@ import {
 
 export default function StudentSchedulePage() {
   const router = useRouter();
+  const { showToast } = useStudentToast();
   const {
     appointments,
     studentProfile,
@@ -306,6 +308,7 @@ export default function StudentSchedulePage() {
     }
 
     setIsSubmitting(false);
+    showToast('調課申請已送出');
     setFeedback({
       success: true,
       msg: res.message || '✅ 調課申請已確認送出！張老師與系統已即時同步更新。',
@@ -313,7 +316,7 @@ export default function StudentSchedulePage() {
 
     setTimeout(() => {
       closeModal();
-    }, 1600);
+    }, 1200);
   };
 
   // 送出確認請假 (串接 DemoContext + Supabase 資料庫 + 後端 API)
@@ -350,6 +353,7 @@ export default function StudentSchedulePage() {
     }
 
     setIsSubmitting(false);
+    showToast('請假申請已送出');
     setFeedback({
       success: true,
       msg: res.message || '📌 請假申請已送出！該堂課時數已完整保留至您的剩餘課堂額度。',
@@ -357,12 +361,13 @@ export default function StudentSchedulePage() {
 
     setTimeout(() => {
       closeModal();
-    }, 1600);
+    }, 1200);
   };
 
   // 報到按鈕點擊處理 (課前打卡持久化儲存)
   const handleCheckin = (appt: Appointment) => {
     const res = checkInAppointment(appt.id);
+    showToast('報到成功！已完成課前報到');
     setCheckinToast(`🎉 ${formatDateBadge(appt.start_time).monthDate} 堂課報到成功！已持久化儲存至資料庫。`);
     setTimeout(() => {
       setCheckinToast(null);
@@ -1653,7 +1658,7 @@ export default function StudentSchedulePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      alert('🎉 預約成功！已將您的第 4 期 10 堂課預約送出審核。');
+                      showToast('課程預約已送出');
                       setIsNewTermModalOpen(false);
                       setNewTermStep(1);
                     }}
