@@ -27,8 +27,8 @@
       "bounds": { "x": 833, "y": 286, "width": 834, "height": 700 },
       "action": {
         "type": "uri",
-        "label": "分享MusiMate",
-        "uri": "https://lin05141021.github.io/test_musimate/index.html"
+        "label": "上傳繳費證明",
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/billing"
       }
     },
     {
@@ -42,9 +42,9 @@
     {
       "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "message",
-        "label": "扣款申訴",
-        "text": "⚖️ 扣款申訴與退費客服功能正在全力開發中，敬請期待！"
+        "type": "uri",
+        "label": "課程與繳費紀錄",
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/history"
       }
     },
     {
@@ -61,7 +61,7 @@
       "action": {
         "type": "uri",
         "label": "FAQ",
-        "uri": "https://lin05141021.github.io/test_musimate/index.html"
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/faq"
       }
     }
   ]

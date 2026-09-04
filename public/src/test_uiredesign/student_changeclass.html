@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="schedule_styles.css">
     <!-- LINE LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <!-- Supabase 雲端即時資料庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
 </head>
@@ -40,7 +42,7 @@
         <div class="main-content">
             <div class="page-header">
                 <h1 class="page-title">我的課表</h1>
-                <p id="changeClassSubtitle" class="page-subtitle">張老師 · 預約課堂清單 (點擊可調課)</p>
+                <p id="changeClassSubtitle" class="page-subtitle">林佩芬 老師 · 預約課堂清單 (點擊可調課)</p>
             </div>
 
             <!-- 課表清單 (由 JS 動態渲染) -->

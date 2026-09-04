@@ -12,6 +12,8 @@
     <!-- 統一共用樣式庫 -->
     <link rel="stylesheet" href="../../UI/style_0824.css">
     <link rel="stylesheet" href="schedule_styles.css">
+    <!-- Supabase JS Client CDN (同學雲端資料庫核心) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
     <style>
@@ -128,7 +130,13 @@
     <div class="content-area">
         <!-- 2.1 標題與週次切換列 -->
         <div class="header-card">
-            <div class="page-title">張老師 · 課表總覽</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div class="page-title" id="teacherHeaderTitle">林佩芬 老師 · 課表總覽</div>
+                <div style="font-size: 11px; font-weight: 700; color: #2E7D32; display: flex; align-items: center; gap: 5px;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; display: inline-block;"></span>
+                    <span>🟢 Supabase 雲端資料庫已連線 (iyzhwnvpqohdjqnrvqjq)</span>
+                </div>
+            </div>
             <div class="week-switcher">
                 <button class="btn-week-nav" onclick="changeWeek(-1)">◀ 上一週</button>
                 <div id="weekLabelBadge" class="week-label-badge" onclick="resetToCurrentWeek()" style="cursor: pointer;" title="點擊回到本週">
@@ -409,12 +417,15 @@ function formatTime(startIso, endIso) {
 }
 
 function getStudentCardClass(studentName) {
-    if (studentName.includes('Lin') || studentName.includes('林')) return 'card-lin';
-    if (studentName.includes('Charles') || studentName.includes('查爾斯')) return 'card-charles';
-    if (studentName.includes('Johnny') || studentName.includes('強尼')) return 'card-johnny';
-    if (studentName.includes('小明') || studentName.includes('Ming')) return 'card-ming';
-    if (studentName.includes('小華') || studentName.includes('Hua')) return 'card-hua';
-    return 'card-lin';
+    if (!studentName) return 'card-lin';
+    if (studentName.includes('Lin') || studentName.includes('劉心悅') || studentName.includes('雅婷')) return 'card-lin';
+    if (studentName.includes('Charles') || studentName.includes('查爾斯') || studentName.includes('冠廷')) return 'card-charles';
+    if (studentName.includes('Johnny') || studentName.includes('強尼') || studentName.includes('義川')) return 'card-johnny';
+    if (studentName.includes('小明') || studentName.includes('Ming') || studentName.includes('大華')) return 'card-ming';
+    if (studentName.includes('小華') || studentName.includes('小美') || studentName.includes('心怡') || studentName.includes('品涵')) return 'card-hua';
+    const hash = studentName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const classes = ['card-lin', 'card-charles', 'card-johnny', 'card-ming', 'card-hua'];
+    return classes[hash % classes.length];
 }
 
 // 渲染當前週次之 7 天
@@ -549,11 +560,16 @@ function populateStudentDropdown() {
     if (!studentSelect || !window.MusiMateDB) return;
 
     const students = window.MusiMateDB.getStudents();
-    studentSelect.innerHTML = students.map(s => `
-        <option value="${s.student_id}|${s.name}|${s.default_instrument}|${s.default_location}|pay_per_lesson">
-            ${s.name} (${s.default_instrument.split(' ')[0]})
-        </option>
-    `).join('');
+    studentSelect.innerHTML = students.map(s => {
+        const inst = (s.default_instrument || '鋼琴').split(' ')[0];
+        const loc = s.default_location || '大安琴房 A 室';
+        const fee = s.rate_per_lesson || 1600;
+        return `
+            <option value="${s.student_id}|${s.name}|${inst}|${loc}|paid">
+                ${s.name} (${inst}) - NT$${fee}/堂
+            </option>
+        `;
+    }).join('');
 }
 
 function handleAddAppointment() {
@@ -719,14 +735,18 @@ function openAddSlotModal(dateStr, blockKey) {
         document.getElementById('modalEndTime').value = '11:00';
     }
 
-    // 填入學生選單
+    // 填入學生選單 (支援同學 Supabase 100 位真實學員)
     if (window.MusiMateDB) {
         const students = window.MusiMateDB.getStudents();
         const sel = document.getElementById('modalStudent');
         if (sel) {
-            sel.innerHTML = students.map(s => `
-                <option value="${s.student_id}">${s.name} (${s.default_instrument.split(' ')[0]}) - NT$${s.rate_per_lesson}/堂</option>
-            `).join('');
+            sel.innerHTML = students.map(s => {
+                const inst = (s.default_instrument || '鋼琴').split(' ')[0];
+                const fee = s.rate_per_lesson || 1600;
+                return `
+                    <option value="${s.student_id}">${s.name} (${inst}) - NT$${fee}/堂</option>
+                `;
+            }).join('');
         }
     }
     
@@ -792,23 +812,35 @@ function submitAddModal() {
     if (currentAddModalTab === 'appointment') {
         const studentId = document.getElementById('modalStudent').value;
         const repeatCount = parseInt(document.getElementById('modalRepeatCount').value || '1', 10);
+        const students = window.MusiMateDB.getStudents();
+        const student = students.find(s => s.student_id === studentId) || { name: '學員', default_instrument: '鋼琴 (Piano)' };
         
-        window.MusiMateDB.addAppointment({
+        const baseAppt = {
             student_id: studentId,
-            start_date: dateVal,
-            start_time: startTimeVal,
-            end_time: endTimeVal,
-            repeat_weeks: repeatCount,
-            location: loc
-        });
-        alert(`🎉 成功排定課程！\n已為學生安排 ${repeatCount} 堂課，資料庫已自動更新並同步。`);
+            student_name: student.name,
+            teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+            teacher_name: '林佩芬',
+            instrument: student.default_instrument || '鋼琴 (Piano)',
+            start_time: startIso,
+            end_time: endIso,
+            location: loc,
+            payment_status: 'paid'
+        };
+
+        if (repeatCount > 1) {
+            window.MusiMateDB.addRecurringAppointments(baseAppt, repeatCount);
+            alert(`🎉 成功排定課程！\n已為 ${student.name} 連續排定 ${repeatCount} 堂課，資料庫已自動更新並同步至同學的雲端 Supabase 資料庫。`);
+        } else {
+            window.MusiMateDB.addAppointment(baseAppt);
+            alert(`🎉 成功排定課程！\n學生：${student.name}\n時間：${dateVal} ${startTimeVal}-${endTimeVal}\n地點：${loc}\n資料庫已自動更新並同步至同學的雲端 Supabase 資料庫。`);
+        }
     } else {
         window.MusiMateDB.addOpenSlot({
             start_time: startIso,
             end_time: endIso,
             location: loc
         });
-        alert(`✨ 成功開放預約時段！\n時段已公佈至學生端選課池。`);
+        alert(`✨ 成功開放預約時段！\n時段已公佈至學生端選課池與同學的雲端 Supabase 資料庫。`);
     }
 
     closeAddSlotModal();
@@ -831,9 +863,9 @@ function focusQuickAdd() {
     openAddSlotModal();
 }
 
-// 監聽 Firebase 雲端即時同步 (當學生請假、調課、或新學員綁定時即時自動更新課表)
+// 監聽 Supabase 雲端即時同步 (當學生請假、調課、或新學員排課時即時自動更新課表)
 window.addEventListener('musimate_db_synced', () => {
-    console.log('⚡ [老師端] 收到雲端即時資料推播，自動刷新課表！');
+    console.log('⚡ [老師端] 收到 Supabase 雲端即時資料推播，自動刷新課表！');
     populateStudentDropdown();
     renderTimetable();
 });

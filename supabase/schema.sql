@@ -263,3 +263,47 @@ INSERT INTO public.appointments (student_id, teacher_id, start_time, end_time, s
 ('s0000000-0000-0000-0000-000000000005', 't0000000-0000-0000-0000-000000000001', '2026-09-19 10:00:00+08', '2026-09-19 12:00:00+08', 'confirmed', '鋼琴 (Piano)', 'pay_per_lesson', 'postpaid'),
 ('s0000000-0000-0000-0000-000000000005', 't0000000-0000-0000-0000-000000000001', '2026-09-23 10:00:00+08', '2026-09-23 12:00:00+08', 'confirmed', '鋼琴 (Piano)', 'pay_per_lesson', 'postpaid'),
 ('s0000000-0000-0000-0000-000000000005', 't0000000-0000-0000-0000-000000000001', '2026-09-26 10:00:00+08', '2026-09-26 12:00:00+08', 'confirmed', '鋼琴 (Piano)', 'pay_per_lesson', 'postpaid');
+
+-- ====================================================================================
+-- 【特別標示：給管理資料庫的同學】期別概念 (student_terms) 與 曠課扣款紀錄 (student_infractions)
+-- ====================================================================================
+
+-- 10. 期別主表 (student_terms)：一期固定 10 堂課，不可單堂預約 (試上除外)
+CREATE TABLE IF NOT EXISTS public.student_terms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    teacher_id UUID NOT NULL REFERENCES public.teachers(id) ON DELETE CASCADE,
+    term_number INT NOT NULL,                                     -- 第幾期 (例如: 1, 2, 3...)
+    start_date DATE NOT NULL,                                     -- 課程開始日
+    end_date DATE NOT NULL,                                       -- 課程結束日
+    total_lessons INT NOT NULL DEFAULT 10,                        -- 預設一期固定 10 堂課
+    completed_lessons INT NOT NULL DEFAULT 0,                     -- 已完成堂數
+    pending_reschedule_lessons INT NOT NULL DEFAULT 0,            -- 待補課堂數
+    reschedule_deadline DATE,                                     -- 調課/補課期限 (例如: 該期結束後兩週內)
+    total_fee NUMERIC(10, 2) NOT NULL DEFAULT 8000.00,            -- 本期應繳金額 (NT$ 8,000)
+    paid_fee NUMERIC(10, 2) NOT NULL DEFAULT 0.00,                -- 本期已繳金額 (NT$ 8,000)
+    payment_status VARCHAR(20) NOT NULL DEFAULT 'unpaid'          -- paid(已繳清), unpaid(未繳), partial(部分繳納)
+        CHECK (payment_status IN ('paid', 'unpaid', 'partial')),
+    payment_method VARCHAR(50) DEFAULT '銀行轉帳',                  -- 繳費方式 (銀行轉帳, 信用卡, LINE Pay 等)
+    payment_deadline DATE,                                        -- 繳費期限
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT unique_student_term UNIQUE (student_id, term_number)
+);
+
+-- 11. 曠課與違約扣款紀錄表 (student_infractions)
+-- 規則：開課24小時內才請假或是未請假未報到算曠課。一年內第一次扣款10%、第二次30%、第三次50%、第四次以上全額。一年內從第一次曠課起算。
+CREATE TABLE IF NOT EXISTS public.student_infractions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID NOT NULL REFERENCES public.students(id) ON DELETE CASCADE,
+    appointment_id UUID REFERENCES public.appointments(id) ON DELETE CASCADE,
+    infraction_type VARCHAR(50) NOT NULL CHECK (infraction_type IN ('late_leave', 'absent_unexcused')),
+    infraction_time TIMESTAMPTZ DEFAULT NOW(),
+    cycle_start_date DATE NOT NULL,                                -- 此週期之第一次曠課日期
+    cycle_end_date DATE NOT NULL,                                  -- 週期滿一年日期 (滿一年自動重置)
+    count_in_cycle INT NOT NULL,                                   -- 週期內第幾次違規 (1, 2, 3, 4+)
+    penalty_rate NUMERIC(5, 2) NOT NULL,                          -- 扣款比率 (0.10, 0.30, 0.50, 1.00)
+    penalty_amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00,           -- 扣款金額
+    note TEXT,                                                     -- 備註說明
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+

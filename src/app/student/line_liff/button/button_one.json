@@ -27,33 +27,32 @@
       "bounds": { "x": 1250, "y": 286, "width": 1250, "height": 700 },
       "action": {
         "type": "uri",
-        "label": "我要請假/調課",
-        "uri": "https://liff.line.me/2011164851-3YNtzchu"
+        "label": "練習打卡",
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/practice"
       }
     },
     {
       "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "message",
+        "type": "uri",
         "label": "智慧聯絡簿",
-        "text": "📝 智慧聯絡簿功能正在全力開發中，敬請期待！"
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/summary/lesson-1"
       }
     },
     {
       "bounds": { "x": 833, "y": 986, "width": 834, "height": 700 },
       "action": {
-        "type": "postback",
-        "label": "練習打卡",
-        "data": "action=practice_checkin",
-        "displayText": "我要練習打卡"
+        "type": "uri",
+        "label": "請假/調課",
+        "uri": "https://liff.line.me/2011164851-3YNtzchu"
       }
     },
     {
       "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
       "action": {
-        "type": "message",
-        "label": "繳費情形",
-        "text": "💳 線上繳費與帳務查詢功能正在全力開發中，敬請期待！"
+        "type": "uri",
+        "label": "成就徽章",
+        "uri": "https://liff.line.me/2011164851-lGsEnQWB?redirect=/student/stamps"
       }
     }
   ]

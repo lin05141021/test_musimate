@@ -18,12 +18,21 @@ import {
   Sliders,
   LogOut,
   LogIn,
-  Clock,
+  Users,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
-  const { currentRole, currentUser, isAuthenticated, logout } = useDemoContext();
+  const {
+    currentRole,
+    currentUser,
+    isAuthenticated,
+    logout,
+    activeStudentId,
+    isMultiChildParent,
+    linkedStudents,
+    switchStudent,
+  } = useDemoContext();
 
   const handleLogout = () => {
     logout();
@@ -86,7 +95,7 @@ export const Navbar: React.FC = () => {
               </div>
             </Link>
 
-            {/* Authenticated Role Badge & Logout / Switch Account Control */}
+            {/* Authenticated Role Badge & Identity Controls */}
             {isAuthenticated ? (
               <div className="flex items-center gap-2 bg-[#FAF7F2] p-1 rounded-full border border-[#EFECE6]">
                 {isTeacher ? (
@@ -94,10 +103,33 @@ export const Navbar: React.FC = () => {
                     <UserCheck className="w-3.5 h-3.5" />
                     張老師 (Teacher)
                   </span>
+                ) : isMultiChildParent ? (
+                  /* 僅限同一個 LINE 帳號綁定 2 位以上小孩的家長，提供專屬小孩切換選單 */
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] text-[#8C6D53] font-bold pl-2 hidden sm:inline">家長專屬切換：</span>
+                    <select
+                      value={activeStudentId}
+                      onChange={(e) => switchStudent(e.target.value)}
+                      className="px-3 py-1 rounded-full text-xs font-bold bg-[#E88D67] text-white shadow-sm border-none appearance-none cursor-pointer focus:outline-none pr-6 relative"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 6px center',
+                      }}
+                      title="同一家長名下小孩切換"
+                    >
+                      {linkedStudents.map((s) => (
+                        <option key={s.student.id} value={s.student.id} className="text-[#332C27] bg-white">
+                          👤 {s.user.name} ({s.instrument})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 ) : (
-                  <span className="px-3.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 bg-[#E88D67] text-white shadow-sm">
+                  /* 一般個人學生：姓名寫死為個人專屬唯讀徽章，嚴格禁止切換查看他人課表 */
+                  <span className="px-3.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 bg-[#E88D67] text-white shadow-sm select-none">
                     <Sparkles className="w-3.5 h-3.5" />
-                    小明 (Student)
+                    {currentUser.name}
                   </span>
                 )}
 
@@ -107,7 +139,7 @@ export const Navbar: React.FC = () => {
                   title="登出並重定向至首頁"
                 >
                   <LogOut className="w-3 h-3 text-[#8C6D53]" />
-                  登出 / 切換帳號
+                  登出
                 </button>
               </div>
             ) : (
@@ -142,6 +174,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={nav.href}
                   href={nav.href}
+                  replace={true}
                   className={`px-3.5 py-2 rounded-full text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition-all ${
                     active
                       ? isTeacher

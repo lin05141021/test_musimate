@@ -20,6 +20,7 @@ export interface Student {
   id: string;
   user_id: string;
   teacher_id: string;
+  package_total_lessons?: number; // [新增] 本期總購買堂數 (預設 10 堂)
 }
 
 export interface ScheduleSlot {
@@ -31,7 +32,7 @@ export interface ScheduleSlot {
   location?: string;  // [新增] 上課地點/琴房 (例如: 音符琴房 A303, 張老師家中)
 }
 
-export type AppointmentStatus = 'confirmed' | 'cancelled' | 'rescheduled';
+export type AppointmentStatus = 'confirmed' | 'cancelled' | 'rescheduled' | 'attended' | 'completed';
 
 export interface Appointment {
   id: string;
@@ -70,6 +71,7 @@ export interface RescheduleRequest {
 export interface CleanSummaryJSON {
   highlights: string[];
   technical_tips: string[];
+  theory_tips?: string[];
   homework: string[];
   encouragement: string;
   bpm_recommendation?: number;
@@ -83,6 +85,7 @@ export interface LessonRecord {
   clean_summary_json: CleanSummaryJSON;
   created_at: string;
   song_title?: string;
+  teacher_name?: string;
 }
 
 export interface TeacherDemoVideo {

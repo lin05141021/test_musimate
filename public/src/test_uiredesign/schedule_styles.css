@@ -551,10 +551,11 @@ body.mobile-view {
    8. 學生端手機外框與課表卡片 (Mobile RWD Layout & Cards)
    ------------------------------------------------------------ */
 .mobile-frame {
-    width: 402px;
-    min-height: 874px;
+    width: 360px;
+    max-width: 100%;
+    min-height: 800px;
     background: #FAF6F0;
-    border-radius: 40px;
+    border-radius: 36px;
     box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;

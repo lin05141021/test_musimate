@@ -153,41 +153,40 @@ def main():
                     "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
                 }
             },
-            # 上排右: 我要請假/調課 (專屬 LIFF ID: 2011164851-3YNtzchu)
+            # 上排右: 練習打卡
             {
                 "bounds": { "x": 1250, "y": 286, "width": 1250, "height": 700 },
                 "action": {
                     "type": "uri",
-                    "label": "我要請假/調課",
-                    "uri": f"https://liff.line.me/{LIFF_LEAVE}"
+                    "label": "練習打卡",
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/practice"
                 }
             },
-            # 下排左: 智慧聯絡簿 (暫未開放，跳出訊息)
+            # 下排左: 智慧聯絡簿
             {
                 "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
                 "action": {
-                    "type": "message",
+                    "type": "uri",
                     "label": "智慧聯絡簿",
-                    "text": "📝 智慧聯絡簿功能正在全力開發中，敬請期待！"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/summary/lesson-1"
                 }
             },
-            # 下排中: 練習打卡
+            # 下排中: 請假/調課
             {
                 "bounds": { "x": 833, "y": 986, "width": 834, "height": 700 },
                 "action": {
-                    "type": "postback",
-                    "label": "練習打卡",
-                    "data": "action=practice_checkin",
-                    "displayText": "我要練習打卡"
+                    "type": "uri",
+                    "label": "請假/調課",
+                    "uri": f"https://liff.line.me/{LIFF_LEAVE}"
                 }
             },
-            # 下排右: 繳費情形 (暫未開放，跳出訊息)
+            # 下排右: 成就徽章
             {
                 "bounds": { "x": 1667, "y": 986, "width": 833, "height": 700 },
                 "action": {
-                    "type": "message",
-                    "label": "繳費情形",
-                    "text": "💳 線上繳費與帳務查詢功能正在全力開發中，敬請期待！"
+                    "type": "uri",
+                    "label": "成就徽章",
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/stamps"
                 }
             }
         ]
@@ -209,7 +208,7 @@ def main():
                     "data": "action=switch_to_page1"
                 }
             },
-            # 上排左: 開始新課程 (專屬 LIFF ID: 2011164851-id3vAnRx，連到 mobole/new_class.html)
+            # 上排左: 開始新課程 (專屬 LIFF ID: 2011164851-id3vAnRx)
             {
                 "bounds": { "x": 0, "y": 286, "width": 833, "height": 700 },
                 "action": {
@@ -218,13 +217,13 @@ def main():
                     "uri": f"https://liff.line.me/{LIFF_COURSES}"
                 }
             },
-            # 上排中: 分享MusiMate
+            # 上排中: 上傳繳費證明
             {
                 "bounds": { "x": 833, "y": 286, "width": 834, "height": 700 },
                 "action": {
                     "type": "uri",
-                    "label": "分享MusiMate",
-                    "uri": "https://lin05141021.github.io/test_musimate/index.html"
+                    "label": "上傳繳費證明",
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/billing"
                 }
             },
             # 上排右: 音樂社群(待開發)
@@ -236,13 +235,13 @@ def main():
                     "text": "🎵 MusiMate 音樂社群正在全力開發中，敬請期待！"
                 }
             },
-            # 下排左: 扣款申訴 (暫未開放，跳出訊息)
+            # 下排左: 課程與繳費紀錄
             {
                 "bounds": { "x": 0, "y": 986, "width": 833, "height": 700 },
                 "action": {
-                    "type": "message",
-                    "label": "扣款申訴",
-                    "text": "⚖️ 扣款申訴與退費客服功能正在全力開發中，敬請期待！"
+                    "type": "uri",
+                    "label": "課程與繳費紀錄",
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/history"
                 }
             },
             # 下排中: 聯繫系統客服
@@ -261,7 +260,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "FAQ",
-                    "uri": "https://lin05141021.github.io/test_musimate/index.html"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/faq"
                 }
             }
         ]

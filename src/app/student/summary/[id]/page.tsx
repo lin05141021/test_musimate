@@ -1,177 +1,491 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { useDemoContext } from '@/context/DemoContext';
+import { StudentTabBar } from '@/components/StudentTabBar';
+import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
 import {
+  ChevronLeft,
+  ChevronRight,
   Sparkles,
-  Music,
-  CheckCircle2,
-  Bookmark,
-  ArrowLeft,
-  Volume2,
-  Play,
-  Heart,
   Gauge,
+  Play,
+  Pause,
+  Volume2,
+  Bookmark,
   BookOpen,
+  CheckCircle2,
+  Heart,
 } from 'lucide-react';
 
 export default function StudentSummaryDetailPage() {
   const params = useParams();
-  const { lessonRecords } = useDemoContext();
+  const router = useRouter();
+  const { lessonRecords, activeStudentId, allStudents, switchStudent } = useDemoContext();
 
-  const recordId = params.id as string;
-  const record = lessonRecords.find((r) => r.id === recordId) || lessonRecords[0];
+  const recordId = (params?.id as string) || 'lesson-1';
 
-  const summary = record.clean_summary_json;
+  // 自動依據使用者 LINE ID 或全組 Demo 學生切換身分防呆
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const studentParam = urlParams.get('student') || urlParams.get('student_id');
+      if (studentParam) {
+        const found = allStudents.find(
+          (s) =>
+            s.student.id.toLowerCase() === studentParam.toLowerCase() ||
+            s.user.name.toLowerCase().includes(studentParam.toLowerCase())
+        );
+        if (found && found.student.id !== activeStudentId) {
+          switchStudent(found.student.id);
+        }
+      }
+    }
+  }, [activeStudentId, allStudents, switchStudent]);
+
+  // 取得完整課堂紀錄列表（依時間順序排序：第 1 堂課到第 5 堂課）
+  const allLessons = (lessonRecords && lessonRecords.length > 0)
+    ? [...lessonRecords].sort(
+        (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      )
+    : [];
+
+  // 計算當前課堂在清單中的索引
+  const currentIndex = allLessons.findIndex((r) => r.id === recordId);
+  const safeIndex = currentIndex !== -1 ? currentIndex : 0;
+  const currentRecord = allLessons[safeIndex] || allLessons[0];
+
+  // 左右切換按鈕邊界禁用邏輯
+  // 左鍵：切換至上一次（更早）上課的聯絡簿。若已是清單第一堂（最舊），到底變灰且 disabled
+  const isPrevDisabled = safeIndex <= 0;
+  // 右鍵：切換至後一次（更新）上課的聯絡簿。若已是清單最後一堂（最新），到底變灰且 disabled
+  const isNextDisabled = safeIndex >= allLessons.length - 1;
+
+  const handlePrevLesson = () => {
+    if (!isPrevDisabled && allLessons[safeIndex - 1]) {
+      router.push(`/student/summary/${allLessons[safeIndex - 1].id}`);
+    }
+  };
+
+  const handleNextLesson = () => {
+    if (!isNextDisabled && allLessons[safeIndex + 1]) {
+      router.push(`/student/summary/${allLessons[safeIndex + 1].id}`);
+    }
+  };
+
+  const navigateToLesson = (id: string) => {
+    router.push(`/student/summary/${id}`);
+  };
+
+  // 格式化日期標籤
+  const formatLessonHeaderDate = (isoString: string, id: string) => {
+    if (id === 'lesson-1') return '8月15日（五）的課程';
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '8月15日（五）的課程';
+    const month = d.getMonth() + 1;
+    const date = d.getDate();
+    const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+    const day = dayNames[d.getDay()];
+    return `${month}月${date}日（${day}）的課程`;
+  };
+
+  const formatCardDate = (isoString: string, id: string) => {
+    if (id === 'lesson-1') return '2026/08/15';
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '2026/08/15';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    return `${year}/${month}/${date}`;
+  };
+
+  // 音訊播放狀態
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playProgress, setPlayProgress] = useState(30); // 預設進度
+  const [audioSeconds, setAudioSeconds] = useState(225); // 03:45
+  const totalSeconds = 750; // 12:30
+  const audioTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (isPlaying) {
+      audioTimerRef.current = setInterval(() => {
+        setAudioSeconds((prev) => {
+          if (prev >= totalSeconds) {
+            setIsPlaying(false);
+            return 0;
+          }
+          const next = prev + 1;
+          setPlayProgress((next / totalSeconds) * 100);
+          return next;
+        });
+      }, 1000);
+    } else {
+      if (audioTimerRef.current) clearInterval(audioTimerRef.current);
+    }
+    return () => {
+      if (audioTimerRef.current) clearInterval(audioTimerRef.current);
+    };
+  }, [isPlaying]);
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const formatTime = (secs: number) => {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  // 作業勾選狀態 (每項作業可點擊切換 未完成 / 已完成)
+  const [completedHw, setCompletedHw] = useState<number[]>([]);
+
+  const toggleHomework = (idx: number) => {
+    setCompletedHw((prev) =>
+      prev.includes(idx) ? prev.filter((i) => i !== idx) : [...prev, idx]
+    );
+  };
+
+  // 更多選單漢堡抽屜狀態
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 當前課堂資料拆解
+  const summary = currentRecord?.clean_summary_json || {
+    highlights: [],
+    technical_tips: [],
+    theory_tips: [],
+    homework: [],
+    encouragement: '',
+    bpm_recommendation: 72,
+  };
+
+  const technicalTips = summary.technical_tips && summary.technical_tips.length > 0
+    ? summary.technical_tips
+    : [
+        '右手持弓姿勢注意放鬆，避免過度緊繃，以保持弓速的流暢度與琴弦共鳴。',
+        '左手第二指按弦精準度，在高把位轉換時應維持指尖垂直落指，防止音準偏低。',
+      ];
+
+  const theoryTips = summary.theory_tips && summary.theory_tips.length > 0
+    ? summary.theory_tips
+    : [
+        '注意十六分音符的均勻度，切分音符需準確踩在拍點上，不能隨意搶拍。',
+        'E大調升分號 (C#) 的按弦位置需特別貼近一指，維持半音關係精準度。',
+      ];
+
+  const homeworkList = summary.homework && summary.homework.length > 0
+    ? summary.homework
+    : [
+        '第15至32小節慢速練習並分段重複10次',
+        '錄製一段節拍器輔助的穩定演奏音訊供批改',
+        '熟記第一樂章前奏的左手把位指法與弓法',
+      ];
+
+  const encouragementText =
+    summary.encouragement || '每一次的練習都是進步的累積，老師看到你的努力了！';
+
+  const currentSongTitle = currentRecord?.song_title || '巴哈：E大調小提琴協奏曲 第一樂章';
+  const teacherName = currentRecord?.teacher_name || '張老師';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-4">
-      {/* Navigation Top Action */}
-      <div className="flex items-center justify-between">
-        <Link
-          href="/student/practice"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7A736E] hover:text-[#332C27] transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> 返回作業學習中心 (P4)
-        </Link>
-        <span className="text-xs text-[#785338] font-bold bg-[#F2E8D8] px-3.5 py-1 rounded-full border border-[#EADFC9]">
-          Lesson Card ID: {record.id}
-        </span>
-      </div>
-
-      {/* Main Premium Physical Paper Lesson Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#FFFDF9] border border-[#EADFC9] border-l-8 border-l-[#8C6D53] shadow-[0_8px_30px_rgba(140,109,83,0.12)] p-8 sm:p-10 space-y-8">
-        {/* Background Music Stave / Notes SVG Watermark */}
-        <div className="absolute right-4 top-4 opacity-10 pointer-events-none select-none text-[#8C6D53]">
-          <svg width="220" height="220" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-          </svg>
-        </div>
-
-        {/* Card Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#EADFC9]/80 pb-6 relative z-10">
-          <div className="space-y-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#F2E8D8] text-[#785338] border border-[#EADFC9] text-xs font-extrabold shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-[#E88D67]" />
-              AI 課堂情緒過濾 & 實體手感學習卡片 (P5)
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#332C27] tracking-tight">
-              {record.song_title || '巴哈：E大調小提琴協奏曲 第一樂章'}
-            </h1>
-            <p className="text-xs text-[#7A736E] font-medium">
-              授課指導：張老師 · 課堂日期：{new Date(record.created_at).toLocaleDateString('zh-TW')}
-            </p>
+    <div className="min-h-screen w-full bg-[#FAF6F0] sm:bg-[#EDE8DE] flex justify-center items-center py-0 sm:py-6 select-none font-['Sora','Noto_Sans_TC',sans-serif]">
+      {/* 360px Google Pixel 9a 標準尺寸手機主視窗容器 (固定高度 800px / 100dvh，超過版面由中間區域垂直滾動 vertical scroll) */}
+      <div className="w-[360px] h-[800px] max-w-full max-h-[100dvh] sm:max-h-[820px] bg-[#FAF6F0] flex flex-col justify-between relative shadow-2xl sm:rounded-[36px] overflow-hidden border border-[#E5DEC9]">
+        
+        {/* 頂部固定品牌列 (flex-shrink-0 置頂) */}
+        <header className="flex-shrink-0 w-full h-16 px-5 py-3 flex items-center bg-[#FAF6F0] border-b border-[#F0EBE1]/80 z-20">
+          <div className="w-[161px] h-10 flex items-center">
+            <img
+              src="/UI/logo.png"
+              alt="MusiMate"
+              className="h-9 w-auto object-contain cursor-pointer"
+              onClick={() => router.push('/')}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (!target.src.endsWith('/logo.png')) {
+                  target.src = '/logo.png';
+                }
+              }}
+            />
           </div>
+        </header>
 
-          {/* BPM Target Pill Badge */}
-          <div className="flex items-center gap-3 bg-[#FAF7F2] p-3.5 rounded-2xl border border-[#EADFC9] shrink-0 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-[#F2E8D8] text-[#785338] flex items-center justify-center border border-[#EADFC9]">
-              <Gauge className="w-5 h-5" />
+        {/* 主要內容區域 (flex-1 獨立垂直滾動 vertical scroll，超出版面卡片平滑滾動) */}
+        <main className="flex-1 overflow-y-auto overscroll-contain px-5 pt-3 pb-6 flex flex-col gap-2 [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent]">
+          
+          {/* 頁面標題與課程切換區 */}
+          <div className="w-full pt-1 pb-2 flex flex-col items-center gap-2 shrink-0">
+            <div className="w-full text-center text-[#2B3049] text-[20px] font-extrabold leading-tight">
+              智慧聯絡簿
             </div>
-            <div>
-              <span className="text-[10px] text-[#7A736E] font-bold block uppercase">建議練習速度</span>
-              <span className="text-xl font-black text-[#8C6D53] font-mono">
-                BPM {summary.bpm_recommendation || 72}
-              </span>
-            </div>
-          </div>
-        </div>
 
-        {/* Audio Recording Player Bar */}
-        <div className="bg-[#FAF7F2] p-4.5 rounded-2xl border border-[#EADFC9] flex items-center gap-4 shadow-sm relative z-10">
-          <button className="w-10 h-10 rounded-full bg-[#8C6D53] hover:bg-[#765942] text-white flex items-center justify-center shadow-md shadow-[#8C6D53]/20 transition-all shrink-0">
-            <Play className="w-4 h-4 fill-current ml-0.5" />
-          </button>
-          <div className="flex-1 space-y-1">
-            <div className="flex justify-between text-xs font-bold text-[#332C27]">
-              <span>課堂現場音訊紀錄 (Classroom Audio)</span>
-              <span className="text-[#7A736E] font-mono">03:45 / 12:30</span>
-            </div>
-            <div className="h-2 bg-[#EADFC9]/50 rounded-full overflow-hidden border border-[#EADFC9]">
-              <div className="w-1/3 h-full bg-gradient-to-r from-[#8C6D53] to-[#E88D67]" />
-            </div>
-          </div>
-          <Volume2 className="w-5 h-5 text-[#7A736E] shrink-0" />
-        </div>
-
-        {/* Section 1: Technical Tips & Hand Postures */}
-        <div className="space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#F2E8D8] text-[#785338] border border-[#EADFC9] text-xs font-bold shadow-sm">
-            <Bookmark className="w-3.5 h-3.5 text-[#785338]" />
-            一、本週技術與手型重點 (Technical Tips)
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-            {summary.technical_tips.map((tip, idx) => (
-              <div
-                key={idx}
-                className="p-4.5 rounded-2xl bg-[#FAF7F2] border border-[#EADFC9] space-y-1.5 shadow-sm"
+            {/* 左右切換按鈕區 (切換上一次上課的聯絡簿，到底變灰不能點選) */}
+            <div className="w-full flex justify-center items-center gap-3">
+              {/* 向左按鈕：切換至上一次（更早）的課堂 */}
+              <button
+                type="button"
+                onClick={handlePrevLesson}
+                disabled={isPrevDisabled}
+                aria-label="切換至上一次上課的聯絡簿"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                  isPrevDisabled
+                    ? 'bg-[#EAE7E2] text-[#B8B4AE] opacity-40 cursor-not-allowed pointer-events-none'
+                    : 'bg-[rgba(104,197,171,0.10)] text-[#68C5AB] hover:bg-[rgba(104,197,171,0.22)] active:scale-95 cursor-pointer'
+                }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-[#8C6D53]">♪ 手感重點 #{idx + 1}</span>
-                </div>
-                <p className="text-xs text-[#332C27] font-medium leading-relaxed">{tip}</p>
+                <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
+              </button>
+
+              {/* 當前課堂日期標籤 */}
+              <div className="text-[#68C5AB] text-[14px] font-bold tracking-tight">
+                {formatLessonHeaderDate(currentRecord?.created_at || '', currentRecord?.id || '')}
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Section 2: Music Theory & Score Details */}
-        <div className="space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E3E8E1] text-[#3D5240] border border-[#C5D2C2] text-xs font-bold shadow-sm">
-            <BookOpen className="w-3.5 h-3.5 text-[#3D5240]" />
-            二、樂理與節拍重點 (Music Theory & Timing)
-          </div>
-
-          <div className="p-4.5 rounded-2xl bg-[#E3E8E1]/40 border border-[#C5D2C2] space-y-2.5 shadow-sm pt-3">
-            <div className="flex items-start gap-2.5 text-xs text-[#332C27] font-medium">
-              <span className="text-sm font-bold text-[#3D5240]">♫</span>
-              <span>十六分音符過渡區間需注意手腕連貫度，避免第 16 小節搶拍。</span>
-            </div>
-            <div className="flex items-start gap-2.5 text-xs text-[#332C27] font-medium">
-              <span className="text-sm font-bold text-[#3D5240]">♫</span>
-              <span>升 C (C#) 按弦位置精準度維持，注意第二指拉回力度。</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Homework & Practice Guide */}
-        <div className="space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FCEADE] text-[#B85536] border border-[#F6D0B8] text-xs font-bold shadow-sm">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#E88D67]" />
-            三、回家作業與練習指引 (Homework)
-          </div>
-
-          <div className="space-y-2 pt-1">
-            {summary.homework.map((hw, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-2xl bg-[#FCEADE]/40 border border-[#F6D0B8] flex items-center justify-between text-xs text-[#332C27] font-medium shadow-sm"
+              {/* 向右按鈕：切換至後一次（更新）的課堂 */}
+              <button
+                type="button"
+                onClick={handleNextLesson}
+                disabled={isNextDisabled}
+                aria-label="切換至後一次上課的聯絡簿"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                  isNextDisabled
+                    ? 'bg-[#EAE7E2] text-[#B8B4AE] opacity-40 cursor-not-allowed pointer-events-none'
+                    : 'bg-[rgba(104,197,171,0.10)] text-[#68C5AB] hover:bg-[rgba(104,197,171,0.22)] active:scale-95 cursor-pointer'
+                }`}
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-[#E88D67] text-white flex items-center justify-center font-bold text-xs">
-                    {idx + 1}
+                <ChevronRight className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            </div>
+
+            {/* 課堂曲目副標題 */}
+            <div className="w-full text-center text-[#6F6F6F] text-[14px] font-normal truncate">
+              {currentSongTitle}
+            </div>
+          </div>
+
+          {/* 聯絡簿卡片主體與分頁圓點 */}
+          <div className="w-full flex flex-col gap-2">
+            
+            {/* 圓點分頁指示器 (共 5 堂課，當前課堂呈現 8px 碧綠色，其餘 6px 半透明灰) */}
+            <div className="w-full py-2 flex justify-center items-center gap-2">
+              {allLessons.map((item, idx) => {
+                const isActive = idx === safeIndex;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => navigateToLesson(item.id)}
+                    aria-label={`第 ${idx + 1} 堂課`}
+                    className={`transition-all duration-200 cursor-pointer rounded-full ${
+                      isActive
+                        ? 'w-2 h-2 bg-[#68C5AB]'
+                        : 'w-1.5 h-1.5 bg-[#6F6F6F] opacity-30 hover:opacity-60'
+                    }`}
+                  />
+                );
+              })}
+            </div>
+
+            {/* 白色圓角卡片容器 (依據 Figma 規範完整精準切版) */}
+            <div className="w-full p-4 bg-white rounded-2xl outline outline-1 outline-[rgba(104,197,171,0.25)] shadow-[0px_8px_24px_rgba(43,48,73,0.06)] flex flex-col gap-5">
+              
+              {/* 卡片頂部：AI 標籤、曲目、BPM 與授課教師 */}
+              <div className="w-full flex flex-col gap-3">
+                <div className="w-full flex justify-between items-start gap-2">
+                  <div className="flex-1 flex flex-col items-start gap-1.5">
+                    {/* AI 課堂情緒過濾 & 學習卡片 Badge */}
+                    <div className="px-2 py-1 bg-[rgba(104,197,171,0.12)] rounded-lg inline-flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-[#D5CC6A]" />
+                      <span className="text-[#D5CC6A] text-[12px] font-bold">
+                        AI 課堂情緒過濾 & 學習卡片
+                      </span>
+                    </div>
+                    {/* 曲目大標題 */}
+                    <h2 className="text-[#2B3049] text-[20px] font-extrabold leading-7">
+                      {currentSongTitle}
+                    </h2>
+                  </div>
+
+                  {/* BPM 方塊 */}
+                  <div className="w-16 px-2 py-1.5 bg-[rgba(104,197,171,0.06)] rounded-xl outline outline-1 outline-[#D5CC6A] flex flex-col items-center justify-center gap-0.5 shrink-0">
+                    <Gauge className="w-4 h-4 text-[#D5CC6A]" />
+                    <span className="text-[#D5CC6A] text-[12px] font-bold whitespace-nowrap">
+                      BPM {summary.bpm_recommendation || 72}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 授課教師與日期 */}
+                <div className="text-[#6F6F6F] text-[12px] font-normal">
+                  授課指導：{teacherName} · 課堂日期：{formatCardDate(currentRecord?.created_at || '', currentRecord?.id || '')}
+                </div>
+              </div>
+
+              {/* 現場原音錄音播放條 (點擊切換播放/暫停) */}
+              <div className="w-full p-3 bg-white rounded-2xl outline outline-1 outline-[rgba(104,197,171,0.25)] flex items-center gap-3 shadow-2xs">
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  aria-label={isPlaying ? '暫停播放' : '播放原音'}
+                  className="w-9 h-9 rounded-full bg-[#D5CC6A] hover:bg-[#c7bd5f] active:scale-95 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-xs"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-4 h-4 text-white fill-white" />
+                  ) : (
+                    <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+                  )}
+                </button>
+                <div className="flex-1 flex flex-col gap-1">
+                  <div className="w-full h-1.5 bg-[rgba(43,48,73,0.12)] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#D5CC6A] transition-all duration-300 rounded-full"
+                      style={{ width: `${playProgress}%` }}
+                    />
+                  </div>
+                  <div className="w-full flex justify-between items-center text-[12px] text-[#6F6F6F]">
+                    <span>{formatTime(audioSeconds)} / {formatTime(totalSeconds)}</span>
+                    <Volume2 className="w-3.5 h-3.5 text-[#6F6F6F]" />
+                  </div>
+                </div>
+              </div>
+
+              {/* 分隔細線 */}
+              <div className="w-full h-0 border-b border-[rgba(43,48,73,0.06)]" />
+
+              {/* 一、本週技術與手型重點 */}
+              <div className="w-full flex flex-col gap-3">
+                <div className="px-2.5 py-1.5 bg-[rgba(104,197,171,0.08)] rounded-xl self-start flex items-center gap-1.5">
+                  <Bookmark className="w-3.5 h-3.5 text-[#D5CC6A]" />
+                  <span className="text-[#D5CC6A] text-[14px] font-bold">
+                    本週技術與手型重點
                   </span>
-                  <span>{hw}</span>
                 </div>
-                <span className="text-[10px] text-[#B85536] font-bold bg-[#FCEADE] px-3 py-0.5 rounded-full border border-[#F6D0B8]">
-                  未完成
-                </span>
+                <div className="w-full flex flex-col gap-2">
+                  {technicalTips.map((tip, idx) => (
+                    <div
+                      key={idx}
+                      className="w-full p-3 bg-white rounded-xl outline outline-1 outline-[rgba(104,197,171,0.25)] flex flex-col gap-1.5"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#D5CC6A]" />
+                        <span className="text-[#D5CC6A] text-[12px] font-bold">
+                          手感重點 #{idx + 1}
+                        </span>
+                      </div>
+                      <div className="text-[#2B3049] text-[14px] font-normal leading-[21px]">
+                        {tip}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Section 4: Encouragement Quote Card */}
-        <div className="p-6 rounded-3xl bg-[#FAF2EC] border border-[#E8D4C5] text-center space-y-2.5 shadow-sm relative z-10">
-          <Heart className="w-5 h-5 text-[#E88D67] mx-auto fill-[#E88D67]" />
-          <p className="text-sm sm:text-base text-[#8C6D53] font-bold italic leading-relaxed">
-            「{summary.encouragement}」
-          </p>
-          <span className="text-xs text-[#7A736E] block font-medium">— 張老師課後小結</span>
-        </div>
+              {/* 二、樂理與節拍重點 */}
+              <div className="w-full p-4 bg-white rounded-2xl outline outline-1 outline-[rgba(104,197,171,0.25)] flex flex-col gap-3">
+                <div className="px-2 py-1 bg-white rounded-lg self-start flex items-center gap-1">
+                  <BookOpen className="w-3.5 h-3.5 text-[#D5CC6A]" />
+                  <span className="text-[#D5CC6A] text-[12px] font-bold">
+                    樂理與節拍重點
+                  </span>
+                </div>
+                <div className="w-full flex flex-col gap-2">
+                  {theoryTips.map((tip, idx) => (
+                    <div key={idx} className="w-full flex items-start gap-2.5">
+                      <div className="pt-1">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#D5CC6A]/20 flex items-center justify-center text-[#D5CC6A] text-[10px] font-black">
+                          ♪
+                        </div>
+                      </div>
+                      <div className="flex-1 text-[#2B3049] text-[14px] font-normal leading-[21px]">
+                        {tip}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 三、回家作業與練習指引 (點擊可切換完成狀態) */}
+              <div className="w-full flex flex-col gap-3">
+                <div className="px-2.5 py-1.5 bg-[rgba(206,171,152,0.10)] rounded-xl self-start flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#CEAB98]" />
+                  <span className="text-[#CEAB98] text-[14px] font-bold">
+                    回家作業與練習指引
+                  </span>
+                </div>
+                <div className="w-full flex flex-col gap-2">
+                  {homeworkList.map((hw, idx) => {
+                    const isDone = completedHw.includes(idx);
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => toggleHomework(idx)}
+                        className={`w-full p-2.5 bg-white rounded-xl outline outline-1 flex items-center gap-2 cursor-pointer transition-all ${
+                          isDone
+                            ? 'outline-[rgba(104,197,171,0.5)] bg-[#F4FBF8]'
+                            : 'outline-[rgba(104,197,171,0.17)] hover:outline-[rgba(104,197,171,0.35)]'
+                        }`}
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white text-[12px] font-bold transition-colors ${
+                            isDone ? 'bg-[#68C5AB]' : 'bg-[#CEAB98]'
+                          }`}
+                        >
+                          {idx + 1}
+                        </div>
+                        <div
+                          className={`flex-1 text-[#2B3049] text-[14px] font-normal transition-opacity ${
+                            isDone ? 'line-through opacity-60' : ''
+                          }`}
+                        >
+                          {hw}
+                        </div>
+                        <div
+                          className={`px-1.5 py-0.5 rounded-lg flex items-center justify-center shrink-0 text-[12px] font-semibold transition-colors ${
+                            isDone
+                              ? 'bg-[rgba(104,197,171,0.15)] text-[#48A58D]'
+                              : 'bg-[rgba(206,171,152,0.12)] text-[#CEAB98]'
+                          }`}
+                        >
+                          {isDone ? '✔ 已完成' : '未完成'}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 四、張老師課後小結 */}
+              <div className="w-full p-3 bg-white rounded-xl outline outline-1 outline-[rgba(104,197,171,0.25)] flex flex-col gap-2">
+                <div className="flex items-center gap-1.5">
+                  <Heart className="w-3.5 h-3.5 text-[#D5CC6A] fill-[#D5CC6A]" />
+                  <span className="text-[#CEAB98] text-[12px] font-bold">
+                    張老師課後小結
+                  </span>
+                </div>
+                <div className="text-[#2B3049] text-[14px] font-normal leading-[21px]">
+                  「{encouragementText}」
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </main>
+
+        {/* 底部固定五大功能 TabBar (聯絡簿 Active) */}
+        <footer className="flex-shrink-0 w-full z-30 bg-[#FAF6F0] shadow-[0_-4px_16px_rgba(0,0,0,0.06)] border-t border-[#EFECE6]">
+          <StudentTabBar
+            activeTab="summary"
+            onMoreClick={() => setIsMenuOpen(true)}
+          />
+        </footer>
+
+        {/* 側邊漢堡側選單抽屜 (點擊 TabBar 的「更多」時滑出) */}
+        <StudentMoreDrawer
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+
       </div>
     </div>
   );
