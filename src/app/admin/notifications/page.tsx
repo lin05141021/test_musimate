@@ -23,6 +23,7 @@ import {
   Award,
   Database,
   ArrowLeft,
+  Palette,
 } from 'lucide-react';
 
 export default function NotificationManagementPage() {
@@ -33,7 +34,7 @@ export default function NotificationManagementPage() {
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
   const [targetUserId, setTargetUserId] = useState('Uf2457bf35e0d6d3060b60838d9a9c91c'); // 預設學員 LINE ID
-  const [activeViewMode, setActiveViewMode] = useState<'preview' | 'json' | 'db'>('preview');
+  const [activeViewMode, setActiveViewMode] = useState<'preview' | 'json'>('preview');
 
   const scenarioList = useMemo(() => Object.values(NOTIFICATION_SCENARIOS), []);
 
@@ -125,27 +126,55 @@ export default function NotificationManagementPage() {
     }
   };
 
-  const getCategoryBadge = (cat: 'A' | 'B' | 'C') => {
-    switch (cat) {
-      case 'A':
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF2EC] text-[#8C6D53] border border-[#E8D4C5]">
-            A. 課程排程與出席
-          </span>
-        );
-      case 'B':
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9]">
-            B. AI 週報與打卡
-          </span>
-        );
-      case 'C':
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF4FC] text-[#4A8FD9] border border-[#D5E4F8]">
-            C. 堂數續約與核銷
-          </span>
-        );
+  // 取得色彩體系標籤
+  const getThemeBadge = (scenario: NotificationScenario) => {
+    if (scenario.id.startsWith('A')) {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF1EC] text-[#E8734A] border border-[#F6D0B8] flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-[#E8734A]" />
+          課程相關 (紅色)
+        </span>
+      );
     }
+    if (scenario.id === 'B1') {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF7E6] text-[#B87D00] border border-[#FDE5A3] flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-[#E5A100]" />
+          聯絡簿相關 (黃色)
+        </span>
+      );
+    }
+    if (scenario.id === 'B2' || scenario.id === 'B3') {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9] flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-[#49BB87]" />
+          打卡相關 (綠色)
+        </span>
+      );
+    }
+    if (scenario.id.startsWith('C')) {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF4FC] text-[#4A8FD9] border border-[#D5E4F8] flex items-center gap-1">
+          <span className="w-2 h-2 rounded-full bg-[#4A8FD9]" />
+          繳費相關 (藍色)
+        </span>
+      );
+    }
+    return (
+      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F6F2FB] text-[#9B7EC8] border border-[#E8DEF8] flex items-center gap-1">
+        <span className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
+        新課程/系統 (紫色)
+      </span>
+    );
+  };
+
+  // 取得 Header 背景漸層
+  const getHeaderGradient = (id: string) => {
+    if (id.startsWith('A')) return 'linear-gradient(45deg, #FF8B66 0%, #E8734A 100%)';
+    if (id === 'B1') return 'linear-gradient(45deg, #F6C744 0%, #E5A100 100%)';
+    if (id === 'B2' || id === 'B3') return 'linear-gradient(45deg, #6BD4A7 0%, #49BB87 100%)';
+    if (id.startsWith('C')) return 'linear-gradient(45deg, #6BAFF4 0%, #4A8FD9 100%)';
+    return 'linear-gradient(45deg, #BA9FE0 0%, #9B7EC8 100%)';
   };
 
   return (
@@ -166,12 +195,13 @@ export default function NotificationManagementPage() {
                 <h1 className="text-lg font-extrabold text-[#2B3049] tracking-tight">
                   LINE 推播卡片通知管理中心
                 </h1>
-                <span className="px-2 py-0.5 rounded-full bg-[#9B7EC8]/10 text-[#9B7EC8] text-[11px] font-bold border border-[#9B7EC8]/20">
-                  v2.1 完整 DB 欄位與多按鈕支援
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#2B3049] text-[11px] font-bold border border-[#EAE3D6] flex items-center gap-1">
+                  <Palette className="w-3 h-3 text-[#E8734A]" />
+                  style_0824 色彩規範體系
                 </span>
               </div>
               <p className="text-xs text-[#7A7E90] mt-0.5">
-                依照 PRD 最新規格打造之 11 種情境卡片 · 支援多按鈕跳轉、DB 欄位對齊與即時模擬器
+                課程(紅) · 聯絡簿(黃) · 打卡(綠) · 繳費(藍) · 系統(紫) 5 大體系全面套用
               </p>
             </div>
           </div>
@@ -186,7 +216,7 @@ export default function NotificationManagementPage() {
             </Link>
             <button
               onClick={handleCopyJson}
-              className="px-4 py-1.5 rounded-full bg-[#9B7EC8] hover:bg-[#8869B5] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+              className="px-4 py-1.5 rounded-full bg-[#2B3049] hover:bg-[#1E2235] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copied ? '已複製 JSON' : '複製 Flex JSON'}
@@ -195,15 +225,41 @@ export default function NotificationManagementPage() {
         </div>
       </header>
 
+      {/* 色彩體系快速說明條 */}
+      <div className="bg-white border-b border-[#EAE3D6] px-6 py-2.5 shadow-2xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+          <span className="text-[#7A7E90] font-bold flex items-center gap-1.5">
+            🎨 色彩規範對應表：
+          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-1.5 text-[#E8734A] font-bold bg-[#FDF1EC] px-2.5 py-0.5 rounded-full border border-[#F6D0B8]">
+              <span className="w-2 h-2 rounded-full bg-[#E8734A]" /> 課程相關 (紅色)
+            </span>
+            <span className="flex items-center gap-1.5 text-[#B87D00] font-bold bg-[#FEF7E6] px-2.5 py-0.5 rounded-full border border-[#FDE5A3]">
+              <span className="w-2 h-2 rounded-full bg-[#E5A100]" /> 聯絡簿相關 (黃色)
+            </span>
+            <span className="flex items-center gap-1.5 text-[#2E7D32] font-bold bg-[#ECFAF3] px-2.5 py-0.5 rounded-full border border-[#C8E6C9]">
+              <span className="w-2 h-2 rounded-full bg-[#49BB87]" /> 打卡相關 (綠色)
+            </span>
+            <span className="flex items-center gap-1.5 text-[#4A8FD9] font-bold bg-[#EEF4FC] px-2.5 py-0.5 rounded-full border border-[#D5E4F8]">
+              <span className="w-2 h-2 rounded-full bg-[#4A8FD9]" /> 繳費相關 (藍色)
+            </span>
+            <span className="flex items-center gap-1.5 text-[#9B7EC8] font-bold bg-[#F6F2FB] px-2.5 py-0.5 rounded-full border border-[#E8DEF8]">
+              <span className="w-2 h-2 rounded-full bg-[#9B7EC8]" /> 新課程/系統 (紫色)
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* 主內容區 */}
       <main className="max-w-7xl mx-auto px-6 pt-6">
         {/* 類別切換 Tabs */}
         <div className="flex flex-wrap items-center gap-2 pb-5 border-b border-[#EAE3D6]">
           {[
             { id: 'ALL', label: '全部通知情境 (11)', count: 11 },
-            { id: 'A', label: 'A. 課程排程與出席 (4)', count: 4, icon: Calendar },
-            { id: 'B', label: 'B. AI 週報與練習打卡 (3)', count: 3, icon: Award },
-            { id: 'C', label: 'C. 堂數續約與繳費核銷 (4)', count: 4, icon: CreditCard },
+            { id: 'A', label: '🔴 A. 課程排程與出席 (4)', count: 4, icon: Calendar },
+            { id: 'B', label: '🟡🟢 B. AI 週報與打卡 (3)', count: 3, icon: Award },
+            { id: 'C', label: '🔵 C. 堂數續約與繳費核銷 (4)', count: 4, icon: CreditCard },
           ].map((tab) => {
             const isSelected = selectedCategory === tab.id;
             return (
@@ -230,10 +286,10 @@ export default function NotificationManagementPage() {
             <div className="bg-white rounded-2xl p-5 border border-[#EAE3D6] shadow-xs">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-bold text-[#2B3049] flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#9B7EC8]" />
+                  <Sparkles className="w-4 h-4 text-[#E8734A]" />
                   選擇通知情境 ({filteredScenarios.length})
                 </h2>
-                <span className="text-[11px] text-[#A3A7BA]">點擊即時切換</span>
+                <span className="text-[11px] text-[#A3A7BA]">點擊即時切換卡片</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -245,22 +301,23 @@ export default function NotificationManagementPage() {
                       onClick={() => setActiveScenarioId(scenario.id)}
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                         isActive
-                          ? 'bg-[#F6F2FB] border-[#9B7EC8] shadow-xs ring-2 ring-[#9B7EC8]/20'
-                          : 'bg-[#FAF7F2]/50 hover:bg-[#FAF7F2] border-[#EAE3D6] text-[#7A7E90] hover:text-[#2B3049]'
+                          ? 'bg-[#FAF7F2] shadow-xs ring-2'
+                          : 'bg-[#FAF7F2]/40 hover:bg-[#FAF7F2] border-[#EAE3D6] text-[#7A7E90] hover:text-[#2B3049]'
                       }`}
+                      style={{
+                        borderColor: isActive ? scenario.themeColor : '#EAE3D6',
+                        boxShadow: isActive ? `0 0 0 2px ${scenario.themeColor}33` : undefined,
+                      }}
                     >
                       <div className="flex items-center justify-between w-full">
                         <span
-                          className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${
-                            isActive
-                              ? 'bg-[#9B7EC8] text-white'
-                              : 'bg-white text-[#7A7E90] border border-[#EAE3D6]'
-                          }`}
+                          className="text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white"
+                          style={{ backgroundColor: scenario.themeColor }}
                         >
                           {scenario.id}
                         </span>
-                        <span className="text-[10px] text-[#A3A7BA] truncate max-w-[80px]">
-                          {scenario.categoryName}
+                        <span className="text-[10px] text-[#7A7E90] font-semibold truncate max-w-[85px]">
+                          {scenario.themeColorName}
                         </span>
                       </div>
                       <div
@@ -281,13 +338,13 @@ export default function NotificationManagementPage() {
               <div className="flex items-center justify-between border-b border-[#F0EBE1] pb-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    {getCategoryBadge(currentScenario.category)}
+                    {getThemeBadge(currentScenario)}
                     <h3 className="text-base font-bold text-[#2B3049]">
                       【{currentScenario.id}】{currentScenario.title}
                     </h3>
                   </div>
                   <p className="text-xs text-[#7A7E90] mt-1 flex items-center gap-1.5">
-                    <Info className="w-3.5 h-3.5 text-[#9B7EC8]" />
+                    <Info className="w-3.5 h-3.5 text-[#7A7E90]" />
                     觸發情境：{currentScenario.triggerTiming}
                   </p>
                 </div>
@@ -305,14 +362,14 @@ export default function NotificationManagementPage() {
               {/* DB 欄位對應參考區 */}
               <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] flex flex-col gap-2">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#7A7E90]">
-                  <Database className="w-3.5 h-3.5 text-[#9B7EC8]" />
+                  <Database className="w-3.5 h-3.5 text-[#2B3049]" />
                   <span>資料庫 (DB) 所需對應欄位清單：</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                   {currentScenario.dbFields.map((df, i) => (
                     <div key={i} className="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-lg border border-[#EAE3D6]">
                       <span className="font-bold text-[#2B3049]">{df.label}:</span>
-                      <code className="text-[#9B7EC8] font-mono text-[10px]">{df.field}</code>
+                      <code className="text-[#2B3049] font-mono text-[10px] bg-[#FAF7F2] px-1 rounded">{df.field}</code>
                     </div>
                   ))}
                 </div>
@@ -373,7 +430,7 @@ export default function NotificationManagementPage() {
                           rows={3}
                           value={currentValue ?? ''}
                           onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#9B7EC8] focus:bg-white focus:outline-none transition-all resize-none text-[#2B3049] font-medium"
+                          className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#2B3049] focus:bg-white focus:outline-none transition-all resize-none text-[#2B3049] font-medium"
                           placeholder={`請輸入 ${fieldKey}`}
                         />
                       ) : (
@@ -381,7 +438,7 @@ export default function NotificationManagementPage() {
                           type="text"
                           value={currentValue ?? ''}
                           onChange={(e) => handleFieldChange(fieldKey, e.target.value)}
-                          className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#9B7EC8] focus:bg-white focus:outline-none transition-all text-[#2B3049] font-medium"
+                          className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#2B3049] focus:bg-white focus:outline-none transition-all text-[#2B3049] font-medium"
                           placeholder={`請輸入 ${fieldKey}`}
                         />
                       )}
@@ -391,15 +448,15 @@ export default function NotificationManagementPage() {
               </div>
 
               {/* 卡片按鈕設計與跳轉清單 */}
-              <div className="p-3.5 rounded-xl bg-[#F6F2FB] border border-[#9B7EC8]/20 flex flex-col gap-2.5">
-                <span className="text-xs font-bold text-[#9B7EC8] flex items-center gap-1.5">
+              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] flex flex-col gap-2.5">
+                <span className="text-xs font-bold text-[#2B3049] flex items-center gap-1.5">
                   <ExternalLink className="w-3.5 h-3.5" />
                   按鈕設計與跳轉連結 ({currentScenario.buttons.length} 個按鈕)
                 </span>
 
                 {currentScenario.buttons.length === 0 ? (
                   <div className="text-xs text-[#7A7E90] bg-white p-3 rounded-lg border border-[#EAE3D6]">
-                    ⚠️ 本卡片為純狀態通知，依規範不設按鈕（避免重複送出）。
+                    ℹ️ 本卡片為純狀態通知，依規範不設按鈕（避免重複送出）。
                   </div>
                 ) : (
                   <div className="flex flex-col gap-2">
@@ -411,7 +468,7 @@ export default function NotificationManagementPage() {
                         <div className="flex items-center gap-2 overflow-hidden">
                           <span
                             className="px-2 py-0.5 rounded text-[10px] font-bold text-white shrink-0"
-                            style={{ backgroundColor: btn.color || '#9B7EC8' }}
+                            style={{ backgroundColor: btn.color || currentScenario.themeColor }}
                           >
                             Button {index + 1}
                           </span>
@@ -457,7 +514,7 @@ export default function NotificationManagementPage() {
                   <button
                     onClick={handleSendPush}
                     disabled={sending}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#49BB87] hover:bg-[#3DA876] active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer shrink-0"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#2B3049] hover:bg-[#1E2235] active:scale-95 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer shrink-0"
                   >
                     {sending ? (
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -566,21 +623,18 @@ export default function NotificationManagementPage() {
                           />
                         </div>
 
-                        {/* Flex 卡片本體 (完全遵循 LINE 樣式) */}
+                        {/* Flex 卡片本體 (遵循 LINE 官方樣式) */}
                         <div className="flex flex-col gap-1 flex-1">
                           <span className="text-[10px] text-white/80 font-medium ml-1">
                             MusiMate 助教
                           </span>
 
                           <div className="w-full bg-white rounded-[18px] overflow-hidden shadow-lg border border-black/10 flex flex-col transition-all">
-                            {/* Flex 卡片 Header (品牌色漸層 #C8A2D0 -> #A8D8EA 或 警示色) */}
+                            {/* Flex 卡片 Header (色彩體系漸層) */}
                             <div
                               className="p-4 flex flex-col gap-1.5"
                               style={{
-                                background:
-                                  currentScenario.id === 'A3' || currentScenario.id === 'C2'
-                                    ? '#E8734A'
-                                    : 'linear-gradient(45deg, #C8A2D0 0%, #A8D8EA 100%)',
+                                background: getHeaderGradient(currentScenario.id),
                               }}
                             >
                               <div className="flex items-center justify-between">
@@ -654,7 +708,7 @@ export default function NotificationManagementPage() {
                                       backgroundColor:
                                         btn.style === 'secondary'
                                           ? undefined
-                                          : btn.color || '#9B7EC8',
+                                          : btn.color || currentScenario.themeColor,
                                     }}
                                   >
                                     {btn.label} ↗
