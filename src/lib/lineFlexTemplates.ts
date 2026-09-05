@@ -1,17 +1,29 @@
 /**
  * MusiMate LINE Flex Message Notification Templates
  * 
- * 依照 PRD 與 style_0824.css 色彩體系重構之 11 種 LINE Flex Message 卡片生成器
+ * 依照 PRD 與使用者精確校正之 5 大色碼體系重構：
+ * 1. 課程相關 ➔ #CEAB98 (粉霧暖紅/棕紅)
+ * 2. 聯絡簿相關 ➔ #D5CC6A (草木芥末黃)
+ * 3. 打卡相關 ➔ #68C5AB (柔和薄荷綠)
+ * 4. 繳費相關 ➔ #82AAD8 (晨曦粉霧藍)
+ * 5. 新課程 / 系統 ➔ #B58EBE (典雅薰衣紫)
  * 
- * 🎨 5 大主題色彩體系：
- * 1. 課程相關 ➔ 紅色 (#E8734A / #FF8B66, 背景 #FDF1EC)
- * 2. 聯絡簿相關 ➔ 黃色 (#E5A100 / #F6C744, 背景 #FEF7E6)
- * 3. 打卡相關 ➔ 綠色 (#49BB87 / #6BD4A7, 背景 #ECFAF3)
- * 4. 繳費相關 ➔ 藍色 (#4A8FD9 / #6BAFF4, 背景 #EEF4FC)
- * 5. 新課程 / 系統 ➔ 紫色 (#9B7EC8 / #BA9FE0, 背景 #F6F2FB)
+ * 依指示精簡 C 類別（保留 C1，移除重複之 C2）：
+ * A. 課程排程與出席 (A1~A4)
+ * B. AI 週報與練習打卡 (B1~B3)
+ * C. 堂數續約與繳費核銷 (C1, C2 憑證送審, C3 續約開通)
  */
 
 export const VERCEL_BASE_URL = 'https://test-musimate.vercel.app';
+
+// 精準 5 大校正色碼
+export const THEME_COLORS = {
+  COURSE: '#CEAB98',     // 課程 (紅/暖棕)
+  SUMMARY: '#D5CC6A',    // 聯絡簿 (黃)
+  PRACTICE: '#68C5AB',   // 打卡 (綠)
+  BILLING: '#82AAD8',    // 繳費 (藍)
+  SYSTEM: '#B58EBE',     // 新課程/系統 (紫)
+};
 
 export interface NotificationScenario {
   id: string;
@@ -57,8 +69,8 @@ function createFieldRow(icon: string, label: string, value: string, valueColor =
   };
 }
 
-// 輔助函式：產生標準卡片 Header (支援自訂漸層起訖色)
-function createHeader(categoryName: string, title: string, iconEmoji = '🎵', startColor = '#FF8B66', endColor = '#E8734A') {
+// 輔助函式：產生標準卡片 Header (支援自訂漸層色)
+function createHeader(categoryName: string, title: string, iconEmoji = '🎵', baseColor = '#CEAB98') {
   return {
     type: 'box',
     layout: 'vertical',
@@ -94,18 +106,13 @@ function createHeader(categoryName: string, title: string, iconEmoji = '🎵', s
         wrap: true,
       },
     ],
-    background: {
-      type: 'linearGradient',
-      angle: '45deg',
-      startColor: startColor,
-      endColor: endColor,
-    },
+    backgroundColor: baseColor,
     paddingAll: '18px',
   };
 }
 
 // 輔助函式：產生按鈕
-function createButton(label: string, uri: string, color = '#E8734A', style = 'primary') {
+function createButton(label: string, uri: string, color = '#CEAB98', style = 'primary') {
   return {
     type: 'button',
     style: style,
@@ -120,12 +127,12 @@ function createButton(label: string, uri: string, color = '#E8734A', style = 'pr
 }
 
 // =========================================================================
-// 11 種精確情境卡片定義與生成器 (套用 5 大色彩規範)
+// 10 種精確情境卡片定義與生成器 (校正色碼版)
 // =========================================================================
 
 export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
   // =======================================================================
-  // 🔴 A. 課程排程與出席管理 (紅色系：#E8734A, 漸層 #FF8B66 -> #E8734A)
+  // 🔴 A. 課程排程與出席管理 (紅色系：#CEAB98)
   // =======================================================================
 
   // A1. 上課提醒
@@ -134,7 +141,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'A',
     categoryName: '課程排程',
     themeColorName: '課程紅',
-    themeColor: '#E8734A',
+    themeColor: THEME_COLORS.COURSE,
     title: '上課提醒',
     triggerTiming: '開課前 24 小時、開課前 2 小時各發送一次',
     description: '提醒學員即將進行之課程時間、琴房地點與本期累積進度',
@@ -157,7 +164,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '📍 課前報到打卡',
         url: `${VERCEL_BASE_URL}/student/schedule?action=checkin&lesson_id=lesson-1`,
-        color: '#E8734A',
+        color: THEME_COLORS.COURSE,
         style: 'primary',
       },
       {
@@ -172,7 +179,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('課程排程', '上課提醒', '🎵', '#FF8B66', '#E8734A'),
+        header: createHeader('課程排程', '上課提醒', '🎵', THEME_COLORS.COURSE),
         body: {
           type: 'box',
           layout: 'vertical',
@@ -183,7 +190,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
             createFieldRow('⏰', '上課時段', data.lesson_time || '09/16 (二) 19:00-20:00', '#2B3049', true),
             createFieldRow('👩‍🏫', '授課教師', data.teacher_name || '林佩芬 老師'),
             createFieldRow('📍', '上課地點', data.classroom_location || '音符音樂教室 A303 琴房'),
-            createFieldRow('📊', '本期進度', data.progress || '第 4 堂 / 共 10 堂', '#E8734A', true),
+            createFieldRow('📊', '本期進度', data.progress || '第 4 堂 / 共 10 堂', THEME_COLORS.COURSE, true),
           ],
         },
         footer: {
@@ -191,7 +198,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           layout: 'vertical',
           spacing: 'sm',
           contents: [
-            createButton('📍 課前報到打卡', `${VERCEL_BASE_URL}/student/schedule?action=checkin&lesson_id=${lessonId}`, '#E8734A', 'primary'),
+            createButton('📍 課前報到打卡', `${VERCEL_BASE_URL}/student/schedule?action=checkin&lesson_id=${lessonId}`, THEME_COLORS.COURSE, 'primary'),
             createButton('📅 查看個人課表', `${VERCEL_BASE_URL}/student/schedule`, '#7A7E90', 'secondary'),
           ],
           paddingAll: '16px',
@@ -207,7 +214,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'A',
     categoryName: '請假/調課審核',
     themeColorName: '課程紅',
-    themeColor: '#E8734A',
+    themeColor: THEME_COLORS.COURSE,
     title: '調課申請結果',
     triggerTiming: '教師於 Web 後台審核通過或拒絕學生之調課/請假申請時即時發送',
     description: '通知調課審核結果（已核准 / 未核准 / 需重新選擇時段）及教師留言',
@@ -228,7 +235,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '📅 查看最新課表',
         url: `${VERCEL_BASE_URL}/student/schedule`,
-        color: '#E8734A',
+        color: THEME_COLORS.COURSE,
         style: 'primary',
       },
     ],
@@ -237,7 +244,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('調課審核', '調課申請結果', isApproved ? '📋' : '⚠️', '#FF8B66', '#E8734A'),
+        header: createHeader('調課審核', '調課申請結果', isApproved ? '📋' : '⚠️', THEME_COLORS.COURSE),
         body: {
           type: 'box',
           layout: 'vertical',
@@ -248,15 +255,15 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
               isApproved ? '✅' : '❌',
               '審核狀態',
               data.status || (isApproved ? '已核准' : '未核准'),
-              isApproved ? '#2E7D32' : '#E8734A',
+              isApproved ? '#2E7D32' : THEME_COLORS.COURSE,
               true
             ),
             createFieldRow('📅', '原上課時間', data.original_time || '09/16 (二) 19:00-20:00'),
-            createFieldRow('✨', '新上課時間', data.new_time || '09/17 (三) 10:00-11:00', '#E8734A', true),
+            createFieldRow('✨', '新上課時間', data.new_time || '09/17 (三) 10:00-11:00', THEME_COLORS.COURSE, true),
             {
               type: 'box',
               layout: 'vertical',
-              backgroundColor: isApproved ? '#ECFAF3' : '#FDF1EC',
+              backgroundColor: isApproved ? '#EFF9F6' : '#FAF4F0',
               cornerRadius: 'md',
               paddingAll: '12px',
               contents: [
@@ -264,7 +271,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                   type: 'text',
                   text: `💬 教師留言：${data.teacher_note || '好的，收到！'}`,
                   size: 'xs',
-                  color: isApproved ? '#2E7D32' : '#B85536',
+                  color: isApproved ? '#2E7D32' : '#8A5B47',
                   wrap: true,
                 },
               ],
@@ -275,7 +282,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           type: 'box',
           layout: 'vertical',
           contents: [
-            createButton('📅 查看最新課表', `${VERCEL_BASE_URL}/student/schedule`, '#E8734A', 'primary'),
+            createButton('📅 查看最新課表', `${VERCEL_BASE_URL}/student/schedule`, THEME_COLORS.COURSE, 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -290,7 +297,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'A',
     categoryName: '出席扣款預警',
     themeColorName: '課程紅',
-    themeColor: '#E8734A',
+    themeColor: THEME_COLORS.COURSE,
     title: '課堂缺席扣款預警',
     triggerTiming: '開課逾 15 分鐘學生未到且未打卡，教師於後台點擊「回報學生缺席」時發送',
     description: '通知缺席扣款預警，並開啟 24 小時申訴倒數',
@@ -311,7 +318,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '⚖️ 提出申訴 (24h 倒數)',
         url: `${VERCEL_BASE_URL}/student/schedule?action=dispute&lesson_id=lesson-1`,
-        color: '#E8734A',
+        color: THEME_COLORS.COURSE,
         style: 'primary',
       },
       {
@@ -326,7 +333,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('出席扣款預警', '課堂缺席扣款預警', '⚠️', '#FF7043', '#E8734A'),
+        header: createHeader('出席扣款預警', '課堂缺席扣款預警', '⚠️', THEME_COLORS.COURSE),
         body: {
           type: 'box',
           layout: 'vertical',
@@ -335,12 +342,12 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           contents: [
             createFieldRow('⏰', '缺席課堂', data.lesson_time || '09/16 (二) 19:00', '#2B3049', true),
             createFieldRow('⚠️', '年度違約', data.violation_count || '第 1 次 (365天內)'),
-            createFieldRow('💸', '預計扣款', data.penalty_rate || '10%', '#E8734A', true),
-            createFieldRow('⏳', '申訴截止', data.appeal_deadline || '24 小時內', '#E8734A', true),
+            createFieldRow('💸', '預計扣款', data.penalty_rate || '10%', THEME_COLORS.COURSE, true),
+            createFieldRow('⏳', '申訴截止', data.appeal_deadline || '24 小時內', THEME_COLORS.COURSE, true),
             {
               type: 'box',
               layout: 'vertical',
-              backgroundColor: '#FDF1EC',
+              backgroundColor: '#FAF4F0',
               cornerRadius: 'md',
               paddingAll: '10px',
               contents: [
@@ -348,7 +355,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                   type: 'text',
                   text: '❗ 如有突發不可抗力之緊急情況，請於 24 小時內點擊下方「提出申訴」上傳證明。',
                   size: 'xxs',
-                  color: '#B85536',
+                  color: '#8A5B47',
                   wrap: true,
                 },
               ],
@@ -360,7 +367,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           layout: 'vertical',
           spacing: 'sm',
           contents: [
-            createButton('⚖️ 提出申訴 (24h 倒數)', `${VERCEL_BASE_URL}/student/schedule?action=dispute&lesson_id=${lessonId}`, '#E8734A', 'primary'),
+            createButton('⚖️ 提出申訴 (24h 倒數)', `${VERCEL_BASE_URL}/student/schedule?action=dispute&lesson_id=${lessonId}`, THEME_COLORS.COURSE, 'primary'),
             createButton('💬 聯繫教師', `${VERCEL_BASE_URL}/student/faq`, '#7A7E90', 'secondary'),
           ],
           paddingAll: '16px',
@@ -376,7 +383,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'A',
     categoryName: '出席結案',
     themeColorName: '課程紅',
-    themeColor: '#E8734A',
+    themeColor: THEME_COLORS.COURSE,
     title: '課堂缺席結案通知',
     triggerTiming: '24 小時申訴期滿未提出申訴，或申訴遭駁回正式結案時發送',
     description: '通知扣除違約補償金結案，並發放剩餘額度補課券代碼',
@@ -395,7 +402,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '🎫 使用補課券預約',
         url: `${VERCEL_BASE_URL}/student/schedule?voucher_id=vch-1`,
-        color: '#E8734A',
+        color: THEME_COLORS.COURSE,
         style: 'primary',
       },
     ],
@@ -404,20 +411,20 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('出席結案', '課堂缺席結案通知', '📋', '#FF8B66', '#E8734A'),
+        header: createHeader('出席結案', '課堂缺席結案通知', '📋', THEME_COLORS.COURSE),
         body: {
           type: 'box',
           layout: 'vertical',
           spacing: 'md',
           paddingAll: '20px',
           contents: [
-            createFieldRow('💸', '扣除補償金', data.deducted_amount || 'NT$ 80 (10%)', '#E8734A', true),
+            createFieldRow('💸', '扣除補償金', data.deducted_amount || 'NT$ 80 (10%)', THEME_COLORS.COURSE, true),
             createFieldRow('🎫', '補課券代碼', data.voucher_code || 'VCH-202609-8831', '#2B3049', true),
             createFieldRow('📅', '有效期限', data.expiry_date || '發放日 + 30 天'),
             {
               type: 'box',
               layout: 'vertical',
-              backgroundColor: '#FDF1EC',
+              backgroundColor: '#FAF4F0',
               cornerRadius: 'md',
               paddingAll: '10px',
               contents: [
@@ -425,7 +432,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                   type: 'text',
                   text: '✨ 系統已將剩餘課程額度轉換為補課券，請於效期內登入預約補課時段。',
                   size: 'xxs',
-                  color: '#B85536',
+                  color: '#8A5B47',
                   wrap: true,
                 },
               ],
@@ -436,7 +443,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           type: 'box',
           layout: 'vertical',
           contents: [
-            createButton('🎫 使用補課券預約', `${VERCEL_BASE_URL}/student/schedule?voucher_id=${voucherId}`, '#E8734A', 'primary'),
+            createButton('🎫 使用補課券預約', `${VERCEL_BASE_URL}/student/schedule?voucher_id=${voucherId}`, THEME_COLORS.COURSE, 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -446,7 +453,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
   },
 
   // =======================================================================
-  // 🟡 B1. 聯絡簿相關 (黃色系：#E5A100, 漸層 #F6C744 -> #E5A100, 背景 #FEF7E6)
+  // 🟡 B1. 聯絡簿相關 (黃色系：#D5CC6A)
   // =======================================================================
 
   // B1. AI 學習週報已送達
@@ -455,7 +462,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'B',
     categoryName: '聯絡簿週報',
     themeColorName: '聯絡簿黃',
-    themeColor: '#E5A100',
+    themeColor: THEME_COLORS.SUMMARY,
     title: '課堂學習週報',
     triggerTiming: '教師於 Web 後台完成 30 秒語音草稿審核/微調並點擊發送時',
     description: '推播課堂教學摘要、弱點技巧指引與本週練琴作業/目標 BPM',
@@ -480,7 +487,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '🔍 查看完整週報',
         url: `${VERCEL_BASE_URL}/student/summary/lesson-1`,
-        color: '#E5A100',
+        color: THEME_COLORS.SUMMARY,
         style: 'primary',
       },
     ],
@@ -489,7 +496,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('聯絡簿週報', '課堂學習週報', '📖', '#F6C744', '#E5A100'),
+        header: createHeader('聯絡簿週報', '課堂學習週報', '📖', THEME_COLORS.SUMMARY),
         body: {
           type: 'box',
           layout: 'vertical',
@@ -498,7 +505,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           contents: [
             createFieldRow('📅', '課堂日期', data.lesson_date || '09/16 (二)'),
             createFieldRow('📖', '作業曲目', data.homework_piece || '巴哈E大調協奏曲', '#2B3049', true),
-            createFieldRow('🎯', '目標速度', data.target_bpm || '88 BPM', '#E5A100', true),
+            createFieldRow('🎯', '目標速度', data.target_bpm || '88 BPM', THEME_COLORS.SUMMARY, true),
             createFieldRow('⏰', '建議頻率', data.target_frequency || '每週 4 天'),
             {
               type: 'separator',
@@ -508,7 +515,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
             {
               type: 'box',
               layout: 'vertical',
-              backgroundColor: '#FEF7E6',
+              backgroundColor: '#FAF9EA',
               cornerRadius: 'md',
               paddingAll: '10px',
               contents: [
@@ -516,7 +523,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                   type: 'text',
                   text: `💡 技巧指引：${data.skill_tips || '注意指法放鬆與換把位穩定度'}`,
                   size: 'xs',
-                  color: '#8A6000',
+                  color: '#7D762B',
                   wrap: true,
                 },
               ],
@@ -527,7 +534,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           type: 'box',
           layout: 'vertical',
           contents: [
-            createButton('🔍 查看完整週報', `${VERCEL_BASE_URL}/student/summary/${reportId}`, '#E5A100', 'primary'),
+            createButton('🔍 查看完整週報', `${VERCEL_BASE_URL}/student/summary/${reportId}`, THEME_COLORS.SUMMARY, 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -537,7 +544,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
   },
 
   // =======================================================================
-  // 🟢 B2 ~ B3. 打卡相關 (綠色系：#49BB87, 漸層 #6BD4A7 -> #49BB87, 背景 #ECFAF3)
+  // 🟢 B2 ~ B3. 打卡相關 (綠色系：#68C5AB)
   // =======================================================================
 
   // B2. 每日練琴打卡提醒
@@ -546,7 +553,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'B',
     categoryName: '練習打卡',
     themeColorName: '打卡綠',
-    themeColor: '#49BB87',
+    themeColor: THEME_COLORS.PRACTICE,
     title: '今天練琴了嗎？',
     triggerTiming: '每日設定時間（如 18:30）排程檢查，當天未上傳練琴音訊者觸發',
     description: '提醒學員今日目標曲目、BPM 與連續打卡天數',
@@ -564,27 +571,27 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '🎙️ 立即 15 秒打卡',
         url: `${VERCEL_BASE_URL}/student/practice`,
-        color: '#49BB87',
+        color: THEME_COLORS.PRACTICE,
         style: 'primary',
       },
     ],
     generateFlex: (data) => ({
       type: 'bubble',
       size: 'mega',
-      header: createHeader('練習打卡', '今天練琴了嗎？', '🎹', '#6BD4A7', '#49BB87'),
+      header: createHeader('練習打卡', '今天練琴了嗎？', '🎹', THEME_COLORS.PRACTICE),
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
         paddingAll: '20px',
         contents: [
-          createFieldRow('🔥', '連續打卡', data.streak_days || '已連續 6 天！', '#49BB87', true),
+          createFieldRow('🔥', '連續打卡', data.streak_days || '已連續 6 天！', THEME_COLORS.PRACTICE, true),
           createFieldRow('📖', '目標曲目', data.homework_piece || '巴哈E大調協奏曲', '#2B3049', true),
-          createFieldRow('🎯', '目標節奏', data.target_bpm || '88 BPM', '#49BB87', true),
+          createFieldRow('🎯', '目標節奏', data.target_bpm || '88 BPM', THEME_COLORS.PRACTICE, true),
           {
             type: 'box',
             layout: 'vertical',
-            backgroundColor: '#ECFAF3',
+            backgroundColor: '#EFF9F6',
             cornerRadius: 'md',
             paddingAll: '10px',
             contents: [
@@ -603,7 +610,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         type: 'box',
         layout: 'vertical',
         contents: [
-          createButton('🎙️ 立即 15 秒打卡', `${VERCEL_BASE_URL}/student/practice`, '#49BB87', 'primary'),
+          createButton('🎙️ 立即 15 秒打卡', `${VERCEL_BASE_URL}/student/practice`, THEME_COLORS.PRACTICE, 'primary'),
         ],
         paddingAll: '16px',
         paddingTop: '0px',
@@ -617,7 +624,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     category: 'B',
     categoryName: '打卡回饋',
     themeColorName: '打卡綠',
-    themeColor: '#49BB87',
+    themeColor: THEME_COLORS.PRACTICE,
     title: '練琴回饋已送達',
     triggerTiming: '依小組確認後的機制推播（AI 判定產生或教師審核放行時）',
     description: '即時推播節奏穩定度、實測 BPM 與教師短評回饋',
@@ -638,7 +645,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '📊 查看練習紀錄趨勢',
         url: `${VERCEL_BASE_URL}/student/compare/p-rec-1`,
-        color: '#49BB87',
+        color: THEME_COLORS.PRACTICE,
         style: 'primary',
       },
     ],
@@ -647,7 +654,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('打卡回饋', '練琴回饋已送達', '⭐', '#6BD4A7', '#49BB87'),
+        header: createHeader('打卡回饋', '練琴回饋已送達', '⭐', THEME_COLORS.PRACTICE),
         body: {
           type: 'box',
           layout: 'vertical',
@@ -655,12 +662,12 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           paddingAll: '20px',
           contents: [
             createFieldRow('📖', '練習曲目', data.piece_name || '巴哈E大調協奏曲'),
-            createFieldRow('🎯', '節奏穩定', data.stability_score || '91%', '#49BB87', true),
+            createFieldRow('🎯', '節奏穩定', data.stability_score || '91%', THEME_COLORS.PRACTICE, true),
             createFieldRow('⚡', '實測速度', data.detected_bpm || '86 BPM', '#2B3049', true),
             {
               type: 'box',
               layout: 'vertical',
-              backgroundColor: '#ECFAF3',
+              backgroundColor: '#EFF9F6',
               cornerRadius: 'md',
               paddingAll: '12px',
               contents: [
@@ -679,7 +686,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           type: 'box',
           layout: 'vertical',
           contents: [
-            createButton('📊 查看練習紀錄趨勢', `${VERCEL_BASE_URL}/student/compare/${recordId}`, '#49BB87', 'primary'),
+            createButton('📊 查看練習紀錄趨勢', `${VERCEL_BASE_URL}/student/compare/${recordId}`, THEME_COLORS.PRACTICE, 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -689,19 +696,19 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
   },
 
   // =======================================================================
-  // 🔵 C. 堂數合約續約與繳費核銷 (藍色系：#4A8FD9, 漸層 #6BAFF4 -> #4A8FD9, 背景 #EEF4FC)
+  // 🔵 C. 堂數續約與繳費核銷 (藍色系：#82AAD8，依指示保留 C1，移除 C2)
   // =======================================================================
 
-  // C1. 新一期續約預約通知（最後 2 堂提醒）
+  // C1. 下一期課程續約預約通知（最後 2 堂提醒）
   C1: {
     id: 'C1',
     category: 'C',
     categoryName: '繳費續約',
     themeColorName: '繳費藍',
-    themeColor: '#4A8FD9',
+    themeColor: THEME_COLORS.BILLING,
     title: '下一期課程續約預約通知',
     triggerTiming: '學生完成第 8 堂課、系統計算剩餘堂數 enrollments.remaining_lessons == 2 時自動推播',
-    description: '提醒合約即將屆滿，引導續約繳費或保留原上課時段',
+    description: '提醒合約即將屆滿，引導預約新一期課程並保留原上課時段',
     dbFields: [
       { field: 'enrollments.completed_lessons / enrollments.total_lessons', label: '當前進度', example: '第 8 / 10 堂（剩餘 2 堂）' },
       { field: 'packages.package_name', label: '續期合約方案', example: '古典鋼琴個別課 (一期 10 堂)' },
@@ -717,31 +724,24 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     },
     buttons: [
       {
-        label: '💳 續約繳費 / 上傳截圖',
-        url: `${VERCEL_BASE_URL}/student/billing?enrollment_id=enr-1`,
-        color: '#4A8FD9',
-        style: 'primary',
-      },
-      {
-        label: '📅 續約保留原時段',
+        label: '📅 預約新一期課程',
         url: `${VERCEL_BASE_URL}/student/schedule?action=renew`,
-        color: '#7A7E90',
-        style: 'secondary',
+        color: THEME_COLORS.BILLING,
+        style: 'primary',
       },
     ],
     generateFlex: (data) => {
-      const enrollmentId = data.enrollment_id || 'enr-1';
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('繳費續約', '下一期課程續約預約通知', '💰', '#6BAFF4', '#4A8FD9'),
+        header: createHeader('繳費續約', '下一期課程續約預約通知', '💰', THEME_COLORS.BILLING),
         body: {
           type: 'box',
           layout: 'vertical',
           spacing: 'md',
           paddingAll: '20px',
           contents: [
-            createFieldRow('📊', '當前進度', data.progress || '第 8 / 10 堂（剩餘 2 堂）', '#4A8FD9', true),
+            createFieldRow('📊', '當前進度', data.progress || '第 8 / 10 堂（剩餘 2 堂）', THEME_COLORS.BILLING, true),
             createFieldRow('📖', '續約方案', data.package_name || '鋼琴課一期 10 堂'),
             createFieldRow('💵', '續約學費', data.price || 'NT$ 8,000', '#2B3049', true),
             createFieldRow('🏦', '匯款帳號', data.bank_info || '國泰世華 (013) 123-456-789012'),
@@ -750,10 +750,8 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         footer: {
           type: 'box',
           layout: 'vertical',
-          spacing: 'sm',
           contents: [
-            createButton('💳 續約繳費 / 上傳截圖', `${VERCEL_BASE_URL}/student/billing?enrollment_id=${enrollmentId}`, '#4A8FD9', 'primary'),
-            createButton('📅 續約保留原時段', `${VERCEL_BASE_URL}/student/schedule?action=renew`, '#7A7E90', 'secondary'),
+            createButton('📅 預約新一期課程', `${VERCEL_BASE_URL}/student/schedule?action=renew`, THEME_COLORS.BILLING, 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -762,87 +760,13 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     },
   },
 
-  // C2. 續約最後提醒（最後 1 堂催繳）
+  // C2 (原 C3). 繳費截圖已送審（OCR 處理完畢）
   C2: {
     id: 'C2',
     category: 'C',
-    categoryName: '繳費催繳',
-    themeColorName: '繳費藍',
-    themeColor: '#4A8FD9',
-    title: '續約最後提醒（剩餘 1 堂）',
-    triggerTiming: '學生完成第 9 堂課、剩餘堂數 enrollments.remaining_lessons == 1 且尚未建立續約繳費單時自動推播',
-    description: '警示下週為最後一堂，請盡速完成繳費以確保下一期時段不被釋出',
-    dbFields: [
-      { field: 'warning_text', label: '警示說明', example: '下週為本期最後一堂課，請盡速完成繳費以確保時段。' },
-      { field: 'packages.price', label: '續約金額', example: 'NT$ 8,000' },
-      { field: 'teachers.bank_code / bank_account', label: '匯款帳號資訊', example: '國泰世華 (013) 123-456-789012' },
-    ],
-    defaultData: {
-      warning_text: '下週為本期最後一堂課，請盡速完成繳費以確保下一期熱門時段不被釋出！',
-      price: 'NT$ 8,000',
-      bank_info: '國泰世華 (013) 123-456-789012 (戶名: 林佩芬)',
-      enrollment_id: 'enr-1',
-    },
-    buttons: [
-      {
-        label: '💳 立即上傳匯款截圖',
-        url: `${VERCEL_BASE_URL}/student/billing?enrollment_id=enr-1`,
-        color: '#4A8FD9',
-        style: 'primary',
-      },
-    ],
-    generateFlex: (data) => {
-      const enrollmentId = data.enrollment_id || 'enr-1';
-      return {
-        type: 'bubble',
-        size: 'mega',
-        header: createHeader('繳費催繳', '續約最後提醒（剩餘 1 堂）', '⏰', '#6BAFF4', '#4A8FD9'),
-        body: {
-          type: 'box',
-          layout: 'vertical',
-          spacing: 'md',
-          paddingAll: '20px',
-          contents: [
-            {
-              type: 'box',
-              layout: 'vertical',
-              backgroundColor: '#EEF4FC',
-              cornerRadius: 'md',
-              paddingAll: '12px',
-              contents: [
-                {
-                  type: 'text',
-                  text: `⚠️ ${data.warning_text || '下週為最後一堂課，請盡速完成繳費以確保時段！'}`,
-                  size: 'xs',
-                  color: '#2A62A0',
-                  wrap: true,
-                },
-              ],
-            },
-            createFieldRow('💵', '續約金額', data.price || 'NT$ 8,000', '#4A8FD9', true),
-            createFieldRow('🏦', '匯款帳號', data.bank_info || '國泰世華 (013) 123-456-789012'),
-          ],
-        },
-        footer: {
-          type: 'box',
-          layout: 'vertical',
-          contents: [
-            createButton('💳 立即上傳匯款截圖', `${VERCEL_BASE_URL}/student/billing?enrollment_id=${enrollmentId}`, '#4A8FD9', 'primary'),
-          ],
-          paddingAll: '16px',
-          paddingTop: '0px',
-        },
-      };
-    },
-  },
-
-  // C3. 繳費截圖已送審（OCR 處理完畢）
-  C3: {
-    id: 'C3',
-    category: 'C',
     categoryName: '繳費核銷',
     themeColorName: '繳費藍',
-    themeColor: '#4A8FD9',
+    themeColor: THEME_COLORS.BILLING,
     title: '繳費憑證已送出',
     triggerTiming: '家長上傳轉帳截圖、OCR 解析完畢後即時推播',
     description: '純狀態通知：通知 OCR 辨識結果（金額、帳號末五碼、交易時間），等待老師一鍵確認',
@@ -862,7 +786,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     generateFlex: (data) => ({
       type: 'bubble',
       size: 'mega',
-      header: createHeader('繳費核銷', '繳費憑證已送出', '⏳', '#6BAFF4', '#4A8FD9'),
+      header: createHeader('繳費核銷', '繳費憑證已送出', '⏳', THEME_COLORS.BILLING),
       body: {
         type: 'box',
         layout: 'vertical',
@@ -870,12 +794,12 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         paddingAll: '20px',
         contents: [
           createFieldRow('💵', '辨識金額', data.amount || 'NT$ 8,000', '#2B3049', true),
-          createFieldRow('🔢', '帳號末五碼', data.bank_last_five || '56789', '#4A8FD9', true),
+          createFieldRow('🔢', '帳號末五碼', data.bank_last_five || '56789', THEME_COLORS.BILLING, true),
           createFieldRow('🕒', '交易時間', data.transaction_time || '2026/09/20 14:32'),
           {
             type: 'box',
             layout: 'vertical',
-            backgroundColor: '#EEF4FC',
+            backgroundColor: '#F2F6FB',
             cornerRadius: 'md',
             paddingAll: '12px',
             contents: [
@@ -883,7 +807,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                 type: 'text',
                 text: `ℹ️ ${data.notice || '系統已辨識完成，正等待老師一鍵確認入帳。'}`,
                 size: 'xs',
-                color: '#2A62A0',
+                color: '#3B6899',
                 wrap: true,
               },
             ],
@@ -893,13 +817,13 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     }),
   },
 
-  // C4. 續約完成與新期堂數開通
-  C4: {
-    id: 'C4',
+  // C3 (原 C4). 續約完成與新期堂數開通
+  C3: {
+    id: 'C3',
     category: 'C',
     categoryName: '繳費開通',
     themeColorName: '繳費藍',
-    themeColor: '#4A8FD9',
+    themeColor: THEME_COLORS.BILLING,
     title: '續約成功，新期已開通',
     triggerTiming: '教師於 Web 後台點擊「確認入帳」、信託池建立完成時發送',
     description: '通知新增堂數 (+10 堂) 已入帳，款項進入課程信託池託管',
@@ -919,27 +843,27 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       {
         label: '📅 查看排課課表',
         url: `${VERCEL_BASE_URL}/student/schedule`,
-        color: '#4A8FD9',
+        color: THEME_COLORS.BILLING,
         style: 'primary',
       },
     ],
     generateFlex: (data) => ({
       type: 'bubble',
       size: 'mega',
-      header: createHeader('繳費開通', '續約成功，新期已開通', '✅', '#6BAFF4', '#4A8FD9'),
+      header: createHeader('繳費開通', '續約成功，新期已開通', '✅', THEME_COLORS.BILLING),
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
         paddingAll: '20px',
         contents: [
-          createFieldRow('✨', '新增堂數', data.purchased_lessons || '+10 堂', '#4A8FD9', true),
+          createFieldRow('✨', '新增堂數', data.purchased_lessons || '+10 堂', THEME_COLORS.BILLING, true),
           createFieldRow('📊', '總剩餘堂數', data.total_remaining_lessons || '12 堂', '#2B3049', true),
           createFieldRow('🕒', '確認時間', data.confirmed_at || '2026/09/20 15:10'),
           {
             type: 'box',
             layout: 'vertical',
-            backgroundColor: '#EEF4FC',
+            backgroundColor: '#F2F6FB',
             cornerRadius: 'md',
             paddingAll: '12px',
             contents: [
@@ -947,7 +871,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
                 type: 'text',
                 text: `🛡️ ${data.trust_notice || '款項已進入課程信託池託管，保障完課權益。'}`,
                 size: 'xs',
-                color: '#2A62A0',
+                color: '#3B6899',
                 wrap: true,
               },
             ],
@@ -958,7 +882,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         type: 'box',
         layout: 'vertical',
         contents: [
-          createButton('📅 查看排課課表', `${VERCEL_BASE_URL}/student/schedule`, '#4A8FD9', 'primary'),
+          createButton('📅 查看排課課表', `${VERCEL_BASE_URL}/student/schedule`, THEME_COLORS.BILLING, 'primary'),
         ],
         paddingAll: '16px',
         paddingTop: '0px',

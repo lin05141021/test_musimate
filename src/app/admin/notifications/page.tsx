@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import {
   NOTIFICATION_SCENARIOS,
+  THEME_COLORS,
   VERCEL_BASE_URL,
   NotificationScenario,
 } from '@/lib/lineFlexTemplates';
@@ -126,55 +127,38 @@ export default function NotificationManagementPage() {
     }
   };
 
-  // 取得色彩體系標籤
+  // 取得色彩體系標籤 (校正色碼版)
   const getThemeBadge = (scenario: NotificationScenario) => {
     if (scenario.id.startsWith('A')) {
       return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF1EC] text-[#E8734A] border border-[#F6D0B8] flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#E8734A]" />
-          課程相關 (紅色)
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF4F0] text-[#8A5B47] border border-[#EADBCE] flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#CEAB98]" />
+          課程相關 (#CEAB98)
         </span>
       );
     }
     if (scenario.id === 'B1') {
       return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FEF7E6] text-[#B87D00] border border-[#FDE5A3] flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#E5A100]" />
-          聯絡簿相關 (黃色)
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF9EA] text-[#7D762B] border border-[#ECE5A6] flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#D5CC6A]" />
+          聯絡簿相關 (#D5CC6A)
         </span>
       );
     }
     if (scenario.id === 'B2' || scenario.id === 'B3') {
       return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9] flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#49BB87]" />
-          打卡相關 (綠色)
-        </span>
-      );
-    }
-    if (scenario.id.startsWith('C')) {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF4FC] text-[#4A8FD9] border border-[#D5E4F8] flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-[#4A8FD9]" />
-          繳費相關 (藍色)
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EFF9F6] text-[#2E7D32] border border-[#BBE7DA] flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#68C5AB]" />
+          打卡相關 (#68C5AB)
         </span>
       );
     }
     return (
-      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F6F2FB] text-[#9B7EC8] border border-[#E8DEF8] flex items-center gap-1">
-        <span className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
-        新課程/系統 (紫色)
+      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F2F6FB] text-[#3B6899] border border-[#C5DAF0] flex items-center gap-1.5">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#82AAD8]" />
+        繳費相關 (#82AAD8)
       </span>
     );
-  };
-
-  // 取得 Header 背景漸層
-  const getHeaderGradient = (id: string) => {
-    if (id.startsWith('A')) return 'linear-gradient(45deg, #FF8B66 0%, #E8734A 100%)';
-    if (id === 'B1') return 'linear-gradient(45deg, #F6C744 0%, #E5A100 100%)';
-    if (id === 'B2' || id === 'B3') return 'linear-gradient(45deg, #6BD4A7 0%, #49BB87 100%)';
-    if (id.startsWith('C')) return 'linear-gradient(45deg, #6BAFF4 0%, #4A8FD9 100%)';
-    return 'linear-gradient(45deg, #BA9FE0 0%, #9B7EC8 100%)';
   };
 
   return (
@@ -191,17 +175,17 @@ export default function NotificationManagementPage() {
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#49BB87] animate-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#68C5AB] animate-pulse" />
                 <h1 className="text-lg font-extrabold text-[#2B3049] tracking-tight">
                   LINE 推播卡片通知管理中心
                 </h1>
                 <span className="px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#2B3049] text-[11px] font-bold border border-[#EAE3D6] flex items-center gap-1">
-                  <Palette className="w-3 h-3 text-[#E8734A]" />
-                  style_0824 色彩規範體系
+                  <Palette className="w-3 h-3 text-[#CEAB98]" />
+                  校正色碼 5 色體系
                 </span>
               </div>
               <p className="text-xs text-[#7A7E90] mt-0.5">
-                課程(紅) · 聯絡簿(黃) · 打卡(綠) · 繳費(藍) · 系統(紫) 5 大體系全面套用
+                精簡 10 種情境 · 課程(#CEAB98) · 聯絡簿(#D5CC6A) · 打卡(#68C5AB) · 繳費(#82AAD8) · 系統(#B58EBE)
               </p>
             </div>
           </div>
@@ -229,23 +213,23 @@ export default function NotificationManagementPage() {
       <div className="bg-white border-b border-[#EAE3D6] px-6 py-2.5 shadow-2xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
           <span className="text-[#7A7E90] font-bold flex items-center gap-1.5">
-            🎨 色彩規範對應表：
+            🎨 校正色彩規範對應表：
           </span>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="flex items-center gap-1.5 text-[#E8734A] font-bold bg-[#FDF1EC] px-2.5 py-0.5 rounded-full border border-[#F6D0B8]">
-              <span className="w-2 h-2 rounded-full bg-[#E8734A]" /> 課程相關 (紅色)
+            <span className="flex items-center gap-1.5 text-[#8A5B47] font-bold bg-[#FAF4F0] px-2.5 py-0.5 rounded-full border border-[#EADBCE]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#CEAB98]" /> 課程相關 (#CEAB98)
             </span>
-            <span className="flex items-center gap-1.5 text-[#B87D00] font-bold bg-[#FEF7E6] px-2.5 py-0.5 rounded-full border border-[#FDE5A3]">
-              <span className="w-2 h-2 rounded-full bg-[#E5A100]" /> 聯絡簿相關 (黃色)
+            <span className="flex items-center gap-1.5 text-[#7D762B] font-bold bg-[#FAF9EA] px-2.5 py-0.5 rounded-full border border-[#ECE5A6]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D5CC6A]" /> 聯絡簿相關 (#D5CC6A)
             </span>
-            <span className="flex items-center gap-1.5 text-[#2E7D32] font-bold bg-[#ECFAF3] px-2.5 py-0.5 rounded-full border border-[#C8E6C9]">
-              <span className="w-2 h-2 rounded-full bg-[#49BB87]" /> 打卡相關 (綠色)
+            <span className="flex items-center gap-1.5 text-[#2E7D32] font-bold bg-[#EFF9F6] px-2.5 py-0.5 rounded-full border border-[#BBE7DA]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#68C5AB]" /> 打卡相關 (#68C5AB)
             </span>
-            <span className="flex items-center gap-1.5 text-[#4A8FD9] font-bold bg-[#EEF4FC] px-2.5 py-0.5 rounded-full border border-[#D5E4F8]">
-              <span className="w-2 h-2 rounded-full bg-[#4A8FD9]" /> 繳費相關 (藍色)
+            <span className="flex items-center gap-1.5 text-[#3B6899] font-bold bg-[#F2F6FB] px-2.5 py-0.5 rounded-full border border-[#C5DAF0]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#82AAD8]" /> 繳費相關 (#82AAD8)
             </span>
-            <span className="flex items-center gap-1.5 text-[#9B7EC8] font-bold bg-[#F6F2FB] px-2.5 py-0.5 rounded-full border border-[#E8DEF8]">
-              <span className="w-2 h-2 rounded-full bg-[#9B7EC8]" /> 新課程/系統 (紫色)
+            <span className="flex items-center gap-1.5 text-[#6D4978] font-bold bg-[#F9F4FA] px-2.5 py-0.5 rounded-full border border-[#E2CEE7]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#B58EBE]" /> 新課程/系統 (#B58EBE)
             </span>
           </div>
         </div>
@@ -256,10 +240,10 @@ export default function NotificationManagementPage() {
         {/* 類別切換 Tabs */}
         <div className="flex flex-wrap items-center gap-2 pb-5 border-b border-[#EAE3D6]">
           {[
-            { id: 'ALL', label: '全部通知情境 (11)', count: 11 },
+            { id: 'ALL', label: '全部通知情境 (10)', count: 10 },
             { id: 'A', label: '🔴 A. 課程排程與出席 (4)', count: 4, icon: Calendar },
             { id: 'B', label: '🟡🟢 B. AI 週報與打卡 (3)', count: 3, icon: Award },
-            { id: 'C', label: '🔵 C. 堂數續約與繳費核銷 (4)', count: 4, icon: CreditCard },
+            { id: 'C', label: '🔵 C. 堂數續約與核銷 (3)', count: 3, icon: CreditCard },
           ].map((tab) => {
             const isSelected = selectedCategory === tab.id;
             return (
@@ -286,10 +270,10 @@ export default function NotificationManagementPage() {
             <div className="bg-white rounded-2xl p-5 border border-[#EAE3D6] shadow-xs">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-bold text-[#2B3049] flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#E8734A]" />
+                  <Sparkles className="w-4 h-4 text-[#CEAB98]" />
                   選擇通知情境 ({filteredScenarios.length})
                 </h2>
-                <span className="text-[11px] text-[#A3A7BA]">點擊即時切換卡片</span>
+                <span className="text-[11px] text-[#A3A7BA]">點擊切換卡片</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -301,12 +285,12 @@ export default function NotificationManagementPage() {
                       onClick={() => setActiveScenarioId(scenario.id)}
                       className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                         isActive
-                          ? 'bg-[#FAF7F2] shadow-xs ring-2'
+                          ? 'bg-[#FAF7F2] shadow-xs'
                           : 'bg-[#FAF7F2]/40 hover:bg-[#FAF7F2] border-[#EAE3D6] text-[#7A7E90] hover:text-[#2B3049]'
                       }`}
                       style={{
                         borderColor: isActive ? scenario.themeColor : '#EAE3D6',
-                        boxShadow: isActive ? `0 0 0 2px ${scenario.themeColor}33` : undefined,
+                        boxShadow: isActive ? `0 0 0 2px ${scenario.themeColor}55` : undefined,
                       }}
                     >
                       <div className="flex items-center justify-between w-full">
@@ -395,7 +379,7 @@ export default function NotificationManagementPage() {
                             onClick={() => handleFieldChange(fieldKey, true)}
                             className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                               currentValue === true
-                                ? 'bg-[#49BB87] text-white shadow-xs'
+                                ? 'bg-[#68C5AB] text-white shadow-xs'
                                 : 'bg-white text-[#7A7E90] border border-[#EAE3D6]'
                             }`}
                           >
@@ -406,7 +390,7 @@ export default function NotificationManagementPage() {
                             onClick={() => handleFieldChange(fieldKey, false)}
                             className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                               currentValue === false
-                                ? 'bg-[#E8734A] text-white shadow-xs'
+                                ? 'bg-[#CEAB98] text-white shadow-xs'
                                 : 'bg-white text-[#7A7E90] border border-[#EAE3D6]'
                             }`}
                           >
@@ -497,7 +481,7 @@ export default function NotificationManagementPage() {
               <div className="border-t border-[#F0EBE1] pt-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-[#2B3049] flex items-center gap-1.5">
-                    <Send className="w-3.5 h-3.5 text-[#49BB87]" />
+                    <Send className="w-3.5 h-3.5 text-[#68C5AB]" />
                     真實 LINE 推播發送測試 (Messaging API)
                   </h4>
                   <span className="text-[10px] text-[#A3A7BA]">填入用戶 LINE ID 即刻推播</span>
@@ -509,7 +493,7 @@ export default function NotificationManagementPage() {
                     value={targetUserId}
                     onChange={(e) => setTargetUserId(e.target.value)}
                     placeholder="請輸入目標 LINE User ID (例如 Uf2457bf3...)"
-                    className="flex-1 w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#49BB87] focus:bg-white focus:outline-none transition-all font-mono text-[#2B3049]"
+                    className="flex-1 w-full px-3.5 py-2.5 text-xs rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] focus:border-[#68C5AB] focus:bg-white focus:outline-none transition-all font-mono text-[#2B3049]"
                   />
                   <button
                     onClick={handleSendPush}
@@ -529,8 +513,8 @@ export default function NotificationManagementPage() {
                   <div
                     className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
                       sendResult.success
-                        ? 'bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9]'
-                        : 'bg-[#FDF1EC] text-[#B85536] border border-[#F6D0B8]'
+                        ? 'bg-[#EFF9F6] text-[#2E7D32] border border-[#BBE7DA]'
+                        : 'bg-[#FAF4F0] text-[#8A5B47] border border-[#EADBCE]'
                     }`}
                   >
                     {sendResult.success ? <Check className="w-4 h-4" /> : <Info className="w-4 h-4" />}
@@ -589,7 +573,7 @@ export default function NotificationManagementPage() {
                   {/* LINE 聊天室 Header */}
                   <div className="bg-[#2B3049]/95 backdrop-blur-md px-4 py-3 flex items-center justify-between text-white border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C8A2D0] to-[#A8D8EA] p-0.5 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CEAB98] to-[#82AAD8] p-0.5 flex items-center justify-center">
                         <img
                           src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100"
                           alt="MusiMate"
@@ -630,11 +614,11 @@ export default function NotificationManagementPage() {
                           </span>
 
                           <div className="w-full bg-white rounded-[18px] overflow-hidden shadow-lg border border-black/10 flex flex-col transition-all">
-                            {/* Flex 卡片 Header (色彩體系漸層) */}
+                            {/* Flex 卡片 Header (校正色彩) */}
                             <div
                               className="p-4 flex flex-col gap-1.5"
                               style={{
-                                background: getHeaderGradient(currentScenario.id),
+                                backgroundColor: currentScenario.themeColor,
                               }}
                             >
                               <div className="flex items-center justify-between">
@@ -676,10 +660,8 @@ export default function NotificationManagementPage() {
                                           ? 'text-[#2E7D32] font-bold'
                                           : String(value).includes('缺席') ||
                                             String(value).includes('扣款') ||
-                                            String(value).includes('催繳') ||
-                                            String(value).includes('倒數') ||
-                                            String(value).includes('最後')
-                                          ? 'text-[#E8734A] font-bold'
+                                            String(value).includes('倒數')
+                                          ? 'text-[#CEAB98] font-bold'
                                           : 'text-[#2B3049]'
                                       }`}
                                     >
@@ -737,7 +719,7 @@ export default function NotificationManagementPage() {
                     <div className="flex-1 bg-[#FAF7F2] rounded-full px-3 py-1.5 text-[11px] text-[#A3A7BA]">
                       點擊卡片按鈕進行互動測試...
                     </div>
-                    <div className="w-7 h-7 rounded-full bg-[#49BB87] text-white flex items-center justify-center text-xs">
+                    <div className="w-7 h-7 rounded-full bg-[#68C5AB] text-white flex items-center justify-center text-xs">
                       ➤
                     </div>
                   </div>
