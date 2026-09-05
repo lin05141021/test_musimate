@@ -860,7 +860,7 @@ export default function CoursesPage() {
         )}
 
         {/* 底部導覽列 */}
-        <StudentTabBar onMoreClick={() => setIsMoreDrawerOpen(true)} />
+        <StudentTabBar activeTab="more" onMoreClick={() => setIsMoreDrawerOpen(true)} />
 
         {/* 側邊更多功能抽屜 */}
         <StudentMoreDrawer

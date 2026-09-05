@@ -37,8 +37,19 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
       if (pathname.startsWith('/student/summary')) {
         return 'summary';
       }
-      if (pathname === '/student/practice' || pathname.startsWith('/student/compare') || pathname.startsWith('/student/stamps')) {
+      if (pathname === '/student/practice' || pathname.startsWith('/student/compare')) {
         return 'practice';
+      }
+      if (
+        pathname.startsWith('/student/courses') ||
+        pathname.startsWith('/student/stamps') ||
+        pathname.startsWith('/student/history') ||
+        pathname.startsWith('/student/faq')
+      ) {
+        return 'more';
+      }
+      if (pathname.startsWith('/student/schedule')) {
+        return 'schedule';
       }
       return 'schedule'; // 預設為課表
     })();
@@ -95,7 +106,7 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
       icon: (
         // 練習打卡：底層疊卡 + 實體彩虹漸層音符樂譜卡片 + 純白音符挖空圖示
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* 底層折疊紙頁陰影輪廓 */}
+          {/* 底層折疊紙頁陰影輪析 */}
           <path
             d="M3.5 7.5V18.5C3.5 19.9 4.6 21 6 21H17"
             stroke="url(#tabbar-rainbow-gradient)"
@@ -194,25 +205,29 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
                 style={{ gap: '4px' }}
               >
                 {/* 圖標外圓：
-                    - Active 時為純白立體高亮圓形 (40px x 40px)
-                    - Inactive 時具備半透明純白襯底 (bg-white/65)，確保圖標在水彩背景上 100% 清晰分明、永不被底圖紫色遮蔽或混淆！
+                    - 只有當前 Active Tab 才會顯示白色圓形發光圓點 (40px x 40px)
+                    - Inactive Tab 保持透明背景，無白色圓點，徹底解決全部功能都處於 active 狀態的問題
                 */}
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
                     isActive
-                      ? 'bg-white shadow-[0_3px_10px_rgba(0,0,0,0.12)] scale-105 border border-white'
-                      : 'bg-white/65 hover:bg-white/95 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-white/50'
+                      ? 'bg-white shadow-[0_3px_10px_rgba(0,0,0,0.14)] scale-105 border border-white'
+                      : 'bg-transparent hover:bg-white/30 border border-transparent'
                   }`}
                 >
-                  <div className="w-6 h-6 flex items-center justify-center">
+                  <div
+                    className={`w-6 h-6 flex items-center justify-center transition-opacity duration-200 ${
+                      isActive ? 'opacity-100' : 'opacity-70 group-hover:opacity-100'
+                    }`}
+                  >
                     {tab.icon}
                   </div>
                 </div>
 
-                {/* 標籤文字：Active 時深色清晰，Inactive 時溫暖灰色 */}
+                {/* 標籤文字：Active 時深色加粗，Inactive 時溫暖灰色 */}
                 <span
                   className={`text-[11px] text-center tracking-tight transition-colors duration-150 ${
-                    isActive ? 'text-[#2B3049] font-bold' : 'text-[#7D766E] font-semibold'
+                    isActive ? 'text-[#2B3049] font-bold' : 'text-[#7D766E] font-medium'
                   }`}
                   style={{ fontFamily: 'Sora, Inter, system-ui, sans-serif' }}
                 >

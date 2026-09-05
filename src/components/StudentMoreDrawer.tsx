@@ -253,12 +253,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
               </button>
               <div className="w-full h-0 border-b border-[#F3F1ED]" />
 
-              {/* 8. 新增課程 */}
+              {/* 8. 開始新課程 */}
               <button
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/newclass');
+                  router.push('/student/courses');
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -268,7 +268,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                     <div className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
                   </div>
                   <Plus className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
-                  <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">新增課程</span>
+                  <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">開始新課程</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
               </button>
@@ -278,13 +278,34 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
           {/* 分隔線 */}
           <div className="w-full h-0 border-b-2 border-[#EAE6E1]" />
 
-          {/* Section 2: 其他 */}
+          {/* Section 2: 其他與管理 */}
           <div className="pt-5 pb-6 px-6 flex flex-col gap-2">
             <div className="text-[#7A7E90] text-[12px] font-semibold uppercase tracking-wider font-['Sora']">
-              其他
+              其他與管理
             </div>
 
             <div className="flex flex-col">
+              {/* LINE 推播卡片管理中心 */}
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  router.push('/admin/notifications');
+                }}
+                className="w-full h-12 flex justify-between items-center hover:bg-purple-50 active:bg-purple-100 rounded-lg transition-colors text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#9B7EC8] shrink-0" />
+                  <div className="w-6 h-6 rounded-full bg-[#F6F2FB] flex items-center justify-center shrink-0">
+                    <div className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
+                  </div>
+                  <Award className="w-4.5 h-4.5 text-[#9B7EC8] shrink-0" strokeWidth={2} />
+                  <span className="text-[14px] font-bold text-[#9B7EC8] font-['Sora']">LINE 推播卡片管理</span>
+                </div>
+                <span className="text-[10px] bg-[#9B7EC8]/15 text-[#9B7EC8] px-2 py-0.5 rounded-full font-bold">14 種情境</span>
+              </button>
+              <div className="w-full h-0 border-b border-[#F3F1ED]" />
+
               {/* FAQ */}
               <button
                 type="button"
@@ -300,7 +321,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                     <div className="w-2 h-2 rounded-full bg-[#A3A7BA]" />
                   </div>
                   <HelpCircle className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
-                  <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">FAQ</span>
+                  <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">FAQ 常見問題</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
               </button>
@@ -310,7 +331,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  alert('如需客服協助，請直接於 MusiMate 官方 LINE 官方帳號留言，或洽詢張老師工作室。');
+                  alert('如需客服協助，請直接於 MusiMate 官方 LINE 帳號留言，或洽詢林佩芬老師工作室。');
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
