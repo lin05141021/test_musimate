@@ -185,3 +185,59 @@
 - `GET /api/student/history`：讀取歷史課堂與金流發票紀錄
 - `GET /api/student/summary/[id]`：讀取指定課堂 AI 聯絡簿摘要
 - `POST /api/courses/trial-booking`：新生體驗試上預約
+- `POST /api/notifications/send`：發送/模擬 LINE Flex Message 推播
+
+---
+
+## 7. LINE 推播卡片完整規格與 DB 欄位對齊 (11 種情境)
+
+### A. 課程排程與出席管理
+1. **A1. 上課提醒卡片**
+   - **觸發情境**：開課前 24 小時、開課前 2 小時各發送一次。
+   - **DB 欄位**：`courses.course_name`、`lessons.start_time - lessons.end_time`、`teachers.name`、`teachers.classroom_location`、`enrollments.completed_lessons / enrollments.total_lessons`
+   - **按鈕**：Button 1 ➔ `📍 課前報到打卡` (`checkin?lesson_id={id}`), Button 2 ➔ `📅 查看個人課表` (`student-schedule`)
+2. **A2. 請假 / 調課審核結果通知**
+   - **觸發情境**：教師於 Web 後台審核通過或拒絕學生之調課/請假申請時即時發送。
+   - **DB 欄位**：`reschedule_requests.status`、`reschedule_requests.original_time`、`reschedule_requests.new_time`、`reschedule_requests.teacher_note`
+   - **按鈕**：Button 1 ➔ `📅 查看最新課表` (`student-schedule`)
+3. **A3. 缺席扣款預警通知（開啟申訴）**
+   - **觸發情境**：開課逾 15 分鐘學生未到且未打卡，教師點擊「回報缺席」時發送。
+   - **DB 欄位**：`lessons.start_time`、`students.violation_count_365d`、`penalty_rules.penalty_rate` (10%/30%/50%)、`disputes.appeal_deadline` (鎖定 24h 倒數)
+   - **按鈕**：Button 1 (警示橘紅) ➔ `⚖️ 提出申訴 (24h 倒數)` (`absence-dispute?lesson_id={id}`), Button 2 ➔ `💬 聯繫教師`
+4. **A4. 缺席扣款結案與補課券發放通知**
+   - **觸發情境**：24 小時申訴期滿未申訴，或申訴遭駁回正式結案時發送。
+   - **DB 欄位**：`vouchers.deducted_amount`、`vouchers.code`、`vouchers.expiry_date` (發放日 + 30天)
+   - **按鈕**：Button 1 ➔ `🎫 使用補課券預約` (`student-schedule?voucher_id={id}`)
+
+### B. AI 週報與練習打卡
+1. **B1. AI 學習週報已送達**
+   - **觸發情境**：教師於 Web 後台完成 30 秒語音草稿審核/微調並發送時。
+   - **DB 欄位**：`lessons.lesson_date`、`lesson_reports.summary`、`lesson_reports.skill_tips`、`lesson_reports.homework_piece`、`lesson_reports.target_bpm`、`lesson_reports.target_frequency`
+   - **按鈕**：Button 1 ➔ `🔍 查看完整週報` (`student-summary-detail?report_id={id}`)
+2. **B2. 每日練琴打卡提醒**
+   - **觸發情境**：每日設定時間（如 18:30）排程檢查，當天未上傳練琴音訊者觸發。
+   - **DB 欄位**：`practice_records.streak_days`、`lesson_reports.homework_piece`、`lesson_reports.target_bpm`
+   - **按鈕**：Button 1 ➔ `🎙️ 立即 15 秒打卡` (`practice-upload`)
+3. **B3. 練琴打卡回饋通知**
+   - **觸發情境**：AI 判定產生或教師審核放行時推播。
+   - **DB 欄位**：`practice_records.piece_name`、`practice_records.stability_score`、`practice_records.detected_bpm`、`practice_feedbacks.feedback_text`
+   - **按鈕**：Button 1 ➔ `📊 查看練習紀錄趨勢` (`practice-dashboard`)
+
+### C. 堂數合約續約與繳費核銷
+1. **C1. 新一期續約預約通知（最後 2 堂提醒）**
+   - **觸發情境**：完成第 8 堂課、剩餘堂數 `enrollments.remaining_lessons == 2` 時自動推播。
+   - **DB 欄位**：`enrollments.completed_lessons / total_lessons`、`packages.package_name`、`packages.price`、`teachers.bank_code`、`teachers.bank_account`
+   - **按鈕**：Button 1 (主按鈕) ➔ `💳 續約繳費 / 上傳截圖` (`payment-verification?enrollment_id={id}`), Button 2 (次按鈕) ➔ `📅 續約保留原時段` (`student-schedule?action=renew`)
+2. **C2. 續約最後提醒（最後 1 堂催繳）**
+   - **觸發情境**：完成第 9 堂課、剩餘堂數 `enrollments.remaining_lessons == 1` 且尚未建立續約繳費單時自動推播。
+   - **DB 欄位**：警示說明、`packages.price`、`teachers.bank_code`、`teachers.bank_account`
+   - **按鈕**：Button 1 (橘紅) ➔ `💳 立即上傳匯款截圖` (`payment-verification?enrollment_id={id}`)
+3. **C3. 繳費截圖已送審（OCR 處理完畢）**
+   - **觸發情境**：家長上傳轉帳截圖、OCR 解析完畢後即時推播。
+   - **DB 欄位**：`payments.amount`、`payments.bank_last_five`、`payments.transaction_time`、說明
+   - **按鈕**：純狀態通知，不設按鈕（避免重複送出）。
+4. **C4. 續約完成與新期堂數開通**
+   - **觸發情境**：教師於 Web 後台點擊「確認入帳」、信託池建立完成時發送。
+   - **DB 欄位**：`payments.purchased_lessons` (+10 堂)、`enrollments.remaining_lessons`、`payments.confirmed_at`、信託說明
+   - **按鈕**：Button 1 ➔ `📅 查看排課課表` (`student-schedule`)
+

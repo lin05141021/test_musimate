@@ -1,22 +1,26 @@
 /**
  * MusiMate LINE Flex Message Notification Templates
  * 
- * 依照 PRD 與 UI 規範打造之 14 種 LINE Flex Message 卡片生成器
- * 品牌漸層 Header (#C8A2D0 -> #A8D8EA)、結構化 Body 欄位、品牌色彩按鈕 Footer
+ * 依照 PRD 最新規格重構之 11 種 LINE Flex Message 卡片生成器
+ * 涵蓋：
+ * A. 課程排程與出席管理 (A1~A4)
+ * B. AI 週報與練習打卡 (B1~B3)
+ * C. 堂數合約續約與繳費核銷 (C1~C4)
  */
 
 export const VERCEL_BASE_URL = 'https://test-musimate.vercel.app';
 
 export interface NotificationScenario {
   id: string;
-  category: 'A' | 'B' | 'C' | 'D';
+  category: 'A' | 'B' | 'C';
   categoryName: string;
   title: string;
   triggerTiming: string;
   description: string;
+  dbFields: Array<{ field: string; label: string; example: string }>;
   defaultData: Record<string, any>;
+  buttons: Array<{ label: string; url: string; color?: string; style?: 'primary' | 'secondary' | 'link' }>;
   generateFlex: (data: Record<string, any>) => any;
-  targetUrl?: string;
 }
 
 // 輔助函式：產生單行 Icon + Label + Value 欄位
@@ -49,7 +53,7 @@ function createFieldRow(icon: string, label: string, value: string, valueColor =
 }
 
 // 輔助函式：產生標準卡片 Header
-function createHeader(categoryName: string, title: string, iconEmoji = '🎵') {
+function createHeader(categoryName: string, title: string, iconEmoji = '🎵', customBg?: string) {
   return {
     type: 'box',
     layout: 'vertical',
@@ -85,12 +89,15 @@ function createHeader(categoryName: string, title: string, iconEmoji = '🎵') {
         wrap: true,
       },
     ],
-    background: {
-      type: 'linearGradient',
-      angle: '45deg',
-      startColor: '#C8A2D0',
-      endColor: '#A8D8EA',
-    },
+    background: customBg
+      ? undefined
+      : {
+          type: 'linearGradient',
+          angle: '45deg',
+          startColor: '#C8A2D0',
+          endColor: '#A8D8EA',
+        },
+    backgroundColor: customBg || undefined,
     paddingAll: '18px',
   };
 }
@@ -111,243 +118,135 @@ function createButton(label: string, uri: string, color = '#9B7EC8', style = 'pr
 }
 
 // =========================================================================
-// 14 種情境卡片定義與生成器
+// 11 種精確情境卡片定義與生成器
 // =========================================================================
 
 export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
-  // -------------------------------------------------------------
-  // A. 課程相關通知
-  // -------------------------------------------------------------
+  // =======================================================================
+  // A. 課程排程與出席管理 (A1 ~ A4)
+  // =======================================================================
+
+  // A1. 上課提醒
   A1: {
     id: 'A1',
     category: 'A',
     categoryName: '課程提醒',
     title: '上課提醒',
-    triggerTiming: '課前 24 小時 + 1 小時 各發一次',
-    description: '提醒學員即將進行之課程時間與琴房地點',
+    triggerTiming: '排程於開課前 24 小時、開課前 2 小時各發送一次',
+    description: '提醒學員即將進行之課程時間、琴房地點與本期累積進度',
+    dbFields: [
+      { field: 'courses.course_name', label: '課程名稱', example: '古典鋼琴個別課' },
+      { field: 'lessons.start_time - lessons.end_time', label: '上課時段', example: '2026/09/16 (二) 19:00 - 20:00' },
+      { field: 'teachers.name', label: '授課教師', example: '林佩芬 老師' },
+      { field: 'teachers.classroom_location', label: '上課地點/琴房', example: '音符音樂教室 A303 琴房' },
+      { field: 'enrollments.completed_lessons / enrollments.total_lessons', label: '本期進度', example: '第 4 堂 / 共 10 堂' },
+    ],
     defaultData: {
-      datetime: '09/16 (二) 19:00-21:00',
-      teacher: '林佩芬 老師',
-      course: '鋼琴個別課 (第 4 堂)',
-      location: '音符音樂教室 A303 琴房',
+      course_name: '古典鋼琴個別課',
+      lesson_time: '2026/09/16 (二) 19:00 - 20:00',
+      teacher_name: '林佩芬 老師',
+      classroom_location: '音符音樂教室 A303 琴房',
+      progress: '第 4 堂 / 共 10 堂',
+      lesson_id: 'lesson-1',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/schedule`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('課程提醒', '上課提醒', '🎵'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📅', '日期時間', data.datetime || '09/16 (二) 19:00-21:00', '#2B3049', true),
-          createFieldRow('👩‍🏫', '授課老師', data.teacher || '林佩芬 老師'),
-          createFieldRow('📖', '上課課程', data.course || '鋼琴個別課'),
-          createFieldRow('📍', '教室地點', data.location || '音符音樂教室 A303 琴房'),
-        ],
+    buttons: [
+      {
+        label: '📍 課前報到打卡',
+        url: `${VERCEL_BASE_URL}/student/schedule?action=checkin&lesson_id=lesson-1`,
+        color: '#49BB87',
+        style: 'primary',
       },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 查看課表', `${VERCEL_BASE_URL}/student/schedule`, '#9B7EC8'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
+      {
+        label: '📅 查看個人課表',
+        url: `${VERCEL_BASE_URL}/student/schedule`,
+        color: '#9B7EC8',
+        style: 'primary',
       },
-    }),
-  },
-
-  A2: {
-    id: 'A2',
-    category: 'A',
-    categoryName: '課程異動',
-    title: '課程異動通知',
-    triggerTiming: '老師請假或停課時 即時發送',
-    description: '通知學員課程異動並引導線上調課/補課',
-    defaultData: {
-      changeType: '停課 / 需調課',
-      originalTime: '09/16 (二) 19:00-21:00',
-      teacher: '林佩芬 老師',
-      reason: '老師臨時有事，請登入系統重新選擇合適的調課/補課時段。',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/schedule?action=reschedule`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('課程異動', '課程異動通知', '🔔'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('⚠️', '異動類型', data.changeType || '停課 / 需調課', '#E8734A', true),
-          createFieldRow('📅', '原定時間', data.originalTime || '09/16 (二) 19:00-21:00'),
-          createFieldRow('👩‍🏫', '授課老師', data.teacher || '林佩芬 老師'),
-          {
-            type: 'box',
-            layout: 'vertical',
-            backgroundColor: '#FDF1EC',
-            cornerRadius: 'md',
-            paddingAll: '12px',
-            contents: [
-              {
-                type: 'text',
-                text: `💬 異動說明：${data.reason || '老師臨時有事，請調整上課時間'}`,
-                size: 'xs',
-                color: '#B85536',
-                wrap: true,
-              },
-            ],
-          },
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 我要調課', `${VERCEL_BASE_URL}/student/schedule?action=reschedule`, '#E8734A'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  A3: {
-    id: 'A3',
-    category: 'A',
-    categoryName: '智慧聯絡簿',
-    title: '課堂筆記已更新',
-    triggerTiming: '老師完成課堂筆記後 即時發送',
-    description: '通知學員課堂摘要已上傳，包含 AI 綜合評分與重點練習叮嚀',
-    defaultData: {
-      lessonDate: '09/16 (二)',
-      courseName: '鋼琴課 — 巴哈E大調小提琴協奏曲',
-      teacher: '林佩芬 老師',
-      score: '92 分 (表現優異 ⭐)',
-      feedback: '觸鍵音色更加純淨，右手指法請注意第 32 小節琶音',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/summary/lesson-1`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('智慧聯絡簿', '課堂筆記已更新', '📓'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📅', '課堂日期', data.lessonDate || '09/16 (二)'),
-          createFieldRow('📖', '課程曲目', data.courseName || '鋼琴課 — 巴哈E大調小提琴協奏曲'),
-          createFieldRow('👩‍🏫', '授課老師', data.teacher || '林佩芬 老師'),
-          createFieldRow('⭐', 'AI 評分', data.score || '92 分', '#49BB87', true),
-          {
-            type: 'separator',
-            margin: 'md',
-            color: '#F0EBE1',
-          },
-          {
-            type: 'text',
-            text: `📝 老師叮嚀：${data.feedback || '表現優異，請保持每日練習！'}`,
-            size: 'xs',
-            color: '#666666',
-            wrap: true,
-          },
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 查看聯絡簿', `${VERCEL_BASE_URL}/student/summary/lesson-1`, '#9B7EC8'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  A4: {
-    id: 'A4',
-    category: 'A',
-    categoryName: '課程確認',
-    title: '課程已排定',
-    triggerTiming: '排課系統確認後 即時發送',
-    description: '新期數課程排定完成確認',
-    defaultData: {
-      course: '古典鋼琴進階班 — 10 堂課',
-      period: '2026/09/01 - 2026/11/30',
-      teacher: '林佩芬 老師',
-      timeSlot: '每週二 19:00-21:00',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/schedule`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('課程確認', '新課程已排定', '✅'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📖', '課程名稱', data.course || '鋼琴課 — 10 堂', '#2B3049', true),
-          createFieldRow('📅', '修業期間', data.period || '2026/09/01 - 2026/11/30'),
-          createFieldRow('👩‍🏫', '指導老師', data.teacher || '林佩芬 老師'),
-          createFieldRow('⏰', '固定時段', data.timeSlot || '每週二 19:00-21:00', '#9B7EC8', true),
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 查看完整課表', `${VERCEL_BASE_URL}/student/schedule`, '#49BB87'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  A5: {
-    id: 'A5',
-    category: 'A',
-    categoryName: '請假審核',
-    title: '請假申請結果',
-    triggerTiming: '老師/系統審核完成後 即時發送',
-    description: '通知請假申請審核通過或未通過之結果',
-    defaultData: {
-      originalLesson: '09/16 (二) 19:00-21:00',
-      status: '已核准 (符合 24H 提前申請，退回 100% 額度)',
-      isApproved: true,
-      teacherReply: '好的，心悅注意安全！請至課表預約補課時段。',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/schedule`,
+    ],
     generateFlex: (data) => {
-      const isApproved = data.isApproved !== false;
+      const lessonId = data.lesson_id || 'lesson-1';
       return {
         type: 'bubble',
         size: 'mega',
-        header: createHeader('請假審核', '請假申請結果', isApproved ? '📋' : '⚠️'),
+        header: createHeader('課程提醒', '上課提醒', '🎵'),
         body: {
           type: 'box',
           layout: 'vertical',
           spacing: 'md',
           paddingAll: '20px',
           contents: [
-            createFieldRow('📅', '請假課程', data.originalLesson || '09/16 (二) 19:00-21:00'),
+            createFieldRow('📖', '課程名稱', data.course_name || '古典鋼琴個別課', '#2B3049', true),
+            createFieldRow('⏰', '上課時段', data.lesson_time || '09/16 (二) 19:00-20:00', '#2B3049', true),
+            createFieldRow('👩‍🏫', '授課教師', data.teacher_name || '林佩芬 老師'),
+            createFieldRow('📍', '上課地點', data.classroom_location || '音符音樂教室 A303 琴房'),
+            createFieldRow('📊', '本期進度', data.progress || '第 4 堂 / 共 10 堂', '#9B7EC8', true),
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'sm',
+          contents: [
+            createButton('📍 課前報到打卡', `${VERCEL_BASE_URL}/student/schedule?action=checkin&lesson_id=${lessonId}`, '#49BB87', 'primary'),
+            createButton('📅 查看個人課表', `${VERCEL_BASE_URL}/student/schedule`, '#9B7EC8', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
+  },
+
+  // A2. 請假 / 調課審核結果通知
+  A2: {
+    id: 'A2',
+    category: 'A',
+    categoryName: '調課/請假審核',
+    title: '調課申請結果',
+    triggerTiming: '教師於 Web 後台審核通過或拒絕學生之調課/請假申請時即時發送',
+    description: '通知調課審核結果（已核准 / 未核准 / 需重新選擇時段）及教師留言',
+    dbFields: [
+      { field: 'reschedule_requests.status', label: '審核狀態', example: '已核准' },
+      { field: 'reschedule_requests.original_time', label: '原上課時間', example: '2026/09/16 (二) 19:00 - 20:00' },
+      { field: 'reschedule_requests.new_time', label: '新上課時間', example: '2026/09/17 (三) 10:00 - 11:00' },
+      { field: 'reschedule_requests.teacher_note', label: '教師留言', example: '好的，已為您調整至週三上午！' },
+    ],
+    defaultData: {
+      status: '已核准 (時段已更新)',
+      isApproved: true,
+      original_time: '2026/09/16 (二) 19:00 - 20:00',
+      new_time: '2026/09/17 (三) 10:00 - 11:00',
+      teacher_note: '好的，已為您安排週三上午上課，請準時出席！',
+    },
+    buttons: [
+      {
+        label: '📅 查看最新課表',
+        url: `${VERCEL_BASE_URL}/student/schedule`,
+        color: '#49BB87',
+        style: 'primary',
+      },
+    ],
+    generateFlex: (data) => {
+      const isApproved = data.isApproved !== false;
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('調課審核', '調課申請結果', isApproved ? '📋' : '⚠️'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
             createFieldRow(
               isApproved ? '✅' : '❌',
-              '審核結果',
+              '審核狀態',
               data.status || (isApproved ? '已核准' : '未核准'),
               isApproved ? '#49BB87' : '#E8734A',
               true
             ),
+            createFieldRow('📅', '原上課時間', data.original_time || '09/16 (二) 19:00-20:00'),
+            createFieldRow('✨', '新上課時間', data.new_time || '09/17 (三) 10:00-11:00', '#9B7EC8', true),
             {
               type: 'box',
               layout: 'vertical',
@@ -357,7 +256,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
               contents: [
                 {
                   type: 'text',
-                  text: `💬 老師回覆：${data.teacherReply || '好的，收到！'}`,
+                  text: `💬 教師留言：${data.teacher_note || '好的，收到！'}`,
                   size: 'xs',
                   color: isApproved ? '#2E7D32' : '#B85536',
                   wrap: true,
@@ -370,7 +269,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
           type: 'box',
           layout: 'vertical',
           contents: [
-            createButton('✅ 查看課表', `${VERCEL_BASE_URL}/student/schedule`, '#9B7EC8'),
+            createButton('📅 查看最新課表', `${VERCEL_BASE_URL}/student/schedule`, '#49BB87', 'primary'),
           ],
           paddingAll: '16px',
           paddingTop: '0px',
@@ -379,228 +278,294 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     },
   },
 
-  A6: {
-    id: 'A6',
+  // A3. 缺席扣款預警通知（開啟申訴）
+  A3: {
+    id: 'A3',
     category: 'A',
-    categoryName: '調課確認',
-    title: '調課申請結果',
-    triggerTiming: '老師/系統確認調課後 即時發送',
-    description: '通知調課成功確認及新上課時段',
+    categoryName: '缺席預警',
+    title: '課堂缺席扣款預警',
+    triggerTiming: '開課逾 15 分鐘學生未到且未打卡，教師於後台點擊「回報學生缺席」時發送',
+    description: '通知缺席扣款預警，並開啟 24 小時申訴倒數',
+    dbFields: [
+      { field: 'lessons.start_time', label: '缺席課堂', example: '2026/09/16 (二) 19:00' },
+      { field: 'students.violation_count_365d', label: '年度累計違約', example: '第 1 次 (365天內)' },
+      { field: 'penalty_rules.penalty_rate', label: '預計扣款比例', example: '10%' },
+      { field: 'disputes.appeal_deadline', label: '申訴截止倒數', example: '2026/09/17 19:15 前 (24h內)' },
+    ],
     defaultData: {
-      originalTime: '09/16 (二) 19:00-21:00',
-      newTime: '09/17 (三) 10:00-12:00',
-      status: '✅ 已確認成功排入課表',
-      isConfirmed: true,
+      lesson_time: '2026/09/16 (二) 19:00',
+      violation_count: '第 1 次 (365天內)',
+      penalty_rate: '10%',
+      appeal_deadline: '2026/09/17 19:15 前 (鎖定 24H 倒數)',
+      lesson_id: 'lesson-1',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/schedule`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('調課確認', '調課申請結果', '📋'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📅', '原定時間', data.originalTime || '09/16 (二) 19:00-21:00'),
-          createFieldRow('✨', '新時段', data.newTime || '09/17 (三) 10:00-12:00', '#9B7EC8', true),
-          createFieldRow('📋', '確認狀態', data.status || '已確認', '#49BB87', true),
-        ],
+    buttons: [
+      {
+        label: '⚖️ 提出申訴 (24h 倒數)',
+        url: `${VERCEL_BASE_URL}/student/schedule?action=dispute&lesson_id=lesson-1`,
+        color: '#E8734A',
+        style: 'primary',
       },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 查看課表', `${VERCEL_BASE_URL}/student/schedule`, '#49BB87'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
+      {
+        label: '💬 聯繫教師',
+        url: `${VERCEL_BASE_URL}/student/faq`,
+        color: '#7A7E90',
+        style: 'secondary',
       },
-    }),
+    ],
+    generateFlex: (data) => {
+      const lessonId = data.lesson_id || 'lesson-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('缺席預警', '課堂缺席扣款預警', '⚠️', '#E8734A'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            createFieldRow('⏰', '缺席課堂', data.lesson_time || '09/16 (二) 19:00', '#2B3049', true),
+            createFieldRow('⚠️', '年度違約', data.violation_count || '第 1 次 (365天內)'),
+            createFieldRow('💸', '預計扣款', data.penalty_rate || '10%', '#E8734A', true),
+            createFieldRow('⏳', '申訴截止', data.appeal_deadline || '24 小時內', '#E8734A', true),
+            {
+              type: 'box',
+              layout: 'vertical',
+              backgroundColor: '#FDF1EC',
+              cornerRadius: 'md',
+              paddingAll: '10px',
+              contents: [
+                {
+                  type: 'text',
+                  text: '❗ 如有突發不可抗力之緊急情況，請於 24 小時內點擊下方「提出申訴」上傳證明。',
+                  size: 'xxs',
+                  color: '#B85536',
+                  wrap: true,
+                },
+              ],
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'sm',
+          contents: [
+            createButton('⚖️ 提出申訴 (24h 倒數)', `${VERCEL_BASE_URL}/student/schedule?action=dispute&lesson_id=${lessonId}`, '#E8734A', 'primary'),
+            createButton('💬 聯繫教師', `${VERCEL_BASE_URL}/student/faq`, '#7A7E90', 'secondary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
   },
 
-  // -------------------------------------------------------------
-  // B. 繳費相關通知
-  // -------------------------------------------------------------
+  // A4. 缺席扣款結案與補課券發放通知
+  A4: {
+    id: 'A4',
+    category: 'A',
+    categoryName: '缺席結案',
+    title: '課堂缺席結案通知',
+    triggerTiming: '24 小時申訴期滿未提出申訴，或申訴遭駁回正式結案時發送',
+    description: '通知扣除違約補償金結案，並發放剩餘額度補課券代碼',
+    dbFields: [
+      { field: 'vouchers.deducted_amount', label: '扣除違約補償金', example: 'NT$ 80 (10%)' },
+      { field: 'vouchers.code', label: '補課券代碼', example: 'VCH-202609-8831' },
+      { field: 'vouchers.expiry_date', label: '補課券有效期限', example: '2026/10/17 (發放日 + 30 天)' },
+    ],
+    defaultData: {
+      deducted_amount: 'NT$ 80 (依 10% 比例扣除補償金)',
+      voucher_code: 'VCH-202609-8831',
+      expiry_date: '2026/10/17 (發放日 + 30 天整)',
+      voucher_id: 'vch-1',
+    },
+    buttons: [
+      {
+        label: '🎫 使用補課券預約',
+        url: `${VERCEL_BASE_URL}/student/schedule?voucher_id=vch-1`,
+        color: '#9B7EC8',
+        style: 'primary',
+      },
+    ],
+    generateFlex: (data) => {
+      const voucherId = data.voucher_id || 'vch-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('缺席結案', '課堂缺席結案通知', '📋'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            createFieldRow('💸', '扣除補償金', data.deducted_amount || 'NT$ 80 (10%)', '#E8734A', true),
+            createFieldRow('🎫', '補課券代碼', data.voucher_code || 'VCH-202609-8831', '#9B7EC8', true),
+            createFieldRow('📅', '有效期限', data.expiry_date || '發放日 + 30 天'),
+            {
+              type: 'box',
+              layout: 'vertical',
+              backgroundColor: '#F6F2FB',
+              cornerRadius: 'md',
+              paddingAll: '10px',
+              contents: [
+                {
+                  type: 'text',
+                  text: '✨ 系統已將剩餘課程額度轉換為補課券，請於效期內登入預約補課時段。',
+                  size: 'xxs',
+                  color: '#4A3268',
+                  wrap: true,
+                },
+              ],
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            createButton('🎫 使用補課券預約', `${VERCEL_BASE_URL}/student/schedule?voucher_id=${voucherId}`, '#9B7EC8', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
+  },
+
+  // =======================================================================
+  // B. AI 週報與練習打卡 (B1 ~ B3)
+  // =======================================================================
+
+  // B1. AI 學習週報已送達
   B1: {
     id: 'B1',
     category: 'B',
-    categoryName: '繳費提醒',
-    title: '學費繳費提醒',
-    triggerTiming: '到期前 7 天 + 3 天 + 當天 各發一次',
-    description: '提醒學員學費即將到期並引導上傳轉帳證明',
+    categoryName: '學習週報',
+    title: '課堂學習週報',
+    triggerTiming: '教師於 Web 後台完成 30 秒語音草稿審核/微調並點擊發送時',
+    description: '推播課堂教學摘要、弱點技巧指引與本週練琴作業/目標 BPM',
+    dbFields: [
+      { field: 'lessons.lesson_date', label: '課堂日期', example: '2026/09/16 (二)' },
+      { field: 'lesson_reports.summary', label: '本次教學摘要', example: '巴哈E大調協奏曲 弱起拍音準與換把位' },
+      { field: 'lesson_reports.skill_tips', label: '弱點技巧指引', example: '第 32 小節琶音右手指法放鬆，注意第四指落點' },
+      { field: 'lesson_reports.homework_piece', label: '本週練琴作業', example: '巴哈E大調協奏曲 第一樂章' },
+      { field: 'lesson_reports.target_bpm', label: '目標速度', example: '88 BPM' },
+      { field: 'lesson_reports.target_frequency', label: '目標頻率', example: '每週至少 4 天，每次 20 分鐘' },
+    ],
     defaultData: {
-      item: '鋼琴個別課 第 3 期 (共 10 堂)',
-      amount: 'NT$ 8,000',
-      dueDate: '2026/09/20',
-      remainingDays: '還有 3 天',
+      lesson_date: '2026/09/16 (二)',
+      summary: '巴哈E大調小提琴協奏曲 第一樂章 弱起拍音準與換把位穩定度',
+      skill_tips: '第 32 小節琶音右手指法放鬆，注意第四指落點準確度',
+      homework_piece: '巴哈E大調協奏曲 第一樂章',
+      target_bpm: '88 BPM',
+      target_frequency: '每週 4 天 · 每次 20 分鐘',
+      report_id: 'lesson-1',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/billing`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('繳費提醒', '學費繳費提醒', '💰'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📖', '繳費項目', data.item || '鋼琴課第3期 10堂'),
-          createFieldRow('💵', '應繳金額', data.amount || 'NT$ 8,000', '#2B3049', true),
-          createFieldRow('📅', '繳費期限', data.dueDate || '2026/09/20'),
-          createFieldRow('⏰', '剩餘天數', data.remainingDays || '還有 3 天', '#E8734A', true),
-        ],
+    buttons: [
+      {
+        label: '🔍 查看完整週報',
+        url: `${VERCEL_BASE_URL}/student/summary/lesson-1`,
+        color: '#9B7EC8',
+        style: 'primary',
       },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('✅ 上傳繳費證明', `${VERCEL_BASE_URL}/student/billing`, '#9B7EC8'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
+    ],
+    generateFlex: (data) => {
+      const reportId = data.report_id || 'lesson-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('學習週報', '課堂學習週報', '📖'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            createFieldRow('📅', '課堂日期', data.lesson_date || '09/16 (二)'),
+            createFieldRow('📖', '作業曲目', data.homework_piece || '巴哈E大調協奏曲', '#2B3049', true),
+            createFieldRow('🎯', '目標速度', data.target_bpm || '88 BPM', '#9B7EC8', true),
+            createFieldRow('⏰', '建議頻率', data.target_frequency || '每週 4 天'),
+            {
+              type: 'separator',
+              margin: 'md',
+              color: '#F0EBE1',
+            },
+            {
+              type: 'text',
+              text: `💡 技巧指引：${data.skill_tips || '注意指法放鬆與換把位穩定度'}`,
+              size: 'xs',
+              color: '#555555',
+              wrap: true,
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            createButton('🔍 查看完整週報', `${VERCEL_BASE_URL}/student/summary/${reportId}`, '#9B7EC8', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
   },
 
+  // B2. 每日練琴打卡提醒
   B2: {
     id: 'B2',
     category: 'B',
-    categoryName: '繳費核對',
-    title: '繳費核對完成',
-    triggerTiming: 'AI / 行政核對完畢後 即時發送',
-    description: '確認繳費證明審核通過，款項已成功入帳',
+    categoryName: '打卡提醒',
+    title: '今天練琴了嗎？',
+    triggerTiming: '每日設定時間（如 18:30）排程檢查，當天未上傳練琴音訊者觸發',
+    description: '提醒學員今日目標曲目、BPM 與連續打卡天數',
+    dbFields: [
+      { field: 'practice_records.streak_days', label: '連續打卡天數', example: '已連續 6 天！🔥' },
+      { field: 'lesson_reports.homework_piece', label: '當前目標作業', example: '巴哈E大調協奏曲 第一樂章' },
+      { field: 'lesson_reports.target_bpm', label: '目標節奏', example: '88 BPM' },
+    ],
     defaultData: {
-      item: '鋼琴個別課 第 3 期 (共 10 堂)',
-      amount: 'NT$ 8,000',
-      status: '資料正確，款項已確認入帳 ✅',
+      streak_days: '已連續打卡 6 天！🔥',
+      homework_piece: '巴哈E大調協奏曲 第一樂章',
+      target_bpm: '88 BPM',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/history`,
+    buttons: [
+      {
+        label: '🎙️ 立即 15 秒打卡',
+        url: `${VERCEL_BASE_URL}/student/practice`,
+        color: '#49BB87',
+        style: 'primary',
+      },
+    ],
     generateFlex: (data) => ({
       type: 'bubble',
       size: 'mega',
-      header: createHeader('繳費核對', '繳費核對完成', '✅'),
+      header: createHeader('練習陪伴', '今天練琴了嗎？', '🎹'),
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
         paddingAll: '20px',
         contents: [
-          createFieldRow('📖', '項目名稱', data.item || '鋼琴課第3期 10堂'),
-          createFieldRow('💵', '入帳金額', data.amount || 'NT$ 8,000', '#2B3049', true),
-          createFieldRow('✅', '核對結果', data.status || '資料正確，已確認入帳', '#49BB87', true),
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('📜 查看繳費紀錄', `${VERCEL_BASE_URL}/student/history`, '#49BB87'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  B3: {
-    id: 'B3',
-    category: 'B',
-    categoryName: '逾期催繳',
-    title: '學費已逾期提醒',
-    triggerTiming: '超過期限後 第 1 天 + 第 3 天 各發一次',
-    description: '學費逾期警示通知，提供立即補繳與聯繫客服途徑',
-    defaultData: {
-      item: '鋼琴個別課 第 3 期 (共 10 堂)',
-      amount: 'NT$ 8,000',
-      dueDate: '2026/09/20',
-      overdueDays: '已逾期 3 天',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/billing`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          {
-            type: 'text',
-            text: '⚠️ 逾期催繳通知',
-            weight: 'bold',
-            size: 'lg',
-            color: '#FFFFFF',
-          },
-        ],
-        backgroundColor: '#E8734A',
-        paddingAll: '18px',
-      },
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📖', '逾期項目', data.item || '鋼琴課第3期 10堂'),
-          createFieldRow('💵', '應補金額', data.amount || 'NT$ 8,000', '#E8734A', true),
-          createFieldRow('📅', '原繳期限', data.dueDate || '2026/09/20'),
-          createFieldRow('❗', '逾期天數', data.overdueDays || '已逾期 3 天', '#E8734A', true),
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'sm',
-        contents: [
-          createButton('💳 立即上傳繳費', `${VERCEL_BASE_URL}/student/billing`, '#E8734A'),
-          createButton('💬 聯繫系統客服', `${VERCEL_BASE_URL}/student/faq`, '#7A7E90', 'secondary'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  // -------------------------------------------------------------
-  // C. 練習 / 打卡相關通知
-  // -------------------------------------------------------------
-  C1: {
-    id: 'C1',
-    category: 'C',
-    categoryName: '練習打卡',
-    title: '今天練習了嗎？',
-    triggerTiming: '每日 預設 18:00 (若當天已打卡則不發)',
-    description: '每日練習陪伴與連續打卡鼓勵通知',
-    defaultData: {
-      streak: '已連續打卡 6 天！🔥',
-      encourage: '再堅持一天就達成連續 7 天週成就囉！加油！',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/practice`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('練習陪伴', '今天練習了嗎？', '🎵'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('🔥', '連續打卡', data.streak || '已連續 6 天！', '#E8734A', true),
+          createFieldRow('🔥', '連續打卡', data.streak_days || '已連續 6 天！', '#E8734A', true),
+          createFieldRow('📖', '目標曲目', data.homework_piece || '巴哈E大調協奏曲', '#2B3049', true),
+          createFieldRow('🎯', '目標節奏', data.target_bpm || '88 BPM', '#9B7EC8', true),
           {
             type: 'box',
             layout: 'vertical',
             backgroundColor: '#FAF7F2',
             cornerRadius: 'md',
-            paddingAll: '12px',
+            paddingAll: '10px',
             contents: [
               {
                 type: 'text',
-                text: `💬 ${data.encourage || '再堅持一天就達成7天成就囉！'}`,
+                text: '💬 再堅持一天就達成連續 7 天週成就囉！立即錄製 15 秒打卡吧！',
                 size: 'xs',
-                color: '#555555',
+                color: '#666666',
                 wrap: true,
               },
             ],
@@ -611,7 +576,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         type: 'box',
         layout: 'vertical',
         contents: [
-          createButton('🎵 開始練習打卡', `${VERCEL_BASE_URL}/student/practice`, '#49BB87'),
+          createButton('🎙️ 立即 15 秒打卡', `${VERCEL_BASE_URL}/student/practice`, '#49BB87', 'primary'),
         ],
         paddingAll: '16px',
         paddingTop: '0px',
@@ -619,164 +584,259 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
     }),
   },
 
+  // B3. 練琴打卡回饋通知
+  B3: {
+    id: 'B3',
+    category: 'B',
+    categoryName: '練琴回饋',
+    title: '練琴回饋已送達',
+    triggerTiming: '依小組確認後的機制推播（AI 判定產生或教師審核放行時）',
+    description: '即時推播節奏穩定度、實測 BPM 與教師短評回饋',
+    dbFields: [
+      { field: 'practice_records.piece_name', label: '練習曲目', example: '巴哈E大調協奏曲 第一樂章' },
+      { field: 'practice_records.stability_score', label: '節奏穩定度', example: '91% (精準穩定)' },
+      { field: 'practice_records.detected_bpm', label: '實際演奏 BPM', example: '86 BPM (目標 88 BPM)' },
+      { field: 'practice_feedbacks.feedback_text', label: '教師評語', example: '音準穩定度大幅提升！換把位更加俐落了！' },
+    ],
+    defaultData: {
+      piece_name: '巴哈E大調協奏曲 第一樂章',
+      stability_score: '91% (精準穩定 ⭐)',
+      detected_bpm: '86 BPM (目標 88 BPM)',
+      feedback_text: '音準穩定度大幅提升！換把位更加俐落了，繼續保持！',
+      record_id: 'p-rec-1',
+    },
+    buttons: [
+      {
+        label: '📊 查看練習紀錄趨勢',
+        url: `${VERCEL_BASE_URL}/student/compare/p-rec-1`,
+        color: '#9B7EC8',
+        style: 'primary',
+      },
+    ],
+    generateFlex: (data) => {
+      const recordId = data.record_id || 'p-rec-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('練琴回饋', '練琴回饋已送達', '⭐'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            createFieldRow('📖', '練習曲目', data.piece_name || '巴哈E大調協奏曲'),
+            createFieldRow('🎯', '節奏穩定', data.stability_score || '91%', '#49BB87', true),
+            createFieldRow('⚡', '實測速度', data.detected_bpm || '86 BPM', '#9B7EC8', true),
+            {
+              type: 'box',
+              layout: 'vertical',
+              backgroundColor: '#ECFAF3',
+              cornerRadius: 'md',
+              paddingAll: '12px',
+              contents: [
+                {
+                  type: 'text',
+                  text: `💬 教師評語：${data.feedback_text || '表現優異！'}`,
+                  size: 'xs',
+                  color: '#2E7D32',
+                  wrap: true,
+                },
+              ],
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            createButton('📊 查看練習紀錄趨勢', `${VERCEL_BASE_URL}/student/compare/${recordId}`, '#9B7EC8', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
+  },
+
+  // =======================================================================
+  // C. 堂數合約續約與繳費核銷 (C1 ~ C4)
+  // =======================================================================
+
+  // C1. 新一期續約預約通知（最後 2 堂提醒）
+  C1: {
+    id: 'C1',
+    category: 'C',
+    categoryName: '續約預約',
+    title: '下一期課程續約預約通知',
+    triggerTiming: '學生完成第 8 堂課、系統計算剩餘堂數 enrollments.remaining_lessons == 2 時自動推播',
+    description: '提醒合約即將屆滿，引導續約繳費或保留原上課時段',
+    dbFields: [
+      { field: 'enrollments.completed_lessons / enrollments.total_lessons', label: '當前進度', example: '第 8 / 10 堂（剩餘 2 堂）' },
+      { field: 'packages.package_name', label: '續期合約方案', example: '古典鋼琴個別課 (一期 10 堂)' },
+      { field: 'packages.price', label: '續約學費', example: 'NT$ 8,000' },
+      { field: 'teachers.bank_code / bank_account', label: '匯款帳號資訊', example: '國泰世華 (013) 123-456-789012' },
+    ],
+    defaultData: {
+      progress: '第 8 / 10 堂（剩餘 2 堂）',
+      package_name: '古典鋼琴個別課 (一期 10 堂)',
+      price: 'NT$ 8,000',
+      bank_info: '國泰世華 (013) 123-456-789012 (戶名: 林佩芬)',
+      enrollment_id: 'enr-1',
+    },
+    buttons: [
+      {
+        label: '💳 續約繳費 / 上傳截圖',
+        url: `${VERCEL_BASE_URL}/student/billing?enrollment_id=enr-1`,
+        color: '#9B7EC8',
+        style: 'primary',
+      },
+      {
+        label: '📅 續約保留原時段',
+        url: `${VERCEL_BASE_URL}/student/schedule?action=renew`,
+        color: '#49BB87',
+        style: 'primary',
+      },
+    ],
+    generateFlex: (data) => {
+      const enrollmentId = data.enrollment_id || 'enr-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('續約通知', '下一期課程續約預約通知', '💰'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            createFieldRow('📊', '當前進度', data.progress || '第 8 / 10 堂（剩餘 2 堂）', '#E8734A', true),
+            createFieldRow('📖', '續約方案', data.package_name || '鋼琴課一期 10 堂'),
+            createFieldRow('💵', '續約學費', data.price || 'NT$ 8,000', '#2B3049', true),
+            createFieldRow('🏦', '匯款帳號', data.bank_info || '國泰世華 (013) 123-456-789012'),
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'sm',
+          contents: [
+            createButton('💳 續約繳費 / 上傳截圖', `${VERCEL_BASE_URL}/student/billing?enrollment_id=${enrollmentId}`, '#9B7EC8', 'primary'),
+            createButton('📅 續約保留原時段', `${VERCEL_BASE_URL}/student/schedule?action=renew`, '#49BB87', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
+  },
+
+  // C2. 續約最後提醒（最後 1 堂催繳）
   C2: {
     id: 'C2',
     category: 'C',
-    categoryName: 'AI 診斷',
-    title: '練習診斷報告出爐',
-    triggerTiming: '學員上傳練習錄音後，AI 分析完畢即時發送',
-    description: '音準、節奏、流暢度 AI 智能分析即時回饋',
+    categoryName: '續約最後提醒',
+    title: '續約最後提醒（剩餘 1 堂）',
+    triggerTiming: '學生完成第 9 堂課、剩餘堂數 enrollments.remaining_lessons == 1 且尚未建立續約繳費單時自動推播',
+    description: '警示下週為最後一堂，請盡速完成繳費以確保下一期時段不被釋出',
+    dbFields: [
+      { field: 'warning_text', label: '警示說明', example: '下週為本期最後一堂課，請盡速完成繳費以確保時段。' },
+      { field: 'packages.price', label: '續約金額', example: 'NT$ 8,000' },
+      { field: 'teachers.bank_code / bank_account', label: '匯款帳號資訊', example: '國泰世華 (013) 123-456-789012' },
+    ],
     defaultData: {
-      song: '巴哈E大調小提琴協奏曲 — 第一樂章',
-      rhythm: '91% (精準穩定)',
-      pitch: '85% (良好)',
-      overallScore: '92 分 ⭐',
+      warning_text: '下週為本期最後一堂課，請盡速完成繳費以確保下一期熱門時段不被釋出！',
+      price: 'NT$ 8,000',
+      bank_info: '國泰世華 (013) 123-456-789012 (戶名: 林佩芬)',
+      enrollment_id: 'enr-1',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/compare/p-rec-1`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('AI 診斷報告', '練習診斷報告出爐', '🤖'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('📖', '分析曲目', data.song || '巴哈E大調小提琴協奏曲'),
-          createFieldRow('🎯', '節奏準度', data.rhythm || '91%', '#49BB87', true),
-          createFieldRow('🎵', '音準準度', data.pitch || '85%', '#9B7EC8', true),
-          createFieldRow('⭐', '綜合評分', data.overallScore || '92 分', '#2B3049', true),
-        ],
+    buttons: [
+      {
+        label: '💳 立即上傳匯款截圖',
+        url: `${VERCEL_BASE_URL}/student/billing?enrollment_id=enr-1`,
+        color: '#E8734A',
+        style: 'primary',
       },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('📊 查看完整診斷報告', `${VERCEL_BASE_URL}/student/compare/p-rec-1`, '#9B7EC8'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
+    ],
+    generateFlex: (data) => {
+      const enrollmentId = data.enrollment_id || 'enr-1';
+      return {
+        type: 'bubble',
+        size: 'mega',
+        header: createHeader('最後提醒', '續約最後提醒（剩餘 1 堂）', '⏰', '#E8734A'),
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'md',
+          paddingAll: '20px',
+          contents: [
+            {
+              type: 'box',
+              layout: 'vertical',
+              backgroundColor: '#FDF1EC',
+              cornerRadius: 'md',
+              paddingAll: '12px',
+              contents: [
+                {
+                  type: 'text',
+                  text: `⚠️ ${data.warning_text || '下週為最後一堂課，請盡速完成繳費以確保時段！'}`,
+                  size: 'xs',
+                  color: '#B85536',
+                  wrap: true,
+                },
+              ],
+            },
+            createFieldRow('💵', '續約金額', data.price || 'NT$ 8,000', '#E8734A', true),
+            createFieldRow('🏦', '匯款帳號', data.bank_info || '國泰世華 (013) 123-456-789012'),
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            createButton('💳 立即上傳匯款截圖', `${VERCEL_BASE_URL}/student/billing?enrollment_id=${enrollmentId}`, '#E8734A', 'primary'),
+          ],
+          paddingAll: '16px',
+          paddingTop: '0px',
+        },
+      };
+    },
   },
 
+  // C3. 繳費截圖已送審（OCR 處理完畢）
   C3: {
     id: 'C3',
     category: 'C',
-    categoryName: '成就解鎖',
-    title: '恭喜解鎖新成就！',
-    triggerTiming: '學員達成學習里程碑條件時 即時發送',
-    description: '獎勵學員持續練習並提升等級',
+    categoryName: '憑證送審',
+    title: '繳費憑證已送出',
+    triggerTiming: '家長上傳轉帳截圖、OCR 解析完畢後即時推播',
+    description: '純狀態通知：通知 OCR 辨識結果（金額、帳號末五碼、交易時間），等待老師一鍵確認',
+    dbFields: [
+      { field: 'payments.amount', label: '辨識匯款金額', example: 'NT$ 8,000' },
+      { field: 'payments.bank_last_five', label: '辨識帳號末五碼', example: '56789' },
+      { field: 'payments.transaction_time', label: '交易時間', example: '2026/09/20 14:32' },
+      { field: 'notice', label: '說明', example: '系統已辨識完成，正等待老師一鍵確認入帳。' },
+    ],
     defaultData: {
-      badgeName: '努力堅持 🎖️',
-      description: '連續練習打卡滿 7 天！',
-      level: 'Lv.1 ➔ Lv.2 音樂探險家',
+      amount: 'NT$ 8,000',
+      bank_last_five: '56789',
+      transaction_time: '2026/09/20 14:32',
+      notice: '系統已成功辨識繳費證明，正等待老師一鍵確認入帳中。',
     },
-    targetUrl: `${VERCEL_BASE_URL}/student/stamps`,
+    buttons: [], // 純狀態通知，不設按鈕避免重複送出
     generateFlex: (data) => ({
       type: 'bubble',
       size: 'mega',
-      header: createHeader('成就榮譽', '恭喜解鎖新成就！', '🏆'),
+      header: createHeader('憑證送審', '繳費憑證已送出', '⏳'),
       body: {
         type: 'box',
         layout: 'vertical',
         spacing: 'md',
         paddingAll: '20px',
         contents: [
-          createFieldRow('🎖️', '成就名稱', data.badgeName || '努力堅持', '#E5A100', true),
-          createFieldRow('📝', '達成說明', data.description || '連續練習打卡 7 天'),
-          createFieldRow('⭐', '等級提升', data.level || 'Lv.1 → Lv.2', '#49BB87', true),
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('🎖️ 查看成就徽章', `${VERCEL_BASE_URL}/student/stamps`, '#E5A100'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  // -------------------------------------------------------------
-  // D. 系統通知
-  // -------------------------------------------------------------
-  D1: {
-    id: 'D1',
-    category: 'D',
-    categoryName: '系統公告',
-    title: '系統公告',
-    triggerTiming: '管理員於後台手動發布',
-    description: '全體或個別學員之節慶停課、教室營運公告',
-    defaultData: {
-      content: '中秋節期間（9/28 - 9/30）教室暫停實體課程，10/1 起恢復正常上課，祝各位師生佳節愉快！',
-      publishTime: '2026/09/20',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/faq`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('系統公告', '重要營運公告', '📢'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          {
-            type: 'text',
-            text: data.content || '中秋節期間暫停上課',
-            size: 'sm',
-            color: '#333333',
-            wrap: true,
-            lineSpacing: '4px',
-          },
-          {
-            type: 'separator',
-            margin: 'md',
-            color: '#F0EBE1',
-          },
-          createFieldRow('📅', '發布日期', data.publishTime || '2026/09/20'),
-        ],
-      },
-      footer: {
-        type: 'box',
-        layout: 'vertical',
-        contents: [
-          createButton('ℹ️ 查看常見問題', `${VERCEL_BASE_URL}/student/faq`, '#7A7E90', 'secondary'),
-        ],
-        paddingAll: '16px',
-        paddingTop: '0px',
-      },
-    }),
-  },
-
-  D2: {
-    id: 'D2',
-    category: 'D',
-    categoryName: '老師訊息',
-    title: '老師留言',
-    triggerTiming: '老師於系統留言或課後叮嚀時 即時推播',
-    description: '老師直接透過系統推播之個人化留言',
-    defaultData: {
-      teacher: '林佩芬 老師',
-      message: '心悅你好，下次上課請記得帶巴哈E大調的指法樂譜喔！這週練習辛苦了～',
-    },
-    targetUrl: `${VERCEL_BASE_URL}/student/summary/lesson-1`,
-    generateFlex: (data) => ({
-      type: 'bubble',
-      size: 'mega',
-      header: createHeader('老師叮嚀', '老師專屬留言', '💬'),
-      body: {
-        type: 'box',
-        layout: 'vertical',
-        spacing: 'md',
-        paddingAll: '20px',
-        contents: [
-          createFieldRow('👩‍🏫', '留言老師', data.teacher || '林佩芬 老師', '#2B3049', true),
+          createFieldRow('💵', '辨識金額', data.amount || 'NT$ 8,000', '#2B3049', true),
+          createFieldRow('🔢', '帳號末五碼', data.bank_last_five || '56789', '#9B7EC8', true),
+          createFieldRow('🕒', '交易時間', data.transaction_time || '2026/09/20 14:32'),
           {
             type: 'box',
             layout: 'vertical',
@@ -786,11 +846,72 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
             contents: [
               {
                 type: 'text',
-                text: `💬 ${data.message || '下次上課請帶樂譜喔！'}`,
+                text: `ℹ️ ${data.notice || '系統已辨識完成，正等待老師一鍵確認入帳。'}`,
                 size: 'xs',
                 color: '#4A3268',
                 wrap: true,
-                lineSpacing: '4px',
+              },
+            ],
+          },
+        ],
+      },
+    }),
+  },
+
+  // C4. 續約完成與新期堂數開通
+  C4: {
+    id: 'C4',
+    category: 'C',
+    categoryName: '續約完成',
+    title: '續約成功，新期已開通',
+    triggerTiming: '教師於 Web 後台點擊「確認入帳」、信託池建立完成時發送',
+    description: '通知新增堂數 (+10 堂) 已入帳，款項進入課程信託池託管',
+    dbFields: [
+      { field: 'payments.purchased_lessons', label: '新增堂數', example: '+10 堂' },
+      { field: 'enrollments.remaining_lessons', label: '新合約總堂數', example: '12 堂 (含前期剩餘 2 堂)' },
+      { field: 'payments.confirmed_at', label: '入帳確認時間', example: '2026/09/20 15:10' },
+      { field: 'trust_notice', label: '說明', example: '款項已進入課程信託池託管，保障完課權益。' },
+    ],
+    defaultData: {
+      purchased_lessons: '+10 堂課',
+      total_remaining_lessons: '12 堂 (含本期剩餘 2 堂)',
+      confirmed_at: '2026/09/20 15:10',
+      trust_notice: '款項已進入課程信託池託管，保障完課權益。',
+    },
+    buttons: [
+      {
+        label: '📅 查看排課課表',
+        url: `${VERCEL_BASE_URL}/student/schedule`,
+        color: '#49BB87',
+        style: 'primary',
+      },
+    ],
+    generateFlex: (data) => ({
+      type: 'bubble',
+      size: 'mega',
+      header: createHeader('續約開通', '續約成功，新期已開通', '✅'),
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'md',
+        paddingAll: '20px',
+        contents: [
+          createFieldRow('✨', '新增堂數', data.purchased_lessons || '+10 堂', '#49BB87', true),
+          createFieldRow('📊', '總剩餘堂數', data.total_remaining_lessons || '12 堂', '#2B3049', true),
+          createFieldRow('🕒', '確認時間', data.confirmed_at || '2026/09/20 15:10'),
+          {
+            type: 'box',
+            layout: 'vertical',
+            backgroundColor: '#ECFAF3',
+            cornerRadius: 'md',
+            paddingAll: '12px',
+            contents: [
+              {
+                type: 'text',
+                text: `🛡️ ${data.trust_notice || '款項已進入課程信託池託管，保障完課權益。'}`,
+                size: 'xs',
+                color: '#2E7D32',
+                wrap: true,
               },
             ],
           },
@@ -800,7 +921,7 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
         type: 'box',
         layout: 'vertical',
         contents: [
-          createButton('📓 查看聯絡簿', `${VERCEL_BASE_URL}/student/summary/lesson-1`, '#9B7EC8'),
+          createButton('📅 查看排課課表', `${VERCEL_BASE_URL}/student/schedule`, '#49BB87', 'primary'),
         ],
         paddingAll: '16px',
         paddingTop: '0px',

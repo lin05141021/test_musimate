@@ -21,20 +21,19 @@ import {
   Calendar,
   CreditCard,
   Award,
-  Radio,
-  ChevronRight,
+  Database,
   ArrowLeft,
 } from 'lucide-react';
 
 export default function NotificationManagementPage() {
-  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'A' | 'B' | 'C' | 'D'>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'A' | 'B' | 'C'>('ALL');
   const [activeScenarioId, setActiveScenarioId] = useState<string>('A1');
   const [customData, setCustomData] = useState<Record<string, Record<string, any>>>({});
   const [copied, setCopied] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
   const [targetUserId, setTargetUserId] = useState('Uf2457bf35e0d6d3060b60838d9a9c91c'); // 預設學員 LINE ID
-  const [activeViewMode, setActiveViewMode] = useState<'preview' | 'json'>('preview');
+  const [activeViewMode, setActiveViewMode] = useState<'preview' | 'json' | 'db'>('preview');
 
   const scenarioList = useMemo(() => Object.values(NOTIFICATION_SCENARIOS), []);
 
@@ -126,16 +125,26 @@ export default function NotificationManagementPage() {
     }
   };
 
-  const getCategoryBadge = (cat: 'A' | 'B' | 'C' | 'D') => {
+  const getCategoryBadge = (cat: 'A' | 'B' | 'C') => {
     switch (cat) {
       case 'A':
-        return <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF2EC] text-[#8C6D53] border border-[#E8D4C5]">A. 課程通知</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF2EC] text-[#8C6D53] border border-[#E8D4C5]">
+            A. 課程排程與出席
+          </span>
+        );
       case 'B':
-        return <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF4FC] text-[#4A8FD9] border border-[#D5E4F8]">B. 繳費通知</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9]">
+            B. AI 週報與打卡
+          </span>
+        );
       case 'C':
-        return <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#ECFAF3] text-[#2E7D32] border border-[#C8E6C9]">C. 練習打卡</span>;
-      case 'D':
-        return <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#F6F2FB] text-[#785338] border border-[#EADFC9]">D. 系統公告</span>;
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EEF4FC] text-[#4A8FD9] border border-[#D5E4F8]">
+            C. 堂數續約與核銷
+          </span>
+        );
     }
   };
 
@@ -158,11 +167,11 @@ export default function NotificationManagementPage() {
                   LINE 推播卡片通知管理中心
                 </h1>
                 <span className="px-2 py-0.5 rounded-full bg-[#9B7EC8]/10 text-[#9B7EC8] text-[11px] font-bold border border-[#9B7EC8]/20">
-                  v2.0 雙向模擬
+                  v2.1 完整 DB 欄位與多按鈕支援
                 </span>
               </div>
               <p className="text-xs text-[#7A7E90] mt-0.5">
-                依照 PRD 規範打造之 14 種情境卡片 · 即時參數編輯與擬真手機預覽
+                依照 PRD 最新規格打造之 11 種情境卡片 · 支援多按鈕跳轉、DB 欄位對齊與即時模擬器
               </p>
             </div>
           </div>
@@ -191,11 +200,10 @@ export default function NotificationManagementPage() {
         {/* 類別切換 Tabs */}
         <div className="flex flex-wrap items-center gap-2 pb-5 border-b border-[#EAE3D6]">
           {[
-            { id: 'ALL', label: '全部通知情境', count: 14 },
-            { id: 'A', label: 'A. 課程相關 (6)', count: 6, icon: Calendar },
-            { id: 'B', label: 'B. 繳費相關 (3)', count: 3, icon: CreditCard },
-            { id: 'C', label: 'C. 練習打卡 (3)', count: 3, icon: Award },
-            { id: 'D', label: 'D. 系統公告 (2)', count: 2, icon: Radio },
+            { id: 'ALL', label: '全部通知情境 (11)', count: 11 },
+            { id: 'A', label: 'A. 課程排程與出席 (4)', count: 4, icon: Calendar },
+            { id: 'B', label: 'B. AI 週報與練習打卡 (3)', count: 3, icon: Award },
+            { id: 'C', label: 'C. 堂數續約與繳費核銷 (4)', count: 4, icon: CreditCard },
           ].map((tab) => {
             const isSelected = selectedCategory === tab.id;
             return (
@@ -225,7 +233,7 @@ export default function NotificationManagementPage() {
                   <Sparkles className="w-4 h-4 text-[#9B7EC8]" />
                   選擇通知情境 ({filteredScenarios.length})
                 </h2>
-                <span className="text-[11px] text-[#A3A7BA]">點擊切換即時預覽</span>
+                <span className="text-[11px] text-[#A3A7BA]">點擊即時切換</span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
@@ -280,7 +288,7 @@ export default function NotificationManagementPage() {
                   </div>
                   <p className="text-xs text-[#7A7E90] mt-1 flex items-center gap-1.5">
                     <Info className="w-3.5 h-3.5 text-[#9B7EC8]" />
-                    觸發時機：{currentScenario.triggerTiming}
+                    觸發情境：{currentScenario.triggerTiming}
                   </p>
                 </div>
 
@@ -292,6 +300,22 @@ export default function NotificationManagementPage() {
                   <RefreshCw className="w-3 h-3" />
                   還原預設值
                 </button>
+              </div>
+
+              {/* DB 欄位對應參考區 */}
+              <div className="p-3.5 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] flex flex-col gap-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#7A7E90]">
+                  <Database className="w-3.5 h-3.5 text-[#9B7EC8]" />
+                  <span>資料庫 (DB) 所需對應欄位清單：</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                  {currentScenario.dbFields.map((df, i) => (
+                    <div key={i} className="flex items-center gap-1.5 bg-white px-2.5 py-1.5 rounded-lg border border-[#EAE3D6]">
+                      <span className="font-bold text-[#2B3049]">{df.label}:</span>
+                      <code className="text-[#9B7EC8] font-mono text-[10px]">{df.field}</code>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* 動態表單欄位 */}
@@ -306,7 +330,7 @@ export default function NotificationManagementPage() {
                     return (
                       <div key={fieldKey} className="sm:col-span-2 flex items-center justify-between p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6]">
                         <span className="text-xs font-bold text-[#2B3049] capitalize">
-                          {fieldKey} (審核/確認狀態)
+                          {fieldKey} (審核狀態)
                         </span>
                         <div className="flex items-center gap-2">
                           <button
@@ -366,30 +390,51 @@ export default function NotificationManagementPage() {
                 })}
               </div>
 
-              {/* 目標按鈕跳轉連結資訊 */}
-              {currentScenario.targetUrl && (
-                <div className="p-3.5 rounded-xl bg-[#F6F2FB] border border-[#9B7EC8]/20 flex items-center justify-between">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <ExternalLink className="w-4 h-4 text-[#9B7EC8] shrink-0" />
-                    <div className="flex flex-col overflow-hidden">
-                      <span className="text-[11px] font-bold text-[#9B7EC8]">
-                        卡片按鈕綁定之 Vercel 連結
-                      </span>
-                      <span className="text-xs text-[#2B3049] truncate font-mono">
-                        {currentScenario.targetUrl}
-                      </span>
-                    </div>
+              {/* 卡片按鈕設計與跳轉清單 */}
+              <div className="p-3.5 rounded-xl bg-[#F6F2FB] border border-[#9B7EC8]/20 flex flex-col gap-2.5">
+                <span className="text-xs font-bold text-[#9B7EC8] flex items-center gap-1.5">
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  按鈕設計與跳轉連結 ({currentScenario.buttons.length} 個按鈕)
+                </span>
+
+                {currentScenario.buttons.length === 0 ? (
+                  <div className="text-xs text-[#7A7E90] bg-white p-3 rounded-lg border border-[#EAE3D6]">
+                    ⚠️ 本卡片為純狀態通知，依規範不設按鈕（避免重複送出）。
                   </div>
-                  <a
-                    href={currentScenario.targetUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-[#9B7EC8] text-xs font-bold border border-[#9B7EC8]/30 shrink-0 transition-all shadow-2xs"
-                  >
-                    前往測試 ↗
-                  </a>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {currentScenario.buttons.map((btn, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-white px-3.5 py-2 rounded-lg border border-[#EAE3D6] gap-2 overflow-hidden"
+                      >
+                        <div className="flex items-center gap-2 overflow-hidden">
+                          <span
+                            className="px-2 py-0.5 rounded text-[10px] font-bold text-white shrink-0"
+                            style={{ backgroundColor: btn.color || '#9B7EC8' }}
+                          >
+                            Button {index + 1}
+                          </span>
+                          <span className="text-xs font-bold text-[#2B3049] shrink-0">
+                            {btn.label}
+                          </span>
+                          <span className="text-[11px] text-[#A3A7BA] truncate font-mono">
+                            ➔ {btn.url}
+                          </span>
+                        </div>
+                        <a
+                          href={btn.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded bg-[#FAF7F2] hover:bg-[#EFECE6] text-[#2B3049] text-xs font-bold border border-[#EAE3D6] shrink-0 transition-all shadow-2xs"
+                        >
+                          測試跳轉 ↗
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* 真實 LINE 推播發送測試區 */}
               <div className="border-t border-[#F0EBE1] pt-4 flex flex-col gap-3">
@@ -398,7 +443,7 @@ export default function NotificationManagementPage() {
                     <Send className="w-3.5 h-3.5 text-[#49BB87]" />
                     真實 LINE 推播發送測試 (Messaging API)
                   </h4>
-                  <span className="text-[10px] text-[#A3A7BA]">需填入用戶 LINE ID</span>
+                  <span className="text-[10px] text-[#A3A7BA]">填入用戶 LINE ID 即刻推播</span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -483,7 +528,7 @@ export default function NotificationManagementPage() {
                 </div>
 
                 {/* 手機螢幕內部 (LINE 聊天介面) */}
-                <div className="w-full bg-[#849EB0] rounded-[28px] overflow-hidden flex flex-col min-h-[580px] max-h-[640px]">
+                <div className="w-full bg-[#849EB0] rounded-[28px] overflow-hidden flex flex-col min-h-[580px] max-h-[660px]">
                   {/* LINE 聊天室 Header */}
                   <div className="bg-[#2B3049]/95 backdrop-blur-md px-4 py-3 flex items-center justify-between text-white border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2">
@@ -511,7 +556,7 @@ export default function NotificationManagementPage() {
 
                     {activeViewMode === 'preview' ? (
                       /* 訊息氣泡 + Flex Message 擬真卡片 */
-                      <div className="flex items-start gap-2 max-w-[95%] animate-in fade-in duration-300">
+                      <div className="flex items-start gap-2 max-w-[96%] animate-in fade-in duration-300">
                         {/* 機器人頭像 */}
                         <div className="w-7 h-7 rounded-full bg-white shadow-xs p-0.5 shrink-0 overflow-hidden">
                           <img
@@ -528,12 +573,12 @@ export default function NotificationManagementPage() {
                           </span>
 
                           <div className="w-full bg-white rounded-[18px] overflow-hidden shadow-lg border border-black/10 flex flex-col transition-all">
-                            {/* Flex 卡片 Header (品牌色漸層 #C8A2D0 -> #A8D8EA) */}
+                            {/* Flex 卡片 Header (品牌色漸層 #C8A2D0 -> #A8D8EA 或 警示色) */}
                             <div
                               className="p-4 flex flex-col gap-1.5"
                               style={{
                                 background:
-                                  currentScenario.id === 'B3'
+                                  currentScenario.id === 'A3' || currentScenario.id === 'C2'
                                     ? '#E8734A'
                                     : 'linear-gradient(45deg, #C8A2D0 0%, #A8D8EA 100%)',
                               }}
@@ -552,9 +597,13 @@ export default function NotificationManagementPage() {
                             </div>
 
                             {/* Flex 卡片 Body */}
-                            <div className="p-4 flex flex-col gap-3 bg-white text-xs">
+                            <div className="p-4 flex flex-col gap-2.5 bg-white text-xs">
                               {Object.entries(currentFormData).map(([key, value]) => {
-                                if (typeof value === 'boolean') return null;
+                                if (
+                                  typeof value === 'boolean' ||
+                                  key.endsWith('_id')
+                                )
+                                  return null;
                                 return (
                                   <div
                                     key={key}
@@ -566,12 +615,16 @@ export default function NotificationManagementPage() {
                                     <span
                                       className={`text-[11px] text-right font-semibold break-all ${
                                         String(value).includes('核准') ||
-                                        String(value).includes('正確') ||
-                                        String(value).includes('92') ||
-                                        String(value).includes('優異')
+                                        String(value).includes('開通') ||
+                                        String(value).includes('優異') ||
+                                        String(value).includes('91%') ||
+                                        String(value).includes('成功')
                                           ? 'text-[#2E7D32] font-bold'
-                                          : String(value).includes('逾期') ||
-                                            String(value).includes('停課')
+                                          : String(value).includes('缺席') ||
+                                            String(value).includes('扣款') ||
+                                            String(value).includes('催繳') ||
+                                            String(value).includes('倒數') ||
+                                            String(value).includes('最後')
                                           ? 'text-[#E8734A] font-bold'
                                           : 'text-[#2B3049]'
                                       }`}
@@ -583,25 +636,30 @@ export default function NotificationManagementPage() {
                               })}
                             </div>
 
-                            {/* Flex 卡片 Footer (操作按鈕區) */}
-                            {currentScenario.targetUrl && (
+                            {/* Flex 卡片 Footer (多按鈕渲染區) */}
+                            {currentScenario.buttons.length > 0 && (
                               <div className="p-3 pt-0 bg-white flex flex-col gap-1.5">
-                                <a
-                                  href={currentScenario.targetUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="w-full py-2.5 rounded-xl font-bold text-xs text-white text-center shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1"
-                                  style={{
-                                    backgroundColor:
-                                      currentScenario.id === 'B3'
-                                        ? '#E8734A'
-                                        : currentScenario.category === 'C'
-                                        ? '#49BB87'
-                                        : '#9B7EC8',
-                                  }}
-                                >
-                                  點擊測試開啟 LIFF 頁面 ↗
-                                </a>
+                                {currentScenario.buttons.map((btn, bIdx) => (
+                                  <a
+                                    key={bIdx}
+                                    href={btn.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className={`w-full py-2.5 rounded-xl font-bold text-xs text-center shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1 ${
+                                      btn.style === 'secondary'
+                                        ? 'bg-[#FAF7F2] hover:bg-[#EFECE6] text-[#2B3049] border border-[#EAE3D6]'
+                                        : 'text-white'
+                                    }`}
+                                    style={{
+                                      backgroundColor:
+                                        btn.style === 'secondary'
+                                          ? undefined
+                                          : btn.color || '#9B7EC8',
+                                    }}
+                                  >
+                                    {btn.label} ↗
+                                  </a>
+                                ))}
                               </div>
                             )}
                           </div>
@@ -614,7 +672,7 @@ export default function NotificationManagementPage() {
                       </div>
                     ) : (
                       /* JSON 原始碼檢視器 */
-                      <div className="bg-[#1E1E1E] text-[#D4D4D4] p-3 rounded-xl font-mono text-[10px] overflow-x-auto max-h-[480px]">
+                      <div className="bg-[#1E1E1E] text-[#D4D4D4] p-3 rounded-xl font-mono text-[10px] overflow-x-auto max-h-[500px]">
                         <pre>{JSON.stringify(currentFlexBubble, null, 2)}</pre>
                       </div>
                     )}

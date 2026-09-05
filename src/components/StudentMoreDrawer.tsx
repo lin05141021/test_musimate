@@ -302,7 +302,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   <Award className="w-4.5 h-4.5 text-[#9B7EC8] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-bold text-[#9B7EC8] font-['Sora']">LINE 推播卡片管理</span>
                 </div>
-                <span className="text-[10px] bg-[#9B7EC8]/15 text-[#9B7EC8] px-2 py-0.5 rounded-full font-bold">14 種情境</span>
+                <span className="text-[10px] bg-[#9B7EC8]/15 text-[#9B7EC8] px-2 py-0.5 rounded-full font-bold">11 種情境</span>
               </button>
               <div className="w-full h-0 border-b border-[#F3F1ED]" />
 
