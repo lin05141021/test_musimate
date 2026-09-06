@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 
 export default function NotificationManagementPage() {
-  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'A' | 'B' | 'C'>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | 'A' | 'B' | 'C' | 'D'>('ALL');
   const [activeScenarioId, setActiveScenarioId] = useState<string>('A1');
   const [customData, setCustomData] = useState<Record<string, Record<string, any>>>({});
   const [copied, setCopied] = useState(false);
@@ -153,6 +153,14 @@ export default function NotificationManagementPage() {
         </span>
       );
     }
+    if (scenario.id.startsWith('D') || scenario.category === 'D') {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FAF4FB] text-[#6D4978] border border-[#E8D7EE] flex items-center gap-1.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#B58EBE]" />
+          專屬關懷 (#B58EBE)
+        </span>
+      );
+    }
     return (
       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F2F6FB] text-[#3B6899] border border-[#C5DAF0] flex items-center gap-1.5">
         <span className="w-2.5 h-2.5 rounded-full bg-[#82AAD8]" />
@@ -185,7 +193,7 @@ export default function NotificationManagementPage() {
                 </span>
               </div>
               <p className="text-xs text-[#7A7E90] mt-0.5">
-                精簡 10 種情境 · 課程(#CEAB98) · 聯絡簿(#D5CC6A) · 打卡(#68C5AB) · 繳費(#82AAD8) · 系統(#B58EBE)
+                精選 11 種情境 · 課程(#CEAB98) · 聯絡簿(#D5CC6A) · 打卡(#68C5AB) · 繳費(#82AAD8) · 專屬關懷(#B58EBE)
               </p>
             </div>
           </div>
@@ -229,7 +237,7 @@ export default function NotificationManagementPage() {
               <span className="w-2.5 h-2.5 rounded-full bg-[#82AAD8]" /> 繳費相關 (#82AAD8)
             </span>
             <span className="flex items-center gap-1.5 text-[#6D4978] font-bold bg-[#F9F4FA] px-2.5 py-0.5 rounded-full border border-[#E2CEE7]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#B58EBE]" /> 新課程/系統 (#B58EBE)
+              <span className="w-2.5 h-2.5 rounded-full bg-[#B58EBE]" /> 專屬關懷/系統 (#B58EBE)
             </span>
           </div>
         </div>
@@ -240,10 +248,11 @@ export default function NotificationManagementPage() {
         {/* 類別切換 Tabs */}
         <div className="flex flex-wrap items-center gap-2 pb-5 border-b border-[#EAE3D6]">
           {[
-            { id: 'ALL', label: '全部通知情境 (10)', count: 10 },
+            { id: 'ALL', label: '全部通知情境 (11)', count: 11 },
             { id: 'A', label: '🔴 A. 課程排程與出席 (4)', count: 4, icon: Calendar },
             { id: 'B', label: '🟡🟢 B. AI 週報與打卡 (3)', count: 3, icon: Award },
             { id: 'C', label: '🔵 C. 堂數續約與核銷 (3)', count: 3, icon: CreditCard },
+            { id: 'D', label: '🟣 D. 專屬關懷與復課 (1)', count: 1, icon: Sparkles },
           ].map((tab) => {
             const isSelected = selectedCategory === tab.id;
             return (
@@ -642,6 +651,21 @@ export default function NotificationManagementPage() {
                                   key.endsWith('_id')
                                 )
                                   return null;
+                                if (key === 'teacher_message') {
+                                  return (
+                                    <div
+                                      key={key}
+                                      className="bg-[#FAF4FB] border border-[#E8D7EE] rounded-xl p-2.5 flex flex-col gap-1 my-1"
+                                    >
+                                      <span className="text-[10px] font-bold text-[#8A5899] flex items-center gap-1">
+                                        👩‍🏫 教師留言
+                                      </span>
+                                      <span className="text-[11px] text-[#4A3B52] leading-relaxed">
+                                        「{String(value)}」
+                                      </span>
+                                    </div>
+                                  );
+                                }
                                 return (
                                   <div
                                     key={key}

@@ -7,12 +7,13 @@ import { Navbar } from '@/components/Navbar';
 export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname() || '';
   const isStudentPage = pathname.startsWith('/student');
+  const isTeacherPage = pathname.startsWith('/teacher');
 
-  // 如果是在學生端手機版頁面（/student/*），完全移除全站桌面版 Navbar 與 Footer，
-  // 並移除桌面容器 padding，讓手機版頁面自帶的頂部品牌列與水彩 TabBar 100% 沉浸連貫展示
-  if (isStudentPage) {
+  // 如果是在學生端手機版頁面（/student/*）或教師端頁面（/teacher/*），
+  // 完全移除全站通用舊版 Navbar 與 Footer，讓各子系統自帶專屬沉浸式頂部導航
+  if (isStudentPage || isTeacherPage) {
     return (
-      <div className="w-full min-h-screen bg-[#FAF6F0] flex justify-center">
+      <div className="w-full min-h-screen bg-[#FAF6F0]">
         {children}
       </div>
     );

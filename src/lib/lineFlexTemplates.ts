@@ -27,7 +27,7 @@ export const THEME_COLORS = {
 
 export interface NotificationScenario {
   id: string;
-  category: 'A' | 'B' | 'C';
+  category: 'A' | 'B' | 'C' | 'D';
   categoryName: string;
   themeColorName: string;
   themeColor: string;
@@ -889,4 +889,129 @@ export const NOTIFICATION_SCENARIOS: Record<string, NotificationScenario> = {
       },
     }),
   },
+
+  // =======================================================================
+  // 🟣 D. 學員專屬關懷與復課邀請 (紫色系：#B58EBE)
+  // =======================================================================
+
+  // D1. 暫停/未續約學員暖心問候與復課邀請
+  D1: {
+    id: 'D1',
+    category: 'D',
+    categoryName: '學員專屬關懷',
+    themeColorName: '薰衣紫',
+    themeColor: THEME_COLORS.SYSTEM,
+    title: '學員暖心問候與復課邀請',
+    triggerTiming: '學生結業超過 2~4 週未預約下一期時，由教師撰寫留言/系統審核後推播',
+    description: '針對未預約下一期或已暫停學生，發送進度回顧、老師手寫留言與保留時段邀請',
+    dbFields: [
+      { field: 'students.name', label: '學員姓名', example: '陳宇恩' },
+      { field: 'teachers.name', label: '授課教師', example: '林佩芬 老師' },
+      { field: 'teacher_message', label: '老師關懷留言', example: '好一陣子沒在琴房見到你了！記得你上一期彈奏的《小步舞曲》表現很棒，最近老師為你準備了幾首新曲目，隨時歡迎回來繼續享受音樂喔！' },
+      { field: 'courses.course_name', label: '上期課程', example: '古典鋼琴個別課' },
+      { field: 'enrollments.milestone', label: '累積成果', example: '已完成 20 堂課 · 掌握 5 首曲目' },
+      { field: 'reserved_slots', label: '優先保留時段', example: '每週二 19:00 / 每週六 10:30' },
+    ],
+    defaultData: {
+      student_name: '陳宇恩',
+      teacher_name: '林佩芬 老師',
+      teacher_message:
+        '好一陣子沒在琴房見到你了！記得你上一期彈奏的《小步舞曲》非常有音樂性，觸鍵音色進步很多。最近老師物色了幾首很適合你的新曲目，隨時歡迎回來一起享受音樂喔！',
+      course_name: '古典鋼琴個別課',
+      milestone: '已累積完成 20 堂課 · 掌握 5 首指定曲目',
+      reserved_slots: '每週二 19:00 或 每週六 10:30 (優先保留中)',
+    },
+    buttons: [
+      {
+        label: '📅 預約復課 / 保留時段',
+        url: `${VERCEL_BASE_URL}/student/schedule?action=resume`,
+        color: THEME_COLORS.SYSTEM,
+        style: 'primary',
+      },
+      {
+        label: '💬 聯繫教室行政',
+        url: `${VERCEL_BASE_URL}/student/schedule`,
+        color: '#7A7E90',
+        style: 'secondary',
+      },
+    ],
+    generateFlex: (data) => ({
+      type: 'bubble',
+      size: 'mega',
+      header: createHeader('學員專屬問候', '期待與你再次相遇！老師的暖心叮嚀', '💜', THEME_COLORS.SYSTEM),
+      body: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'md',
+        paddingAll: '20px',
+        contents: [
+          {
+            type: 'text',
+            text: `親愛的 ${data.student_name || '學員'} 同學：`,
+            weight: 'bold',
+            size: 'md',
+            color: '#2B3049',
+          },
+          {
+            type: 'box',
+            layout: 'vertical',
+            backgroundColor: '#FAF4FB',
+            cornerRadius: 'md',
+            paddingAll: '14px',
+            borderColor: '#E8D7EE',
+            borderWidth: '1px',
+            contents: [
+              {
+                type: 'text',
+                text: `👩‍🏫 ${data.teacher_name || '授課教師'} 的暖心留言：`,
+                size: 'xs',
+                weight: 'bold',
+                color: '#8A5899',
+                marginBottom: '4px',
+              },
+              {
+                type: 'text',
+                text: `「${data.teacher_message || '好一陣子沒在琴房見到你了！最近練琴還順利嗎？隨時歡迎回來一起享受音樂喔！'}」`,
+                size: 'sm',
+                color: '#4A3B52',
+                wrap: true,
+                lineSpacing: '4px',
+              },
+            ],
+          },
+          createFieldRow('🎵', '上期課程', data.course_name || '古典鋼琴個別課'),
+          createFieldRow('🏆', '累積成果', data.milestone || '已完成 20 堂課', THEME_COLORS.SYSTEM, true),
+          createFieldRow('⏰', '保留時段', data.reserved_slots || '每週二 19:00 或 每週六 10:30', '#2B3049', true),
+          {
+            type: 'box',
+            layout: 'vertical',
+            backgroundColor: '#F7F8FA',
+            cornerRadius: 'sm',
+            paddingAll: '10px',
+            contents: [
+              {
+                type: 'text',
+                text: '💡 教室已為您預留合適的時段，若近期想重啟上課節奏，歡迎點擊下方預約！',
+                size: 'xxs',
+                color: '#7A7E90',
+                wrap: true,
+              },
+            ],
+          },
+        ],
+      },
+      footer: {
+        type: 'box',
+        layout: 'vertical',
+        spacing: 'sm',
+        contents: [
+          createButton('📅 預約復課 / 保留時段', `${VERCEL_BASE_URL}/student/schedule?action=resume`, THEME_COLORS.SYSTEM, 'primary'),
+          createButton('💬 聯繫教室行政', `${VERCEL_BASE_URL}/student/schedule`, '#7A7E90', 'secondary'),
+        ],
+        paddingAll: '16px',
+        paddingTop: '0px',
+      },
+    }),
+  },
 };
+

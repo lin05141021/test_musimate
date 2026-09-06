@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學生管理 | MusiMate 教師端</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- 樣式庫 -->
+    <link rel="stylesheet" href="../../UI/style_0824.css">
+    <link rel="stylesheet" href="newclass_styles.css">
+    <script src="../data/musimate_db.js"></script>
+    <style>
+        .students-main-wrap {
+            width: 1440px;
+            min-height: 1024px;
+            position: relative;
+            background: #FAF6F0;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            display: inline-flex;
+            margin: 0 auto;
+        }
+        .bg-glow-1 {
+            width: 700px;
+            height: 700px;
+            left: -150px;
+            top: 120px;
+            position: absolute;
+            opacity: 0.30;
+            background: linear-gradient(180deg, rgba(201, 162, 89, 0.8) 0%, rgba(213, 204, 105, 0.8) 24%, rgba(104, 197, 171, 0.8) 50%, rgba(97, 147, 203, 0.8) 77%, rgba(187, 101, 178, 0.8) 100%);
+            border-radius: 350px;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+        .bg-glow-2 {
+            width: 600px;
+            height: 600px;
+            left: 990px;
+            top: 500px;
+            position: absolute;
+            opacity: 0.25;
+            background: linear-gradient(180deg, rgba(201, 162, 89, 0.8) 0%, rgba(213, 204, 105, 0.8) 24%, rgba(104, 197, 171, 0.8) 50%, rgba(97, 147, 203, 0.8) 77%, rgba(187, 101, 178, 0.8) 100%);
+            border-radius: 300px;
+            filter: blur(50px);
+            pointer-events: none;
+        }
+        .students-content-wrap {
+            align-self: stretch;
+            padding-top: 40px;
+            padding-bottom: 80px;
+            padding-left: 80px;
+            padding-right: 80px;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 32px;
+            display: flex;
+            position: relative;
+            z-index: 10;
+        }
+        .stat-card {
+            flex: 1 1 0;
+            padding: 24px;
+            background: white;
+            box-shadow: 0px 4px 16px rgba(44, 42, 41, 0.02);
+            border-radius: 16px;
+            outline: 1px #EFECE6 solid;
+            outline-offset: -1px;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 16px;
+            display: inline-flex;
+        }
+        .table-container {
+            align-self: stretch;
+            background: white;
+            box-shadow: 0px 8px 24px rgba(44, 42, 41, 0.02);
+            overflow: hidden;
+            border-radius: 24px;
+            outline: 1px #EFECE6 solid;
+            outline-offset: -1px;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            display: flex;
+        }
+        .table-header {
+            align-self: stretch;
+            padding-left: 32px;
+            padding-right: 32px;
+            padding-top: 18px;
+            padding-bottom: 18px;
+            background: rgba(250, 246, 240, 0.50);
+            border-bottom: 1px #EFECE6 solid;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 24px;
+            display: inline-flex;
+        }
+        .table-row {
+            align-self: stretch;
+            padding-left: 32px;
+            padding-right: 32px;
+            padding-top: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px #EFECE6 solid;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 24px;
+            display: inline-flex;
+            transition: background 0.2s;
+        }
+        .table-row:hover {
+            background: rgba(250, 247, 242, 0.8) !important;
+        }
+        .table-row:nth-child(even) {
+            background: rgba(250, 246, 240, 0.12);
+        }
+        .btn-detail {
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 100px;
+            outline: 1px #2B3049 solid;
+            outline-offset: -1px;
+            justify-content: flex-start;
+            align-items: flex-start;
+            display: flex;
+            color: #2B3049;
+            font-size: 14px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-detail:hover {
+            background: #2B3049;
+            color: white;
+        }
+        .btn-purple-care {
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            border-radius: 100px;
+            background: #FAF4FB;
+            border: 1px solid #E8D7EE;
+            color: #8A5899;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: all 0.2s;
+        }
+        .btn-purple-care:hover {
+            background: #F3E5F6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="students-main-wrap">
+    <!-- 光暈效果 -->
+    <div class="bg-glow-1"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- 1. 頂部導航列 (對齊 Figma 1440x88 規範) -->
+    <div class="navbar-container" id="navbarWrapper">
+        <div class="logo-box" onclick="location.href='newclass_homepage.html'">
+            <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+        </div>
+        <div class="nav-links">
+            <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
+            <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
+            <a href="teacher_students.html" class="nav-item active" data-property-1="active">學生管理</a>
+            <a href="../money/overview_checked.html" class="nav-item" data-property-1="defult">薪資看板</a>
+            <a href="teacher_info.html" class="nav-item" data-property-1="defult">個人介紹</a>
+        </div>
+        <div class="nav-right-actions">
+            <div class="nav-bell-box" title="通知中心 (3 則未讀)" onclick="location.href='../admin/notifications'">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B3049" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div class="nav-bell-badge">3</div>
+            </div>
+            <div class="nav-avatar-box" title="張芷嫣老師檔案 (點擊編輯)" onclick="location.href='teacher_info_edit.html'">
+                <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 主內容區域 -->
+    <div class="students-content-wrap">
+        <!-- 標題與麵包屑 -->
+        <div style="align-self: stretch; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 12px; display: flex">
+            <div style="justify-content: flex-start; align-items: center; gap: 8px; display: inline-flex">
+                <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">帳戶設定</div>
+                <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">&gt;</div>
+                <div style="color: #2B3049; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 500;">學生管理</div>
+            </div>
+            <div style="align-self: stretch; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 4px; display: flex">
+                <div style="align-self: stretch; color: #2B3049; font-size: 32px; font-family: 'Noto Serif TC'; font-weight: 700;">學生管理</div>
+                <div style="align-self: stretch; color: #7A736E; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">管理您的學生資訊、課程預約與打卡審核</div>
+            </div>
+        </div>
+
+        <!-- 搜尋列與新增按鈕 -->
+        <div style="align-self: stretch; justify-content: space-between; align-items: center; display: inline-flex">
+            <div style="width: 320px; padding-left: 16px; padding-right: 16px; padding-top: 10px; padding-bottom: 10px; background: white; border-radius: 100px; outline: 1px #EFECE6 solid; outline-offset: -1px; justify-content: flex-start; align-items: center; gap: 10px; display: flex">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7A736E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="studentSearchInput" placeholder="搜尋學生姓名..." style="border: none; outline: none; background: transparent; flex: 1; font-size: 14px; font-family: 'Noto Sans TC'; color: #2B3049;" oninput="filterStudents(this.value)" />
+            </div>
+            <div style="justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                <div style="padding-top: 10px; padding-bottom: 10px; padding-left: 18px; padding-right: 14px; background: white; border-radius: 100px; outline: 1px #EFECE6 solid; outline-offset: -1px; justify-content: flex-start; align-items: center; gap: 12px; display: flex; cursor: pointer;">
+                    <div style="color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">所有狀態</div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B3049" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+                <div onclick="alert('＋ 新增學生視窗即將開啟')" style="padding-left: 24px; padding-right: 24px; padding-top: 10px; padding-bottom: 10px; background: #68C5AB; box-shadow: 0px 4px 12px rgba(104, 197, 171, 0.3); border-radius: 100px; justify-content: flex-start; align-items: center; gap: 8px; display: flex; cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <div style="color: white; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">新增學生</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 大數據指標卡 -->
+        <div style="align-self: stretch; justify-content: flex-start; align-items: flex-start; gap: 20px; display: inline-flex">
+            <div class="stat-card">
+                <div style="align-self: stretch; color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">學生總數</div>
+                <div style="align-self: stretch; justify-content: flex-start; align-items: center; gap: 12px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 32px; font-family: 'Noto Serif TC'; font-weight: 700;">18 人</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="align-self: stretch; color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">進行中</div>
+                <div style="align-self: stretch; justify-content: flex-start; align-items: center; gap: 12px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 32px; font-family: 'Noto Serif TC'; font-weight: 700;">15 人</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(104, 197, 171, 0.13); border-radius: 100px; justify-content: flex-start; align-items: center; gap: 6px; display: flex">
+                        <div style="width: 8px; height: 8px; background: #68C5AB; border-radius: 9999px"></div>
+                        <div style="color: #68C5AB; font-size: 12px; font-family: 'Noto Sans TC'; font-weight: 700;">上課中</div>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="align-self: stretch; color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">待審核打卡</div>
+                <div style="align-self: stretch; justify-content: flex-start; align-items: center; gap: 12px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 32px; font-family: 'Noto Serif TC'; font-weight: 700;">4 筆</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(206, 171, 152, 0.13); border-radius: 100px; justify-content: flex-start; align-items: center; gap: 6px; display: flex">
+                        <div style="width: 8px; height: 8px; background: #CEAB98; border-radius: 9999px"></div>
+                        <div style="color: #CEAB98; font-size: 12px; font-family: 'Noto Sans TC'; font-weight: 700;">需處理</div>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div style="align-self: stretch; color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">已暫停</div>
+                <div style="align-self: stretch; justify-content: flex-start; align-items: center; gap: 12px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 32px; font-family: 'Noto Serif TC'; font-weight: 700;">3 人</div>
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(111, 111, 111, 0.13); border-radius: 100px; justify-content: flex-start; align-items: center; gap: 6px; display: flex">
+                        <div style="width: 8px; height: 8px; background: #6F6F6F; border-radius: 9999px"></div>
+                        <div style="color: #6F6F6F; font-size: 12px; font-family: 'Noto Sans TC'; font-weight: 700;">暫停</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 學生資料表格主體 -->
+        <div class="table-container">
+            <!-- 表頭 -->
+            <div class="table-header">
+                <div style="width: 220px; color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">學生姓名</div>
+                <div style="width: 240px; color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">下次上課</div>
+                <div style="width: 120px; color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">已預約堂數</div>
+                <div style="width: 120px; color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">待審核打卡</div>
+                <div style="flex: 1 1 0; text-align: right; color: #2B3049; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">操作</div>
+            </div>
+
+            <!-- Row 1: 王小明 -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">王小明</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">鋼琴</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">08/30 (六) 14:00</div>
+                    <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">台北教室A</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">4 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(206, 171, 152, 0.12); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #CEAB98; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 700;">1 筆待審</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <a href="javascript:void(0)" onclick="alert('學員：王小明\n課程：鋼琴個別課\n下次上課：08/30 (六) 14:00\n累積進度：第 4 堂 / 共 10 堂\n待審打卡：1 筆')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- Row 2: 李美玲 -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">李美玲</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">鋼琴</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">09/01 (一) 16:00</div>
+                    <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">線上課程</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">3 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(111, 111, 111, 0.10); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #6F6F6F; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 500;">0 筆</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <a href="javascript:void(0)" onclick="alert('學員：李美玲\n課程：鋼琴個別課\n下次上課：09/01 (一) 16:00\n已預約：3 堂')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- Row 3: 陳志偉 -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">陳志偉</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">長笛</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">08/29 (五) 15:00</div>
+                    <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">新竹工作室</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">2 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(206, 171, 152, 0.12); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #CEAB98; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 700;">2 筆待審</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <a href="javascript:void(0)" onclick="alert('學員：陳志偉\n課程：長笛個別課\n下次上課：08/29 (五) 15:00\n待審核打卡：2 筆')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- Row 4: 林雅婷 -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">林雅婷</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">鋼琴</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">09/02 (二) 17:00</div>
+                    <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">台北教室B</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">6 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(111, 111, 111, 0.10); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #6F6F6F; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 500;">0 筆</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <a href="javascript:void(0)" onclick="alert('學員：林雅婷\n課程：鋼琴個別課\n已預約：6 堂')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- Row 5: 張家豪 -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">張家豪</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">小提琴</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">08/30 (六) 10:00</div>
+                    <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">台中教室</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">1 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(206, 171, 152, 0.12); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #CEAB98; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 700;">1 筆待審</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <a href="javascript:void(0)" onclick="alert('學員：張家豪\n課程：小提琴個別課\n下次上課：08/30 (六) 10:00')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- Row 6: 黃建華 (已暫停) -->
+            <div class="table-row">
+                <div style="width: 220px; justify-content: flex-start; align-items: center; gap: 16px; display: flex">
+                    <div style="width: 44px; height: 44px; overflow: hidden; border-radius: 100px; display: flex">
+                        <img style="width: 44px; height: 44px; object-fit: cover;" src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120" />
+                    </div>
+                    <div style="flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                        <div style="color: #2B3049; font-size: 16px; font-family: 'Noto Sans TC'; font-weight: 700;">黃建華</div>
+                        <div style="color: #7A736E; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 400;">吉他</div>
+                    </div>
+                </div>
+                <div style="width: 240px; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; display: inline-flex">
+                    <div style="color: #6F6F6F; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 500;">已暫停</div>
+                </div>
+                <div style="width: 120px; color: #2B3049; font-size: 15px; font-family: 'Noto Sans TC'; font-weight: 400;">0 堂</div>
+                <div style="width: 120px; justify-content: flex-start; align-items: flex-start; display: flex">
+                    <div style="padding-left: 10px; padding-right: 10px; padding-top: 4px; padding-bottom: 4px; background: rgba(111, 111, 111, 0.10); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex">
+                        <div style="color: #6F6F6F; font-size: 13px; font-family: 'Noto Sans TC'; font-weight: 500;">0 筆</div>
+                    </div>
+                </div>
+                <div style="flex: 1 1 0; justify-content: flex-end; align-items: center; display: flex">
+                    <button class="btn-purple-care" onclick="alert('💌 正在準備推播【紫色復課邀請卡片】至 黃建華 的 LINE 官方帳號...')">紫色關懷 💌</button>
+                    <a href="javascript:void(0)" onclick="alert('學員：黃建華 (已暫停)\n第一期已結業，保留時段每週二 19:00')" class="btn-detail">查看詳情</a>
+                </div>
+            </div>
+
+            <!-- 表格分頁導航 -->
+            <div style="align-self: stretch; padding-left: 32px; padding-right: 32px; padding-top: 20px; padding-bottom: 20px; justify-content: space-between; align-items: center; display: inline-flex; border-top: 1px #EFECE6 solid;">
+                <div style="color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 400;">顯示第 1-6 筆，共 18 筆學生</div>
+                <div style="justify-content: flex-start; align-items: center; gap: 8px; display: flex">
+                    <div style="padding: 8px; border-radius: 100px; outline: 1px #EFECE6 solid; outline-offset: -1px; justify-content: flex-start; align-items: flex-start; display: flex; cursor: pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A736E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                    </div>
+                    <div style="padding-left: 14px; padding-right: 14px; padding-top: 6px; padding-bottom: 6px; background: rgba(181, 142, 190, 0.12); border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex; cursor: pointer;">
+                        <div style="color: #B58EBE; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 700;">1</div>
+                    </div>
+                    <div style="padding-left: 14px; padding-right: 14px; padding-top: 6px; padding-bottom: 6px; border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex; cursor: pointer;">
+                        <div style="color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">2</div>
+                    </div>
+                    <div style="padding-left: 14px; padding-right: 14px; padding-top: 6px; padding-bottom: 6px; border-radius: 100px; justify-content: flex-start; align-items: flex-start; display: flex; cursor: pointer;">
+                        <div style="color: #7A736E; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">3</div>
+                    </div>
+                    <div style="padding: 8px; border-radius: 100px; outline: 1px #EFECE6 solid; outline-offset: -1px; justify-content: flex-start; align-items: flex-start; display: flex; cursor: pointer;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7A736E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 底部頁尾 -->
+    <div style="width: 1440px; padding-top: 48px; padding-bottom: 36px; padding-left: 80px; padding-right: 80px; background: #FAF6F0 url('../../UI/water_color.png') center/cover; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 48px; display: flex; border-top: 1px #F0EAE1 solid; margin-top: auto;">
+        <div style="align-self: stretch; justify-content: space-between; align-items: center; display: inline-flex">
+            <div style="width: 1280px; justify-content: space-between; align-items: center; display: flex">
+                <img style="width: 184px; height: 40px; border-radius: 100px; object-fit: contain;" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
+                <div style="color: #6F6F6F; font-size: 14px; font-family: 'Noto Sans TC'; font-weight: 500;">專業音樂教育最貼心的好夥伴，陪您一起發掘音符中的無限可能。</div>
+                <div style="color: #4A3A31; font-size: 12px; font-family: 'Noto Sans TC'; font-weight: 500;">&copy; 2026 MusiMate. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterStudents(val) {
+        const query = val.trim().toLowerCase();
+        const rows = document.querySelectorAll('.table-row');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? 'inline-flex' : 'none';
+        });
+    }
+</script>
+</body>
+</html>
