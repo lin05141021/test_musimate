@@ -140,7 +140,7 @@ export default function StudentHistoryPage() {
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-[#68C5AB] rounded-full" />
               <span className="text-[#6F6F6F] text-[13px] font-semibold font-['Sora']">
-                {termData?.teacherName || '張老師'} · {termData?.instrument || '鋼琴課'} · 課程與繳費紀錄
+                {termData?.teacherName || '林佩芬老師'} · {termData?.instrument || '古典鋼琴課'} · 課程與繳費紀錄
               </span>
             </div>
 

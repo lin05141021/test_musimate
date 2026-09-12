@@ -7,7 +7,7 @@
  */
 
 const MusiMateDB = (() => {
-    const STORAGE_KEY = 'musimate_supabase_cached_db_v2';
+    const STORAGE_KEY = 'musimate_supabase_cached_db_v3';
     const RECONCILED_KEY = 'musimate_reconciled_ids';
     const REMAINING_HOURS_PREFIX = 'musimate_remaining_hours_';
 
@@ -39,15 +39,6 @@ const MusiMateDB = (() => {
                 email: 'chl@gmail.com',
                 password: 'teacher123',
                 avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
-            },
-            {
-                id: 'u0000000-0000-0000-0000-000000000001',
-                role: 'teacher',
-                name: '張芷嫣 老師 (Teacher Chang)',
-                email: 'chang.teacher@harmony.edu',
-                password: 'teacher123',
-                avatar_url: '../../UI/teacher_avatar.png',
                 line_user_id: null
             },
             {
@@ -113,13 +104,6 @@ const MusiMateDB = (() => {
                 name: 'Charles Lin',
                 instrument: '鋼琴 (Piano)',
                 bio: '專業鋼琴演奏與 AI 音樂教學。'
-            },
-            {
-                id: 't0000000-0000-0000-0000-000000000001',
-                user_id: 'u0000000-0000-0000-0000-000000000001',
-                name: '張芷嫣 老師',
-                instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
-                bio: '國立維也納音樂大學與師大音樂系碩士，主修鋼琴與小提琴。音樂教學資歷 10 年。'
             }
         ],
         students: [

@@ -64,10 +64,10 @@ def load_intent_rules():
         },
         {
             "name": "teacher_profile",
-            "keywords": ["老師", "師資", "張老師", "張芷嫣", "介紹", "簡介", "學歷", "背景", "名師"],
-            "title": "👩‍🏫 張芷嫣老師 師資檔案",
-            "text": "張芷嫣老師主修鋼琴與小提琴（國立師大與維也納音樂大學碩士），教學資歷 10 年。歡迎點擊查看名師詳細檔案：",
-            "action_label": "🎻 瀏覽張老師個人專欄",
+            "keywords": ["老師", "師資", "林老師", "林佩芬", "林佩芬老師", "介紹", "簡介", "學歷", "背景", "名師"],
+            "title": "👩‍🏫 林佩芬老師 師資檔案",
+            "text": "林佩芬老師（Teacher Lin）主修古典鋼琴與流行爵士鋼琴（國立維也納音樂學院碩士），教學資歷 12 年。歡迎點擊查看名師詳細檔案：",
+            "action_label": "🎹 瀏覽林佩芬老師個人專欄",
             "action_url": "https://lin05141021.github.io/test_musimate/src/newclass/teacher_info.html"
         }
     ]
@@ -87,7 +87,7 @@ def build_reply_messages(matched_rule):
     if not matched_rule:
         return [{
             "type": "text",
-            "text": "🎵 您好！我是 MusiMate 音樂教室智慧小助手。\n您可以輸入「查課表」、「請假」、「新課程」或「張老師簡介」，我會即時為您服務喔！"
+            "text": "🎵 您好！我是 MusiMate 音樂教室智慧小助手。\n您可以輸入「查課表」、「請假」、「新課程」或「林老師簡介」，我會即時為您服務喔！"
         }]
 
     if matched_rule.get("action_url"):
@@ -166,7 +166,7 @@ def reply_line_message(reply_token, messages):
 
 if __name__ == "__main__":
     print("✨ MusiMate 關鍵字意圖測試：")
-    test_inputs = ["我想看我的課表", "下週三我要請假", "有鋼琴新課程可以預約嗎", "張老師的學歷背景是什麼", "哈囉"]
+    test_inputs = ["我想看我的課表", "下週三我要請假", "有鋼琴新課程可以預約嗎", "林老師的學歷背景是什麼", "哈囉"]
     for text in test_inputs:
         matched = match_keyword(text)
         print(f"輸入：『{text}』 ➔ 命中意圖：{matched['name'] if matched else '未命中 (預設回覆)'}")

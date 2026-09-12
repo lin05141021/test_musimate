@@ -48,7 +48,7 @@
                     <h1 class="page-title">我的課表</h1>
                     <span id="dbStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;">🟢 Supabase 連線中</span>
                 </div>
-                <p id="studentBannerSubtitle" class="page-subtitle">張芷嫣 老師 · 劉心悅 (Lin) 個人專屬課表</p>
+                <p id="studentBannerSubtitle" class="page-subtitle">林佩芬 老師 · 劉心悅 (Lin) 個人專屬課表</p>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 12px;">
                     <span id="lineIdDisplayTag" style="font-size: 11px; color: #5B524E; background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 8px;">🆔 LINE: 載入中...</span>
                     <button onclick="promptBindMyLineId()" style="background: transparent; border: 1px dashed #CEAB98; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #8C6D58; cursor: pointer; font-weight: 700;">✏️ 綁定我的 LINE ID</button>
@@ -190,7 +190,7 @@ function updateStudentHeader(student, lineDisplayName) {
         avatarEl.innerHTML = `<img src="${student.avatar_url}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;" alt="avatar" />`;
     }
     if (subTitleEl) {
-        subTitleEl.innerText = `張芷嫣 老師 · ${displayName} 個人專屬課表`;
+        subTitleEl.innerText = `林佩芬 老師 · ${displayName} 個人專屬課表`;
     }
     if (lineTag) {
         const lineId = student.line_user_id || localStorage.getItem('custom_test_line_user_id') || 'Uf2457bf35e0d6d3060b60838d9a9c91c';

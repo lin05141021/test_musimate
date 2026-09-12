@@ -178,7 +178,7 @@
 
             <!-- 選擇試上時間 -->
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <div style="color: #6F6F6F; font-size: 12px; font-weight: 700;">選擇張老師開放時段 (30分鐘)</div>
+                <div style="color: #6F6F6F; font-size: 12px; font-weight: 700;">選擇林佩芬老師開放時段 (30分鐘)</div>
                 <select id="trialTimeSelect" class="form-input" style="cursor: pointer;">
                     <!-- JS 動態填入 -->
                 </select>
@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="${s.start_time}">${formatTrialSlotOption(s.start_time, s.end_time, s.location)}</option>
             `).join('');
         } else {
-            select.innerHTML = '<option value="">本週開放時段已滿，請洽張老師</option>';
+            select.innerHTML = '<option value="">本週開放時段已滿，請洽林佩芬老師</option>';
         }
     }
 });

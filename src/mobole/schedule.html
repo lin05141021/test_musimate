@@ -34,7 +34,7 @@
         <div class="main-content">
             <div class="page-header">
                 <h1 class="page-title">我的課表</h1>
-                <p id="mobileSubtitle" class="page-subtitle">張老師 · 預約課堂清單 (資料庫連線)</p>
+                <p id="mobileSubtitle" class="page-subtitle">林佩芬老師 · 預約課堂清單 (資料庫連線)</p>
             </div>
 
             <!-- 動態課表容器 (由 JS 依據資料庫查詢渲染) -->
@@ -78,7 +78,7 @@ function renderMobileSchedule(studentId) {
     const current = students.find(s => s.student_id === studentId) || students[0];
     if (!current) return;
 
-    document.getElementById('mobileSubtitle').innerText = `張老師 · ${current.name} 預約課堂清單 (資料庫連線)`;
+    document.getElementById('mobileSubtitle').innerText = `林佩芬老師 · ${current.name} 預約課堂清單 (資料庫連線)`;
 
     const appts = window.MusiMateDB.getAppointmentsByStudent(current.student_id);
 
@@ -103,7 +103,7 @@ function renderMobileSchedule(studentId) {
                 <div class="info-card" style="${isLeave ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
                     <div class="info-card-left">
                         <div class="time-text">${timeSpan} ${isNewTag}</div>
-                        <div class="course-title">張老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
+                        <div class="course-title">林佩芬老師${appt.instrument ? appt.instrument.split(' ')[0] : '古典鋼琴'}課</div>
                         <div class="location-text">${appt.location || '音符琴房 A303'} · ${isLeave ? '📌 已請假' : (appt.payment_status === 'paid' ? '✅ 已預付' : '💳 現金後付')}</div>
                     </div>
                     <div class="music-gradient-icon">${isLeave ? '⏳' : '🎵'}</div>

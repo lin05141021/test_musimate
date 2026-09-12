@@ -78,13 +78,13 @@ def get_26h_flex_json(appointment_data: dict) -> dict:
     - room           : 上課琴房 (例如 'A301 鋼琴琴房')
     """
     student_name = appointment_data.get("student_name", "學員")
-    instrument = appointment_data.get("instrument", "鋼琴 (Piano)")
-    teacher_name = appointment_data.get("teacher_name", "張老師 (Teacher Chang)")
+    instrument = appointment_data.get("instrument", "古典鋼琴 (Piano)")
+    teacher_name = appointment_data.get("teacher_name", "林佩芬 老師 (Teacher Lin)")
     start_time = appointment_data.get("start_time", "")
     end_time = appointment_data.get("end_time", "")
     payment_status = appointment_data.get("payment_status", "unpaid")
     payment_type = appointment_data.get("payment_type", "prepaid")
-    room = appointment_data.get("room", "A301 鋼琴琴房")
+    room = appointment_data.get("room", "音符琴房 A303")
 
     time_display = format_db_time_range(start_time, end_time)
     pay_text, pay_color = format_payment_badge(payment_status, payment_type)
@@ -176,8 +176,8 @@ def get_26h_flex_json(appointment_data: dict) -> dict:
                     "height": "sm",
                     "action": {
                         "type": "uri",
-                        "label": "查看個人課表 / 請假調課",
-                        "uri": "https://line.me"
+                        "label": "⏱️ 線上請假 / 調課申請",
+                        "uri": "https://liff.line.me/2011164851-lGsEnQWB?action=reschedule"
                     }
                 }
             ]
@@ -214,40 +214,40 @@ MOCK_DATABASE_APPOINTMENTS = [
         "student_id": "s0000000-0000-0000-0000-000000000003",
         "student_name": "Charles",
         "line_user_id": None,
-        "teacher_name": "張老師 (Teacher Chang)",
-        "instrument": "鋼琴 (Piano)",
+        "teacher_name": "林佩芬 老師 (Teacher Lin)",
+        "instrument": "古典鋼琴 (Piano)",
         "start_time": "2026-08-26 19:30:00+08",
         "end_time": "2026-08-26 21:30:00+08",
         "payment_status": "paid",
         "payment_type": "prepaid",
         "status": "confirmed",
-        "room": "鋼琴 1 號琴房 (A301)"
+        "room": "音符琴房 A301"
     },
     {
         "student_id": "s0000000-0000-0000-0000-000000000004",
         "student_name": "Johnny",
         "line_user_id": None,
-        "teacher_name": "張老師 (Teacher Chang)",
-        "instrument": "鋼琴 (Piano)",
+        "teacher_name": "林佩芬 老師 (Teacher Lin)",
+        "instrument": "古典鋼琴 (Piano)",
         "start_time": "2026-08-27 19:30:00+08",
         "end_time": "2026-08-27 21:30:00+08",
         "payment_status": "pay_per_lesson",
         "payment_type": "postpaid",
         "status": "confirmed",
-        "room": "鋼琴 2 號琴房 (A302)"
+        "room": "音符琴房 A302"
     },
     {
-        "student_id": "s0000000-0000-0000-0000-000000000005",
-        "student_name": "Lin",
+        "student_id": "55555555-5555-4555-b555-555555555555",
+        "student_name": "劉心悅 (Lin)",
         "line_user_id": "Uf2457bf35e0d6d3060b60838d9a9c91c",
-        "teacher_name": "張老師 (Teacher Chang)",
-        "instrument": "鋼琴 (Piano)",
-        "start_time": "2026-08-26 10:00:00+08",
-        "end_time": "2026-08-26 12:00:00+08",
+        "teacher_name": "林佩芬 老師 (Teacher Lin)",
+        "instrument": "古典鋼琴 (Piano)",
+        "start_time": "2026-09-16 10:00:00+08",
+        "end_time": "2026-09-16 12:00:00+08",
         "payment_status": "pay_per_lesson",
         "payment_type": "postpaid",
         "status": "confirmed",
-        "room": "鋼琴 3 號琴房 (A303)"
+        "room": "音符琴房 A303"
     }
 ]
 
@@ -315,7 +315,7 @@ def get_welcome_flex_json(student_name: str = "學員") -> dict:
             "spacing": "md",
             "contents": [
                 {"type": "text", "text": f"親愛的 {student_name} 您好：", "weight": "bold", "size": "md", "color": "#333333"},
-                {"type": "text", "text": "歡迎您加入張老師的音樂課堂！您的 LINE 身分已成功登錄系統。", "size": "sm", "color": "#666666", "wrap": True},
+                {"type": "text", "text": "歡迎您加入林佩芬老師的音樂課堂！您的 LINE 身分已成功登錄系統。", "size": "sm", "color": "#666666", "wrap": True},
                 {"type": "separator", "margin": "md"},
                 {
                     "type": "box",
@@ -444,19 +444,59 @@ class LineWebhookHandler(BaseHTTPRequestHandler):
         pass
 
 
-def run_webhook_server(port: int = 8000):
-    server_address = ("0.0.0.0", port)
-    httpd = HTTPServer(server_address, LineWebhookHandler)
+def run_daily_cron(target_user_id: str = "Uf2457bf35e0d6d3060b60838d9a9c91c"):
+    """
+    GitHub Actions 定時自動執行任務：
+    1. 查詢 Supabase 中央資料庫排課紀錄
+    2. 自動組合 26 小時課前預報 Flex 卡片
+    3. 發送推播至學員 LINE (預設為劉心悅 Lin: Uf2457bf35e0d6d3060b60838d9a9c91c)
+    """
     print("=" * 65)
-    print(f"🚀 [MusiMate Webhook 伺服器啟動中] Port: {port}")
-    print(f"👉 請確保 ngrok 已連線至 8000:  ngrok http {port}")
-    print("👉 現在只要拿起手機在 LINE 官方帳號傳送「hi」或「測試」，")
-    print("   終端機就會立即印出您的 LINE User ID，並發送卡片至您的手機！")
-    print("=" * 65 + "\n")
+    print("⏰ [MusiMate GitHub Actions 定時課前提醒服務啟動]")
+    print(f"🎯 目標學員 LINE ID: {target_user_id}")
+    print("=" * 65)
+
+    supabase_url = "https://iyzhwnvpqohdjqnrvqjq.supabase.co/rest/v1/schedules?select=*"
+    supabase_key = "sb_publishable_qhofcnT-u4Xbwv2QY1FjaA_vrdNOe_v"
+    headers = {
+        "apikey": supabase_key,
+        "Authorization": f"Bearer {supabase_key}"
+    }
+
+    appt_to_send = None
+
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\n🛑 伺服器已停止。")
+        res = requests.get(supabase_url, headers=headers, timeout=10)
+        if res.status_code == 200:
+            schedules = res.json()
+            for s in schedules:
+                name = s.get("student_name", "")
+                if "劉心悅" in name or "Lin" in name:
+                    appt_to_send = {
+                        "student_name": "劉心悅 (Lin)",
+                        "teacher_name": s.get("teacher_name") or "林佩芬 老師 (Teacher Lin)",
+                        "instrument": s.get("instrument") or "古典鋼琴 (Piano)",
+                        "start_time": s.get("start_time") or "2026-09-16 10:00:00+08",
+                        "end_time": s.get("end_time") or "2026-09-16 12:00:00+08",
+                        "payment_status": "pay_per_lesson",
+                        "payment_type": "postpaid",
+                        "room": s.get("room") or "音符琴房 A303"
+                    }
+                    print(f"✅ 成功自 Supabase 讀取劉心悅課表排程：{appt_to_send['start_time']}")
+                    break
+    except Exception as e:
+        print(f"⚠️ Supabase 查詢異常，改用本機標準排程資料: {e}")
+
+    if not appt_to_send:
+        appt_to_send = MOCK_DATABASE_APPOINTMENTS[2] # 劉心悅 (Lin)
+
+    # 產生並發送推播
+    flex_card = get_26h_flex_json(appt_to_send)
+    success = send_line_push(target_user_id, f"【課前提醒】{appt_to_send['student_name']} 明日鋼琴課預報 ⏰", flex_card)
+    if success:
+        print("🎉 [GitHub Actions 排程任務執行成功] 今日課前推播已全自動送出！")
+    else:
+        print("❌ [GitHub Actions 排程任務] 發送失敗，請檢查 LINE Access Token。")
 
 
 if __name__ == "__main__":
@@ -465,6 +505,14 @@ if __name__ == "__main__":
     
     if "--server" in args or "server" in args:
         run_webhook_server()
+    elif "--cron" in args or "cron" in args:
+        # GitHub Actions 定時執行
+        target_id = "Uf2457bf35e0d6d3060b60838d9a9c91c"
+        for a in args:
+            if a.startswith("U"):
+                target_id = a
+                break
+        run_daily_cron(target_user_id=target_id)
     elif len(args) > 0 and args[0].startswith("U"):
         # 直接推播到指定 ID: python class_remind.py U123456...
         test_generate_reminders(target_line_user_id=args[0])
@@ -472,5 +520,6 @@ if __name__ == "__main__":
         # 預設執行測試，並提示如何啟動伺服器
         test_generate_reminders()
         print("\n💡 提示：")
+        print("  - 定時排程推播 (Cron)： python src/app/student/line_liff/class_remind/class_remind.py --cron")
         print("  - 啟動接收訊息伺服器： python src/app/student/line_liff/class_remind/class_remind.py --server")
         print("  - 直接推播給特定 ID ： python src/app/student/line_liff/class_remind/class_remind.py 您的ID")

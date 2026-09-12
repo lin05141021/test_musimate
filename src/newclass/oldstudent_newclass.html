@@ -113,10 +113,10 @@
         <span id="bgStudentTag" style="font-size: 12px; font-weight: bold; color: #7B1FA2; background: #F3E5F5; padding: 4px 10px; border-radius: 12px;">Lin (林同學)</span>
     </div>
     <div class="main-content">
-        <div class="page-header"><h1 class="page-title">我的課表</h1><p class="page-subtitle">張老師 · 預約課堂清單</p></div>
+        <div class="page-header"><h1 class="page-title">我的課表</h1><p class="page-subtitle">林佩芬老師 · 預約課堂清單</p></div>
         <div class="lesson-item">
             <div class="date-badge"><div class="day-number">8/26</div><div class="day-weekday">(三)</div></div>
-            <div class="lesson-card-right"><div class="info-card"><div class="info-card-left"><div class="time-text">10:00 - 12:00</div><div class="course-title">張老師鋼琴課</div></div></div></div>
+            <div class="lesson-card-right"><div class="info-card"><div class="info-card-left"><div class="time-text">10:00 - 12:00</div><div class="course-title">林佩芬老師古典鋼琴課</div></div></div></div>
         </div>
     </div>
 </div>
@@ -163,7 +163,7 @@
             </div>
 
             <div class="field-group">
-                <label class="field-label">選擇張老師開放上課時段</label>
+                <label class="field-label">選擇林佩芬老師開放上課時段</label>
                 <select class="field-select" id="timeSlotSelect">
                     <!-- JS 動態填入 -->
                 </select>
@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateStudentInfo(currentStudentId);
 
-        // 載入張老師開放時段
+        // 載入林佩芬老師開放時段
         const slots = window.MusiMateDB.getAvailableSlots();
         const timeSelect = document.getElementById('timeSlotSelect');
         if (slots.length > 0) {
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <option value="${s.start_time}">${formatSlotOption(s.start_time, s.end_time, s.location)}</option>
             `).join('');
         } else {
-            timeSelect.innerHTML = '<option value="">目前開放時段已滿，請洽張老師</option>';
+            timeSelect.innerHTML = '<option value="">目前開放時段已滿，請洽林佩芬老師</option>';
         }
     }
 });

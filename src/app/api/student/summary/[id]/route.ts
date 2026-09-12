@@ -29,7 +29,7 @@ const FALLBACK_LESSONS = [
     },
     created_at: '2026-08-15T10:00:00+08:00',
     song_title: '巴哈：E大調小提琴協奏曲 第一樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-2',
@@ -55,7 +55,7 @@ const FALLBACK_LESSONS = [
     },
     created_at: '2026-08-19T10:00:00+08:00',
     song_title: '蕭邦：降E大調夜曲 Op.9 No.2',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-3',
@@ -81,7 +81,7 @@ const FALLBACK_LESSONS = [
     },
     created_at: '2026-08-26T10:00:00+08:00',
     song_title: '貝多芬：第十四號鋼琴奏鳴曲《月光》第三樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-4',
@@ -107,7 +107,7 @@ const FALLBACK_LESSONS = [
     },
     created_at: '2026-08-29T15:30:00+08:00',
     song_title: '莫札特：G大調第三號小提琴協奏曲 第一樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-5',
@@ -133,7 +133,7 @@ const FALLBACK_LESSONS = [
     },
     created_at: '2026-09-02T10:00:00+08:00',
     song_title: '德布西：《貝加馬斯克組曲》第三首〈月光〉',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
 ];
 

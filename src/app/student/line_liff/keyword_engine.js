@@ -39,10 +39,10 @@
         },
         {
             name: 'teacher_profile',
-            keywords: ['老師', '師資', '張老師', '張芷嫣', '介紹', '簡介', '學歷', '背景', '名師'],
-            replyText: '👩‍🏫 張芷嫣老師主修鋼琴與小提琴（國立師大與維也納音樂大學碩士），教學資歷 10 年。歡迎點擊查看名師詳細檔案：',
+            keywords: ['老師', '師資', '林老師', '林佩芬', '林佩芬老師', '介紹', '簡介', '學歷', '背景', '名師'],
+            replyText: '👩‍🏫 林佩芬老師（Teacher Lin）主修古典鋼琴與流行爵士鋼琴（國立維也納音樂學院碩士），教學資歷 12 年。歡迎點擊查看名師詳細檔案：',
             webUrl: 'https://lin05141021.github.io/test_musimate/src/newclass/teacher_info.html',
-            actionLabel: '🎻 瀏覽張老師個人專欄'
+            actionLabel: '🎹 瀏覽林佩芬老師個人專欄'
         }
     ];
 

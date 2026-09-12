@@ -315,7 +315,7 @@ def get_welcome_flex_json(student_name: str = "學員") -> dict:
             "spacing": "md",
             "contents": [
                 {"type": "text", "text": f"親愛的 {student_name} 您好：", "weight": "bold", "size": "md", "color": "#333333"},
-                {"type": "text", "text": "歡迎您加入張老師的音樂課堂！您的 LINE 身分已成功登錄系統。", "size": "sm", "color": "#666666", "wrap": True},
+                {"type": "text", "text": "歡迎您加入林佩芬老師的音樂課堂！您的 LINE 身分已成功登錄系統。", "size": "sm", "color": "#666666", "wrap": True},
                 {"type": "separator", "margin": "md"},
                 {
                     "type": "box",

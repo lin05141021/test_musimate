@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>張芷嫣老師 - 師資詳細介紹與課程預約 | MusiMate</title>
+    <title>林佩芬老師 - 師資詳細介紹與課程預約 | MusiMate</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
 <body>
 
 <div class="main-container">
-    <!-- 1. 頂部導航列 (對齊 UI/component/navbar.html 標準組件) -->
+    <!-- 1. 頂部導航列 (對齊 Figma 1440x88 規範) -->
     <div class="navbar-container" id="navbarWrapper">
         <div class="logo-box" onclick="location.href='newclass_homepage.html'">
             <img class="navbar-logo-img" src="../../UI/logo.png" alt="MusiMate" onerror="this.src='../logo.png'" />
@@ -25,12 +25,21 @@
         <div class="nav-links">
             <a href="../test_uiredesign/schedule.html" class="nav-item" data-property-1="defult">我的課表</a>
             <a href="javascript:void(0)" onclick="alert('📖 智慧聯絡簿模組開發中，敬請期待！')" class="nav-item" data-property-1="defult">智慧聯絡簿</a>
-            <a href="javascript:void(0)" onclick="alert('⏱️ 學生打卡簽到功能即將推出！')" class="nav-item" data-property-1="defult">學生打卡</a>
+            <a href="javascript:void(0)" onclick="alert('👥 學生管理模組即將上線！')" class="nav-item" data-property-1="defult">學生管理</a>
             <a href="../money/overview_checked.html" class="nav-item" data-property-1="defult">薪資看板</a>
-            <a href="teacher_info_edit.html" class="nav-item" data-property-1="defult">修改個人介紹</a>
+            <a href="teacher_info.html" class="nav-item active" data-property-1="active">個人介紹</a>
         </div>
-        <div class="nav-avatar-box" title="張芷嫣老師檔案 (點擊編輯)" onclick="location.href='teacher_info_edit.html'">
-            <img src="../../UI/teacher_avatar.png" alt="張芷嫣老師" onerror="this.src='../teacher_avatar.png'" />
+        <div class="nav-right-actions">
+            <div class="nav-bell-box" title="通知中心 (3 則未讀)" onclick="location.href='../admin/notifications'">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B3049" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <div class="nav-bell-badge">3</div>
+            </div>
+            <div class="nav-avatar-box" title="林佩芬老師檔案 (點擊編輯)" onclick="location.href='teacher_info_edit.html'">
+                <img src="../../UI/teacher_avatar.png" alt="林佩芬老師" onerror="this.src='../teacher_avatar.png'" />
+            </div>
         </div>
     </div>
 
@@ -40,7 +49,7 @@
             <span>✦</span>
             <span>PIANO & VIOLIN MASTER</span>
         </div>
-        <h1 id="teacherNameBanner" class="hero-title" style="font-size: 38px;">張芷嫣 · 名師專欄介紹</h1>
+        <h1 id="teacherNameBanner" class="hero-title" style="font-size: 38px;">林佩芬 · 名師專欄介紹</h1>
         
         <!-- 核心切換模式膠囊 (View ⇄ Edit Mode Switcher) -->
         <div id="modeSwitcherWrap" style="display: flex; justify-content: center; margin-top: 16px;">
@@ -68,16 +77,16 @@
             <div class="experience-block">
                 <div class="experience-title">學歷背景與演奏文憑 (Education & Diplomas)</div>
                 <ul class="experience-list" id="educationList">
-                    <li>奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)</li>
+                    <li>奧地利國立維也納音樂暨表演藝術大學 鋼琴演奏碩士 (Master of Arts)</li>
                     <li>國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)</li>
-                    <li>曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧</li>
+                    <li>曾師從維也納愛樂樂團鋼琴大師深入研習德奧古典樂派詮釋技巧</li>
                 </ul>
             </div>
 
             <div class="experience-block">
                 <div class="experience-title">教學成果與教學特色 (Teaching Highlights)</div>
                 <ul class="experience-list" id="highlightsList">
-                    <li>10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所</li>
+                    <li>12 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所</li>
                     <li>特別著重學員觸鍵發力與身體協調性，針對不同年齡與基礎量身訂製教材</li>
                     <li>結合 AI 課堂即時錄音重點摘要與課後音準姿態對比，使自主練習目標清晰明確</li>
                 </ul>
@@ -86,7 +95,7 @@
             <!-- 開放預約時段快速入口 -->
             <div style="padding-top: 16px; border-top: 1px solid #F0EAE1; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <div style="font-weight: 700; font-size: 16px; color: #2B3049;">想與張芷嫣老師一起展開音樂旅程？</div>
+                    <div style="font-weight: 700; font-size: 16px; color: #2B3049;">想與林佩芬老師一起展開音樂旅程？</div>
                     <div style="font-size: 13px; color: #7A736E; margin-top: 2px;">本週尚有開放試聽與預約名額，歡迎線上預約。</div>
                 </div>
                 <button class="btn-book-course" onclick="location.href='newstudent_newclass.html'">
@@ -125,17 +134,17 @@ function renderTeacherProfile() {
 
     if (!profile) {
         profile = {
-            name: '張芷嫣',
-            instrument: '鋼琴 (Piano) · 小提琴 (Violin)',
+            name: '林佩芬',
+            instrument: '古典鋼琴 · 流行爵士鋼琴',
             tags: ['伴奏鋼琴', '音樂班專業', '音樂素養'],
             tag_color: '#B58EBE',
             tag_bg: 'rgba(181, 142, 190, 0.15)',
             avatar_url: '../../UI/teacher_avatar.png',
-            bio: '國立師大音樂系與維也納音樂大學碩士，主修鋼琴與小提琴。音樂教學資歷 10 年，培養超過 30 位學生錄取國立音樂專班及在鋼琴大賽中屢獲佳績。曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的演奏藝術。',
+            bio: '奧地利國立維也納音樂暨表演藝術大學碩士，具備 12 年專業教學資歷，專注於觸鍵音色與音樂詮釋。曾培育多位學生於全國鋼琴大賽獲獎並考取國立音樂系所。',
             education: [
-                '奧地利國立維也納音樂暨表演藝術大學 小提琴演奏碩士 (Master of Arts)',
+                '奧地利國立維也納音樂暨表演藝術大學 鋼琴演奏碩士 (Master of Arts)',
                 '國立臺灣師範大學 音樂學系鋼琴演奏學士 (Bachelor of Music)',
-                '曾師從維也納愛樂樂團首席大師深入研習德奧古典樂派詮釋技巧'
+                '曾師從維也納愛樂樂團鋼琴大師深入研習德奧古典樂派詮釋技巧'
             ],
             highlights: [
                 '10 年豐富音樂教學經驗，累計輔導逾 30 位學員順利錄取各級國立音樂專班與研究所',

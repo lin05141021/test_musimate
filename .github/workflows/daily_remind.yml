@@ -1,0 +1,30 @@
+name: Daily MusiMate Lesson Reminder
+
+on:
+  # 每天台灣時間 20:00 (UTC 12:00) 自動執行排程
+  schedule:
+    - cron: '0 12 * * *'
+  # 支援在 GitHub 網頁 Actions 標籤手動點擊「Run workflow」隨時測試
+  workflow_dispatch:
+
+jobs:
+  remind:
+    name: Send 26h Lesson Reminders
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Reminder Cron
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+        run: |
+          python src/app/student/line_liff/class_remind/class_remind.py --cron Uf2457bf35e0d6d3060b60838d9a9c91c

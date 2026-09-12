@@ -138,7 +138,7 @@ function renderSchedule() {
     if (targetAppt) {
         currentStudentId = targetAppt.student_id;
         document.getElementById('studentNamePill').innerText = targetAppt.student_name;
-        document.getElementById('changeClassSubtitle').innerText = `張老師 · ${targetAppt.student_name} 課堂清單`;
+        document.getElementById('changeClassSubtitle').innerText = `林佩芬老師 · ${targetAppt.student_name} 課堂清單`;
     }
 
     const appts = window.MusiMateDB.getAppointmentsByStudent(currentStudentId);
@@ -159,7 +159,7 @@ function renderSchedule() {
                 <div class="info-card" style="${isLeave ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
                     <div class="info-card-left">
                         <div class="time-text">${timeSpan}</div>
-                        <div class="course-title">${appt.student_name} - 張老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
+                        <div class="course-title">${appt.student_name} - 林佩芬老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
                         <div class="location-text">${appt.location || '音符琴房 A303'} · ${isLeave ? '📌 已請假 (時數保留)' : '✅ 正常上課'}</div>
                     </div>
                     <div class="music-gradient-icon">${isLeave ? '⏳' : '🎵'}</div>
@@ -190,7 +190,7 @@ function openRescheduleModal(appointmentId) {
         <div style="font-size: 12px; color: #7A7471; margin-top: 4px;">學員：${appt.student_name} · 地點：${appt.location} · 課程：${appt.instrument || '鋼琴'}</div>
     `;
 
-    // 動態讀取張老師行事曆即時開放的空閒時段
+    // 動態讀取林佩芬老師行事曆即時開放的空閒時段
     const activeSlots = window.MusiMateDB.getAvailableSlots();
 
     const select = document.getElementById('slotSelector');
@@ -232,7 +232,7 @@ function submitReschedule() {
 
     const feedback = document.getElementById('feedbackBox');
     feedback.className = 'alert-msg alert-success';
-    feedback.innerText = '✅ 調課已成功送出！原時段已釋放，新時段已同步更新至張老師課表。';
+    feedback.innerText = '✅ 調課已成功送出！原時段已釋放，新時段已同步更新至林佩芬老師課表。';
     feedback.style.display = 'block';
 
     setTimeout(() => {

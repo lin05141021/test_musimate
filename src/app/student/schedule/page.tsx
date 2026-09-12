@@ -311,7 +311,7 @@ export default function StudentSchedulePage() {
     showToast('調課申請已送出');
     setFeedback({
       success: true,
-      msg: res.message || '✅ 調課申請已確認送出！張老師與系統已即時同步更新。',
+      msg: res.message || '✅ 調課申請已確認送出！林佩芬老師與系統已即時同步更新。',
     });
 
     setTimeout(() => {
@@ -404,12 +404,12 @@ export default function StudentSchedulePage() {
     return `${s} - ${e}`;
   };
 
-  // 格式化課程標題
+  // 格式化課程標題 (動態讀取授課教師與科目)
   const formatCourseTitle = (appt: Appointment) => {
-    if (appt.teacher_name?.includes('李老師') || (appt.instrument?.includes('小提琴') && !appt.teacher_name?.includes('張'))) {
-      return '李老師小提琴課';
-    }
-    return '張老師鋼琴課';
+    const rawTeacher = appt.teacher_name || '林佩芬 老師';
+    const cleanTeacher = rawTeacher.replace(/\s*\(.*?\)\s*/g, '').replace('老師', '').trim();
+    const inst = appt.instrument?.includes('小提琴') ? '小提琴課' : '鋼琴課';
+    return `${cleanTeacher}老師${inst}`;
   };
 
   // 格式化繳費標籤
@@ -993,7 +993,7 @@ export default function StudentSchedulePage() {
                     <button
                       type="button"
                       onClick={() => {
-                        alert('如需客服協助，請直接於 MusiMate 官方 LINE 官方帳號留言，或洽詢張老師工作室。');
+                        alert('如需客服協助，請直接於 MusiMate 官方 LINE 官方帳號留言，或洽詢林佩芬老師工作室。');
                       }}
                       className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
                     >

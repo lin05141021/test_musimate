@@ -68,7 +68,7 @@ export default function RoleSelectorPage() {
     setErrorMsg('');
     setSuccessMsg('');
     if (role === 'teacher') {
-      setEmail('chang.teacher@harmony.edu');
+      setEmail('lin.teacher@harmony.edu');
       setPassword('teacher123');
     } else {
       setEmail('ming.student@harmony.edu');
@@ -282,15 +282,15 @@ export default function RoleSelectorPage() {
 
                 <div className="p-3.5 rounded-2xl bg-[#FAF2EC] border border-[#E8D4C5] space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-[#8C6D53]">張老師 (Teacher)</span>
-                    <span className="text-[10px] text-[#7A736E] font-mono">chang.teacher@harmony.edu</span>
+                    <span className="font-bold text-xs text-[#8C6D53]">林佩芬老師 (Teacher)</span>
+                    <span className="text-[10px] text-[#7A736E] font-mono">lin.teacher@harmony.edu</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleQuickFill('teacher')}
                     className="w-full py-2 rounded-full bg-[#8C6D53] hover:bg-[#765942] text-white text-xs font-bold shadow-xs transition-all"
                   >
-                    帶入張老師帳密 (teacher123)
+                    帶入林佩芬老師帳密 (teacher123)
                   </button>
                 </div>
               </div>
@@ -313,7 +313,7 @@ export default function RoleSelectorPage() {
                     歡迎回來，{currentUser.name}！
                   </h2>
                   <span className="text-xs text-[#8C6D53] font-bold">
-                    {currentRole === 'teacher' ? '張老師教學 Portal' : '小明學習 Portal'} 已成功登入
+                    {currentRole === 'teacher' ? '林佩芬老師教學 Portal' : '學員學習 Portal'} 已成功登入
                   </span>
                 </div>
               </div>

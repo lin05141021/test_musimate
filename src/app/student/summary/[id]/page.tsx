@@ -186,7 +186,7 @@ export default function StudentSummaryDetailPage() {
     summary.encouragement || '每一次的練習都是進步的累積，老師看到你的努力了！';
 
   const currentSongTitle = currentRecord?.song_title || '巴哈：E大調小提琴協奏曲 第一樂章';
-  const teacherName = currentRecord?.teacher_name || '張老師';
+  const teacherName = currentRecord?.teacher_name || '林佩芬 老師 (Teacher Lin)';
 
   return (
     <div className="min-h-screen w-full bg-[#FAF6F0] sm:bg-[#EDE8DE] flex justify-center items-center py-0 sm:py-6 select-none font-['Sora','Noto_Sans_TC',sans-serif]">
@@ -455,12 +455,12 @@ export default function StudentSummaryDetailPage() {
                 </div>
               </div>
 
-              {/* 四、張老師課後小結 */}
+              {/* 四、老師課後小結 */}
               <div className="w-full p-3 bg-white rounded-xl outline outline-1 outline-[rgba(104,197,171,0.25)] flex flex-col gap-2">
                 <div className="flex items-center gap-1.5">
                   <Heart className="w-3.5 h-3.5 text-[#D5CC6A] fill-[#D5CC6A]" />
                   <span className="text-[#CEAB98] text-[12px] font-bold">
-                    張老師課後小結
+                    {teacherName.replace(/\s*\(.*?\)\s*/g, '')} 課後小結
                   </span>
                 </div>
                 <div className="text-[#2B3049] text-[14px] font-normal leading-[21px]">

@@ -61,16 +61,16 @@ export const MOCK_STUDENT_JOHNNY_USER: User = {
 };
 
 export const MOCK_TEACHER: Teacher = {
-  id: 't0000000-0000-0000-0000-000000000001',
+  id: 'df637b26-7cab-443b-8801-4361fb35afdd',
   user_id: MOCK_TEACHER_USER.id,
-  instrument: '小提琴 (Violin) & 鋼琴 (Piano)',
-  bio: '國立音樂學院碩士，10年專業小提琴與古典鋼琴教學經驗。專精於古典演奏與AI音聲診斷。',
+  instrument: '古典鋼琴 · 流行爵士鋼琴',
+  bio: '國立維也納音樂學院碩士，具備 12 年教學資歷，專注於觸鍵音色與音樂詮釋。',
 };
 
 export const MOCK_STUDENT: Student = {
   id: '55555555-5555-4555-b555-555555555555', // 同學 Supabase 資料庫劉心悅 (Lin) 真實 ID
   user_id: MOCK_STUDENT_USER.id,
-  teacher_id: 'ef167dc4-2264-4658-91f1-2eb2418242ab', // 張芷嫣老師 (Piano)
+  teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', // 林佩芬老師 (Piano)
   package_total_lessons: 10,
 };
 
@@ -142,7 +142,7 @@ const INITIAL_SLOTS: ScheduleSlot[] = [
     start_time: getDynamicDate(3, 19),
     end_time: getDynamicDate(3, 20),
     is_available: true,
-    location: '張老師家中',
+    location: '林佩芬老師音樂工作室',
   },
   {
     id: 'slot-6',
@@ -168,11 +168,11 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-12T10:00:00+08:00',
     end_time: '2026-08-12T12:00:00+08:00',
     status: 'completed',
-    instrument: '鋼琴 (Piano)',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
     payment_status: 'paid',
     payment_type: 'prepaid',
@@ -182,11 +182,11 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-19T10:00:00+08:00',
     end_time: '2026-08-19T12:00:00+08:00',
     status: 'completed',
-    instrument: '鋼琴 (Piano)',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
     payment_status: 'paid',
     payment_type: 'prepaid',
@@ -196,133 +196,133 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-26T10:00:00+08:00',
     end_time: '2026-08-26T12:00:00+08:00',
     status: 'completed',
-    instrument: '鋼琴 (Piano)',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-2',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '李老師 (Teacher Lee)',
-    start_time: '2026-08-29T14:00:00+08:00',
-    end_time: '2026-08-29T15:30:00+08:00',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-29T10:00:00+08:00',
+    end_time: '2026-08-29T12:00:00+08:00',
     status: 'completed',
-    instrument: '小提琴 (Violin)',
-    location: '交響琴房 B104',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-3',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-09-02T10:00:00+08:00',
     end_time: '2026-09-02T12:00:00+08:00',
     status: 'completed',
-    instrument: '鋼琴 (Piano)',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-urgent',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-09-05T10:00:00+08:00',
-    end_time: '2026-09-05T11:00:00+08:00',
-    status: 'confirmed',
-    instrument: '古典鋼琴進階',
-    location: '音符音樂教室 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    end_time: '2026-09-05T12:00:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-4',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-09-09T10:00:00+08:00',
     end_time: '2026-09-09T12:00:00+08:00',
-    status: 'confirmed',
-    instrument: '古典鋼琴進階',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-5',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '李老師 (Teacher Lee)',
-    start_time: '2026-09-12T14:00:00+08:00',
-    end_time: '2026-09-12T15:30:00+08:00',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-12T10:00:00+08:00',
+    end_time: '2026-09-12T12:00:00+08:00',
     status: 'confirmed',
-    instrument: '視唱練耳基礎',
-    location: '交響琴房 B104',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-6',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-09-16T10:00:00+08:00',
     end_time: '2026-09-16T12:00:00+08:00',
     status: 'confirmed',
-    instrument: '古典鋼琴進階',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-7',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
-    start_time: '2026-09-23T10:00:00+08:00',
-    end_time: '2026-09-23T12:00:00+08:00',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-19T10:00:00+08:00',
+    end_time: '2026-09-19T12:00:00+08:00',
     status: 'confirmed',
-    instrument: '古典鋼琴進階',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-lin-8',
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
-    start_time: '2026-09-30T10:00:00+08:00',
-    end_time: '2026-09-30T12:00:00+08:00',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-23T10:00:00+08:00',
+    end_time: '2026-09-23T12:00:00+08:00',
     status: 'confirmed',
-    instrument: '古典鋼琴進階',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
-    payment_type: 'prepaid',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
   },
   {
     id: 'app-charles-1',
     student_id: MOCK_STUDENT_CHARLES.id,
     student_name: 'Charles',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-26T19:30:00+08:00',
     end_time: '2026-08-26T21:30:00+08:00',
     status: 'confirmed',
@@ -336,7 +336,7 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_id: MOCK_STUDENT_JOHNNY.id,
     student_name: 'Johnny',
     teacher_id: MOCK_TEACHER.id,
-    teacher_name: '張老師 (Teacher Chang)',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-24T17:00:00+08:00',
     end_time: '2026-08-24T19:00:00+08:00',
     status: 'confirmed',
@@ -373,7 +373,7 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-08-15T10:00:00+08:00',
     song_title: '巴哈：E大調小提琴協奏曲 第一樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-2',
@@ -400,7 +400,7 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-08-19T10:00:00+08:00',
     song_title: '蕭邦：降E大調夜曲 Op.9 No.2',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-3',
@@ -427,7 +427,7 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-08-26T10:00:00+08:00',
     song_title: '貝多芬：第十四號鋼琴奏鳴曲《月光》第三樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-4',
@@ -454,7 +454,7 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-08-29T15:30:00+08:00',
     song_title: '莫札特：G大調第三號小提琴協奏曲 第一樂章',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-5',
@@ -481,7 +481,7 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-09-02T10:00:00+08:00',
     song_title: '德布西：《貝加馬斯克組曲》第三首〈月光〉',
-    teacher_name: '張老師',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
 ];
 
@@ -489,7 +489,7 @@ const INITIAL_DEMO_VIDEOS: TeacherDemoVideo[] = [
   {
     id: 'demo-1',
     teacher_id: MOCK_TEACHER.id,
-    title: '巴哈：E大調協奏曲 第一樂章範例 (張老師示範)',
+    title: '巴哈：E大調協奏曲 第一樂章範例 (林佩芬老師示範)',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     midi_data: { bpm: 96, key: 'E Major' },
     tags: ['小提琴', '鋼琴', '經典名曲'],
@@ -571,7 +571,7 @@ const STORAGE_KEYS = {
   ROLE: 'musimate_active_role',
   STUDENT_ID: 'musimate_active_student_id',
   AUTH: 'musimate_is_authenticated',
-  APPOINTMENTS: 'musimate_appointments_v4',
+  APPOINTMENTS: 'musimate_appointments_v5',
 };
 
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -582,6 +582,12 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
     if (typeof window !== 'undefined') {
       try {
+        // 清理舊版快取
+        localStorage.removeItem('musimate_appointments_v1');
+        localStorage.removeItem('musimate_appointments_v2');
+        localStorage.removeItem('musimate_appointments_v3');
+        localStorage.removeItem('musimate_appointments_v4');
+
         const saved = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -627,11 +633,11 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
               student_id: MOCK_STUDENT.id,
               student_name: item.student_name || '劉心悅 (Lin)',
               teacher_id: item.teacher_id || MOCK_TEACHER.id,
-              teacher_name: item.teacher_name || '張老師 (Teacher Chang)',
+              teacher_name: item.teacher_name || '林佩芬 老師 (Teacher Lin)',
               start_time: startTimeIso,
               end_time: endTimeIso,
               status: 'confirmed',
-              instrument: item.instrument || '鋼琴 (Piano)',
+              instrument: item.instrument || '古典鋼琴 (Piano)',
               location: item.room || '音符琴房 A303',
               payment_status: 'paid',
               payment_type: 'prepaid',
@@ -642,7 +648,13 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const existingIds = new Set(prev.map((a) => a.id));
             const toAdd = liveAppts.filter((a) => !existingIds.has(a.id));
             if (toAdd.length === 0) return prev;
-            return [...prev, ...toAdd];
+            const updated = [...prev, ...toAdd];
+            try {
+              localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(updated));
+            } catch (e) {
+              console.warn('Failed to cache synced appointments:', e);
+            }
+            return updated;
           });
         }
       } catch (err) {
@@ -745,14 +757,14 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = (email: string, pass: string, role: Role) => {
     if (role === 'teacher') {
-      if (email.trim() === 'chang.teacher@harmony.edu' && pass === 'teacher123') {
+      if ((email.trim() === 'lin.teacher@harmony.edu' || email.trim() === 'chang.teacher@harmony.edu') && pass === 'teacher123') {
         setCurrentRole('teacher');
         setIsAuthenticated(true);
         if (typeof window !== 'undefined') {
           localStorage.setItem(STORAGE_KEYS.ROLE, 'teacher');
           localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
         }
-        return { success: true, message: '登入成功！歡迎張老師。' };
+        return { success: true, message: '登入成功！歡迎林佩芬老師。' };
       }
       return { success: false, message: '帳號或密碼錯誤（預設密碼: teacher123）' };
     } else {
@@ -853,7 +865,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return {
       success: true,
       message: isUrgent
-        ? '⚠️ 調課已確認送出！因距開課不足 24 小時，系統已依規定扣除該堂課費用/時數，新時段已同步張老師。'
+        ? '⚠️ 調課已確認送出！因距開課不足 24 小時，系統已依規定扣除該堂課費用/時數，新時段已同步林佩芬老師。'
         : '調課成功！舊課程已成功移至新時段，全站與老師端課表已即時同步連動。',
     };
   };

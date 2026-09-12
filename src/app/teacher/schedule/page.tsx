@@ -521,7 +521,7 @@ export default function TeacherSchedulePage() {
       <div className="warm-card p-6 sm:p-10 rounded-3xl border border-[#EFECE6] shadow-warm space-y-6 overflow-x-auto max-h-[850px] overflow-y-auto scrollbar-thin">
         <div className="flex items-center justify-between border-b border-[#EFECE6] pb-4 sticky top-0 bg-white/95 backdrop-blur-md z-20 pt-1">
           <h2 className="text-lg font-bold text-[#332C27] flex items-center gap-2">
-            <span>張老師 7x3 課表總覽</span>
+            <span>林佩芬老師 7x3 課表總覽</span>
             <span className="text-xs text-[#7A736E] font-normal">（學生姓名與上下課時間100%完全顯示 · 課表設定實時連動）</span>
           </h2>
           <div className="flex items-center gap-3 text-xs font-bold">
