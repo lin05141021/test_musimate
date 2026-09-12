@@ -362,20 +362,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (redirect) {
+        if (redirect.startsWith('/student/') || redirect.startsWith('/admin/')) {
+            window.location.replace(redirect);
+            return;
+        }
         if (redirect.includes('billing')) {
-            window.location.replace('../money/overview_checked.html');
+            window.location.replace('/student/billing');
+            return;
+        } else if (redirect.includes('practice')) {
+            window.location.replace('/student/practice');
+            return;
+        } else if (redirect.includes('summary')) {
+            window.location.replace('/student/summary/lesson-1');
+            return;
+        } else if (redirect.includes('stamps')) {
+            window.location.replace('/student/stamps');
             return;
         } else if (redirect.includes('history')) {
-            window.location.replace('../money/overview_checked.html');
+            window.location.replace('/student/history');
             return;
         } else if (redirect.includes('courses') || redirect.includes('newclass')) {
-            window.location.replace('../newclass/oldstudent_newclass.html');
+            window.location.replace('/student/courses');
             return;
         } else if (redirect.includes('faq')) {
-            window.location.replace('../../index.html#faq');
+            window.location.replace('/student/faq');
             return;
         } else if (redirect.includes('leave') || redirect.includes('reschedule')) {
-            window.location.replace('student_changeclass.html');
+            window.location.replace('/student/schedule?action=reschedule');
             return;
         }
     }

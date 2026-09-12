@@ -29,26 +29,71 @@ export default function RoleSelectorPage() {
   const router = useRouter();
   const { currentRole, isAuthenticated, login, logout, teacherProfile, currentUser } = useDemoContext();
 
-  // 支援 LINE LIFF 網址參數或 liff.state 自動導向專屬靜態頁面
+  // 支援 LINE LIFF 網址參數與 liff.state 全域智慧分發導向
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
         const urlParams = new URLSearchParams(window.location.search);
+        let redirect = urlParams.get('redirect');
         let page = urlParams.get('page');
-        if (!page && urlParams.get('liff.state')) {
+        let action = urlParams.get('action');
+
+        if (urlParams.get('liff.state')) {
           const liffState = decodeURIComponent(urlParams.get('liff.state') || '');
-          const match = liffState.match(/page=([^&]+)/);
-          if (match) page = match[1];
-          else if (liffState.includes('reschedule') || liffState.includes('leave') || liffState.includes('action=reschedule')) page = 'reschedule';
-          else if (liffState.includes('courses') || liffState.includes('newclass')) page = 'courses';
-          else if (liffState.includes('schedule')) page = 'schedule';
+          const matchRedirect = liffState.match(/redirect=([^&]+)/);
+          if (matchRedirect) redirect = matchRedirect[1];
+          const matchPage = liffState.match(/page=([^&]+)/);
+          if (matchPage) page = matchPage[1];
+          const matchAction = liffState.match(/action=([^&]+)/);
+          if (matchAction) action = matchAction[1];
+
+          // 如果 liff.state 包含特定關鍵字
+          if (!redirect && !action && !page) {
+            if (liffState.includes('reschedule') || liffState.includes('leave')) action = 'reschedule';
+            else if (liffState.includes('practice')) redirect = '/student/practice';
+            else if (liffState.includes('summary')) redirect = '/student/summary/lesson-1';
+            else if (liffState.includes('stamps')) redirect = '/student/stamps';
+            else if (liffState.includes('billing')) redirect = '/student/billing';
+            else if (liffState.includes('history')) redirect = '/student/history';
+            else if (liffState.includes('faq')) redirect = '/student/faq';
+            else if (liffState.includes('courses') || liffState.includes('newclass')) redirect = '/student/courses';
+          }
         }
-        if (page === 'leave' || page === 'reschedule') {
-          window.location.replace('/src/test_uiredesign/student_changeclass.html');
-        } else if (page === 'courses' || page === 'newclass') {
-          window.location.replace('/src/newclass/oldstudent_newclass.html');
-        } else if (page === 'schedule') {
-          window.location.replace('/src/test_uiredesign/student_schedule.html');
+
+        // 1. 若有明確的跳轉目標 redirect
+        if (redirect) {
+          window.location.replace(redirect);
+          return;
+        }
+
+        // 2. 若為調課請假 action
+        if (action === 'reschedule' || action === 'leave' || page === 'leave' || page === 'reschedule') {
+          window.location.replace('/student/schedule?action=reschedule');
+          return;
+        }
+
+        // 3. 其他 page 分發
+        if (page === 'courses' || page === 'newclass') {
+          window.location.replace('/student/courses');
+          return;
+        } else if (page === 'practice') {
+          window.location.replace('/student/practice');
+          return;
+        } else if (page === 'summary') {
+          window.location.replace('/student/summary/lesson-1');
+          return;
+        } else if (page === 'stamps') {
+          window.location.replace('/student/stamps');
+          return;
+        } else if (page === 'billing') {
+          window.location.replace('/student/billing');
+          return;
+        } else if (page === 'history') {
+          window.location.replace('/student/history');
+          return;
+        } else if (page === 'faq') {
+          window.location.replace('/student/faq');
+          return;
         }
       } catch (err) {
         console.warn('LIFF redirect err:', err);
