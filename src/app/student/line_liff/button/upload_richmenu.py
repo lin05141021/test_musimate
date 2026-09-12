@@ -153,7 +153,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "我的課表",
-                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/schedule"
                 }
             },
             # 上排右: 練習打卡
@@ -180,7 +180,7 @@ def main():
                 "action": {
                     "type": "uri",
                     "label": "請假/調課",
-                    "uri": f"https://liff.line.me/{LIFF_LEAVE}"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/schedule%3Faction%3Dreschedule"
                 }
             },
             # 下排右: 成就徽章
@@ -211,13 +211,13 @@ def main():
                     "data": "action=switch_to_page1"
                 }
             },
-            # 上排左: 開始新課程 (專屬 LIFF ID: 2011164851-id3vAnRx)
+            # 上排左: 開始新課程
             {
                 "bounds": { "x": 0, "y": 286, "width": 833, "height": 700 },
                 "action": {
                     "type": "uri",
                     "label": "開始新課程",
-                    "uri": f"https://liff.line.me/{LIFF_COURSES}"
+                    "uri": f"https://liff.line.me/{LIFF_SCHEDULE}?redirect=/student/courses"
                 }
             },
             # 上排中: 上傳繳費證明

@@ -1,3 +1,151 @@
+// ============================================================================
+// MusiMate (Studio OS) — Unified TypeScript Interfaces for Student LIFF
+// File: src/web-liff/src/types/index.ts
+// ============================================================================
+
+export type LessonStatus = 
+  | 'SCHEDULED'
+  | 'STUDENT_ARRIVED'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'CANCELLED_EXEMPT'
+  | 'RESCHEDULED'
+  | 'NO_SHOW_PENDING'
+  | 'NO_SHOW_CONFIRMED'
+  | 'RESCHEDULE_REQUESTED';
+
+export type AttendanceStatus = 'pending' | 'attended' | 'leave' | 'no_show';
+
+export interface StudentProfile {
+  id: string;
+  user_id?: string;
+  name: string;
+  email?: string;
+  avatar_url?: string;
+  line_user_id?: string;
+  default_instrument: string;
+  rate_per_lesson: number;
+}
+
+export interface TeacherProfile {
+  id: string;
+  name: string;
+  slug: string;
+  bio?: string;
+  hourly_rate: number;
+}
+
+export interface LessonItem {
+  id: string;
+  student_id: string;
+  teacher_id: string;
+  teacher_name: string;
+  start_time: string;
+  end_time: string;
+  location: string;
+  status: LessonStatus | string;
+  instrument: string;
+  memo_notes?: string;
+  student_checkin_at?: string | null;
+  lesson_index?: number | null;
+  is_leave?: boolean;
+  is_rescheduled?: boolean;
+  is_pending_reschedule?: boolean;
+  pending_request_id?: string | null;
+  pending_reschedule_reason?: string | null;
+  total_lessons?: number;
+}
+
+export interface PracticeLog {
+  id: string;
+  student_id?: string;
+  lesson_id?: string;
+  title?: string;
+  song_title?: string;
+  date?: string;
+  duration_minutes?: number;
+  duration_seconds?: number;
+  bpm?: number;
+  bpm_stability?: number;
+  bpm_stability_score?: number;
+  tempo_deviation_percent?: number;
+  pitch_score?: number;
+  pitch_accuracy_score?: number;
+  ai_feedback_draft?: string;
+  teacher_feedback?: string;
+  status?: string;
+  created_at?: string;
+  media_url?: string;
+  audio_url?: string;
+}
+
+export interface AvailabilitySlot {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  teacher_name: string;
+  location: string;
+  available: boolean;
+}
+
+export interface RescheduleRequestItem {
+  id: string;
+  lesson_id: string;
+  target_slot_id?: string;
+  original_time?: string;
+  target_time?: string;
+  reason: string;
+  status: 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | string;
+  created_at: string;
+}
+
+export interface LessonReportItem {
+  id: string;
+  lesson_id: string;
+  lesson_index: number;
+  lesson_title: string;
+  date: string;
+  summary: string;
+  technique_tips: string[];
+  assignment: {
+    song: string;
+    target_bpm: number;
+    daily_minutes: number;
+  };
+}
+
+export interface ContractBillingInfo {
+  contract_id?: string;
+  contract_no?: string;
+  total_lessons?: number;
+  remaining_lessons?: number;
+  completed_lessons?: number;
+  rate_per_lesson?: number;
+  total_paid_amount?: number;
+  total_amount?: number;
+  payment_mode?: 'PREPAID_10' | 'PAY_PER_LESSON';
+  teacher_name?: string;
+  bank_name?: string;
+  account_number?: string;
+  account_name?: string;
+  invoice_status?: 'PENDING_PAYMENT' | 'PAID' | 'TRANSFERRED_CONFIRMING' | 'OVERDUE' | string;
+  due_date?: string;
+  invoices?: Array<{
+    id: string;
+    invoice_no: string;
+    amount: number;
+    status: 'PAID' | 'PENDING' | 'OVERDUE';
+    paid_at?: string;
+    due_date: string;
+  }>;
+}
+
+// ============================================================================
+// Extended UI & Video Comparison Types (from MusiMate Student Portal)
+// ============================================================================
+
 export type Role = 'teacher' | 'student';
 
 export interface User {
@@ -6,7 +154,7 @@ export interface User {
   name: string;
   email: string;
   avatar_url?: string;
-  line_user_id?: string; // [新增] LINE User ID 欄位 (供 LINE LIFF / Bot 自動綁定)
+  line_user_id?: string;
 }
 
 export interface Teacher {
@@ -20,16 +168,16 @@ export interface Student {
   id: string;
   user_id: string;
   teacher_id: string;
-  package_total_lessons?: number; // [新增] 本期總購買堂數 (預設 10 堂)
+  package_total_lessons?: number;
 }
 
 export interface ScheduleSlot {
   id: string;
   teacher_id: string;
-  start_time: string; // ISO string
-  end_time: string;   // ISO string
+  start_time: string;
+  end_time: string;
   is_available: boolean;
-  location?: string;  // [新增] 上課地點/琴房 (例如: 音符琴房 A303, 張老師家中)
+  location?: string;
 }
 
 export type AppointmentStatus = 'confirmed' | 'cancelled' | 'rescheduled' | 'attended' | 'completed';
@@ -39,14 +187,14 @@ export interface Appointment {
   student_id: string;
   student_name?: string;
   teacher_id: string;
-  teacher_name?: string; // [新增] 授課教師姓名
+  teacher_name?: string;
   start_time: string;
   end_time: string;
   status: AppointmentStatus;
-  instrument?: string; // [新增] 上課科目/樂器 (例如: 鋼琴 (Piano))
-  location?: string;   // [新增] 上課地點/琴房 (例如: 音符琴房 A303, 張老師家中)
-  payment_status?: 'paid' | 'unpaid' | 'pay_per_lesson'; // [新增] 繳費狀態: paid(已繳費) / unpaid(未繳費) / pay_per_lesson(每堂完成後繳費)
-  payment_type?: 'prepaid' | 'postpaid'; // [新增] 繳費模式: prepaid(包堂預付) / postpaid(單堂後付)
+  instrument?: string;
+  location?: string;
+  payment_status?: 'paid' | 'unpaid' | 'pay_per_lesson';
+  payment_type?: 'prepaid' | 'postpaid';
 }
 
 export interface AvailableSlotResponse {
@@ -104,7 +252,7 @@ export interface TeacherDemoVideo {
 }
 
 export interface TimelineMarker {
-  time: number; // in seconds
+  time: number;
   type: 'pitch' | 'rhythm' | 'posture';
   severity: 'error' | 'warning' | 'good';
   title: string;
@@ -129,3 +277,5 @@ export interface StudentPracticeVideo {
   ai_feedback_json: AIFeedbackJSON;
   created_at: string;
 }
+
+export type AvailableSlot = AvailabilitySlot;

@@ -201,32 +201,105 @@ export default function StudentSchedulePage() {
     return scheduleSlots.filter((slot) => slot.is_available);
   }, [apiSlots, scheduleSlots, currentStudentInfo]);
 
-  // 網址參數監聽 (LINE 推播 ?action=reschedule 或 ?student=lin)
+  // 網址參數監聽 (LINE 推播 ?action=reschedule、?redirect=... 或 ?student=lin)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const action = params.get('action');
-      const lessonId = params.get('lesson_id');
-      const studentParam = params.get('student') || params.get('student_id');
+      try {
+        const search = window.location.search;
+        const hash = window.location.hash;
+        const params = new URLSearchParams(search);
 
-      if (studentParam) {
-        const found = allStudents.find(
-          (s) =>
-            s.student.id.toLowerCase() === studentParam.toLowerCase() ||
-            s.user.name.toLowerCase().includes(studentParam.toLowerCase())
-        );
-        if (found && found.student.id !== activeStudentId) {
-          switchStudent(found.student.id);
-        }
-      }
+        let redirect = params.get('redirect') || params.get('to') || params.get('target');
+        let action = params.get('action');
+        let page = params.get('page');
+        const lessonId = params.get('lesson_id');
+        const studentParam = params.get('student') || params.get('student_id');
+        const liffClientId = params.get('liffClientId');
 
-      if (action === 'reschedule' || lessonId) {
-        const target = lessonId
-          ? appointments.find((a) => a.id === lessonId)
-          : upcomingAppointments[0] || studentAppointments[0];
-        if (target) {
-          openRescheduleModal(target);
+        // 1. 檢查 liff.state 參數
+        const liffStateRaw = params.get('liff.state') || (hash.includes('liff.state=') ? hash.split('liff.state=')[1]?.split('&')[0] : null);
+        if (liffStateRaw) {
+          let decoded = decodeURIComponent(liffStateRaw);
+          if (decoded.includes('%')) {
+            try { decoded = decodeURIComponent(decoded); } catch (e) {}
+          }
+          const matchRedirect = decoded.match(/redirect=([^&]+)/);
+          if (matchRedirect) redirect = matchRedirect[1];
+          const matchPage = decoded.match(/page=([^&]+)/);
+          if (matchPage && !redirect) page = matchPage[1];
+          const matchAction = decoded.match(/action=([^&]+)/);
+          if (matchAction && !redirect) action = matchAction[1];
+
+          if (!redirect && !action && !page) {
+            if (decoded.includes('practice')) redirect = '/student/practice';
+            else if (decoded.includes('summary')) redirect = '/student/summary/lesson-1';
+            else if (decoded.includes('stamps')) redirect = '/student/stamps';
+            else if (decoded.includes('billing')) redirect = '/student/billing';
+            else if (decoded.includes('history')) redirect = '/student/history';
+            else if (decoded.includes('faq')) redirect = '/student/faq';
+            else if (decoded.includes('contracts')) redirect = '/student/contracts';
+            else if (decoded.includes('courses') || decoded.includes('newclass')) redirect = '/student/courses';
+            else if (decoded.includes('reschedule') || decoded.includes('leave')) action = 'reschedule';
+          }
         }
+
+        // 2. 檢查 page 參數
+        if (!redirect && page) {
+          if (page === 'practice') redirect = '/student/practice';
+          else if (page === 'summary') redirect = '/student/summary/lesson-1';
+          else if (page === 'stamps') redirect = '/student/stamps';
+          else if (page === 'billing') redirect = '/student/billing';
+          else if (page === 'history') redirect = '/student/history';
+          else if (page === 'faq') redirect = '/student/faq';
+          else if (page === 'contracts') redirect = '/student/contracts';
+          else if (page === 'courses' || page === 'newclass') redirect = '/student/courses';
+          else if (page === 'reschedule' || page === 'leave') action = 'reschedule';
+          else redirect = page.startsWith('/') ? page : `/student/${page}`;
+        }
+
+        // 3. 檢查 LIFF Client ID
+        if (!redirect && liffClientId) {
+          if (liffClientId === '2011164851-3YNtzchu') {
+            action = 'reschedule';
+          } else if (liffClientId === '2011164851-id3vAnRx') {
+            redirect = '/student/courses';
+          }
+        }
+
+        // 4. 若解析出目標不是本頁 (/student/schedule)，立刻跳轉
+        if (redirect) {
+          if (!redirect.startsWith('/')) redirect = '/' + redirect;
+          const targetPathOnly = redirect.split('?')[0];
+          if (targetPathOnly !== '/student/schedule') {
+            console.log('[StudentSchedulePage] Redirecting to target:', redirect);
+            window.location.replace(redirect);
+            return;
+          }
+        }
+
+        // 5. 學生切換
+        if (studentParam) {
+          const found = allStudents.find(
+            (s) =>
+              s.student.id.toLowerCase() === studentParam.toLowerCase() ||
+              s.user.name.toLowerCase().includes(studentParam.toLowerCase())
+          );
+          if (found && found.student.id !== activeStudentId) {
+            switchStudent(found.student.id);
+          }
+        }
+
+        // 6. 調課/請假 Modal 開啟
+        if (action === 'reschedule' || action === 'leave' || lessonId) {
+          const target = lessonId
+            ? appointments.find((a) => a.id === lessonId)
+            : upcomingAppointments[0] || studentAppointments[0];
+          if (target) {
+            openRescheduleModal(target, action === 'leave' ? 'leave' : 'reschedule');
+          }
+        }
+      } catch (err) {
+        console.warn('[StudentSchedulePage] URL dispatch error:', err);
       }
     }
   }, [appointments, activeStudentId]);

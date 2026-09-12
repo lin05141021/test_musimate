@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { DemoProvider } from '@/context/DemoContext';
 import { ToastProvider } from '@/context/ToastContext';
+import { LiffAuthProvider } from '@/context/LiffAuthContext';
 import { AppLayoutWrapper } from '@/components/AppLayoutWrapper';
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body className="antialiased text-[#332C27] bg-[#FAF7F2] min-h-screen flex flex-col font-sans">
         <DemoProvider>
           <ToastProvider>
-            <AppLayoutWrapper>{children}</AppLayoutWrapper>
+            <LiffAuthProvider>
+              <AppLayoutWrapper>{children}</AppLayoutWrapper>
+            </LiffAuthProvider>
           </ToastProvider>
         </DemoProvider>
       </body>
