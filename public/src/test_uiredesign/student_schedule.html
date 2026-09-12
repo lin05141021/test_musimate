@@ -344,15 +344,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 檢查是否有 redirect 或 action 參數 (支援 LINE LIFF 跳轉分發)
     const urlParams = new URLSearchParams(window.location.search);
     let redirect = urlParams.get('redirect') || urlParams.get('page');
-    const action = urlParams.get('action');
+    let action = urlParams.get('action');
 
-    if (!redirect && urlParams.get('liff.state')) {
+    if (urlParams.get('liff.state')) {
         try {
             const state = decodeURIComponent(urlParams.get('liff.state'));
             const matchRedirect = state.match(/redirect=([^&]+)/);
             if (matchRedirect) redirect = matchRedirect[1];
             const matchPage = state.match(/page=([^&]+)/);
             if (matchPage) redirect = matchPage[1];
+            const matchAction = state.match(/action=([^&]+)/);
+            if (matchAction) action = matchAction[1];
+            if (!action && (state.includes('reschedule') || state.includes('leave'))) {
+                action = 'reschedule';
+            }
         } catch (e) {}
     }
 

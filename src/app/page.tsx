@@ -39,16 +39,16 @@ export default function RoleSelectorPage() {
           const liffState = decodeURIComponent(urlParams.get('liff.state') || '');
           const match = liffState.match(/page=([^&]+)/);
           if (match) page = match[1];
+          else if (liffState.includes('reschedule') || liffState.includes('leave') || liffState.includes('action=reschedule')) page = 'reschedule';
+          else if (liffState.includes('courses') || liffState.includes('newclass')) page = 'courses';
           else if (liffState.includes('schedule')) page = 'schedule';
-          else if (liffState.includes('leave')) page = 'leave';
-          else if (liffState.includes('courses')) page = 'courses';
         }
-        if (page === 'schedule') {
-          window.location.replace('/src/test_uiredesign/student_schedule.html');
-        } else if (page === 'leave' || page === 'reschedule') {
+        if (page === 'leave' || page === 'reschedule') {
           window.location.replace('/src/test_uiredesign/student_changeclass.html');
         } else if (page === 'courses' || page === 'newclass') {
           window.location.replace('/src/newclass/oldstudent_newclass.html');
+        } else if (page === 'schedule') {
+          window.location.replace('/src/test_uiredesign/student_schedule.html');
         }
       } catch (err) {
         console.warn('LIFF redirect err:', err);

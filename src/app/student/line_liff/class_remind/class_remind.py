@@ -95,7 +95,7 @@ def get_26h_flex_json(appointment_data: dict) -> dict:
         "header": {
             "type": "box",
             "layout": "vertical",
-            "backgroundColor": "#1E88E5",
+            "backgroundColor": "#CEAB98",
             "paddingAll": "20px",
             "contents": [
                 {"type": "text", "text": "MusiMate 音樂教室 · 課前提醒", "color": "#FFFFFF", "weight": "bold", "size": "xs"},
@@ -129,7 +129,7 @@ def get_26h_flex_json(appointment_data: dict) -> dict:
                             "layout": "baseline",
                             "contents": [
                                 {"type": "text", "text": "上課時間", "color": "#999999", "size": "sm", "flex": 2},
-                                {"type": "text", "text": time_display, "color": "#1E88E5", "size": "sm", "flex": 5, "weight": "bold"}
+                                {"type": "text", "text": time_display, "color": "#CEAB98", "size": "sm", "flex": 5, "weight": "bold"}
                             ]
                         },
                         {
@@ -161,7 +161,7 @@ def get_26h_flex_json(appointment_data: dict) -> dict:
                 {
                     "type": "button",
                     "style": "primary",
-                    "color": "#1E88E5",
+                    "color": "#CEAB98",
                     "height": "sm",
                     "action": {
                         "type": "postback",
