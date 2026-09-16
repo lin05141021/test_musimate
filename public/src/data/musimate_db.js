@@ -60,10 +60,10 @@ const MusiMateDB = (() => {
             {
                 id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u',
                 role: 'student',
-                name: '許雅婷',
+                name: '許雅婷 (Charles / 查爾斯)',
                 email: 'yating.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
+                line_user_id: 'U26ed3c0e48864aebdc244594cf780df0'
             },
             {
                 id: '89bdd196-dd00-4fc0-ab4d-16683f63bd6b-u',
@@ -315,14 +315,36 @@ const MusiMateDB = (() => {
             return isCloudSynced;
         },
 
-        // 1. 取得所有學員清單 (優先整合同學 Supabase 100 位學生 + 本地名冊)
+        // 1. 取得所有學員清單 (整合同學 Supabase 100+ 位學生 + 自訂學員 + 本地名冊)
         getStudents() {
             const db = getDB();
             const list = [];
             const seen = new Set();
-            const globalTestLineId = localStorage.getItem('custom_test_line_user_id');
 
-            // 1) 優先載入 Supabase 100 位學生
+            // 讀取自訂/動態註冊之學員 (例如久美或其他 LINE 新生)
+            const customRaw = localStorage.getItem('musimate_custom_students');
+            let customList = [];
+            try { customList = customRaw ? JSON.parse(customRaw) : []; } catch(e) {}
+
+            // 1) 載入自訂/動態註冊之學員 (最高優先級)
+            customList.forEach(s => {
+                if (s && s.name && !seen.has(s.name)) {
+                    seen.add(s.name);
+                    const customLineId = localStorage.getItem(`line_user_id_${s.student_id}`) || localStorage.getItem(`line_user_id_${s.id}`) || localStorage.getItem(`line_user_id_${s.name}`) || s.line_user_id;
+                    list.push({
+                        student_id: s.student_id || s.id || `custom-${Date.now()}`,
+                        user_id: s.user_id || s.student_id || s.id,
+                        name: s.name,
+                        avatar_url: s.avatar_url || `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(s.name)}`,
+                        line_user_id: customLineId || null,
+                        default_instrument: s.default_instrument || '古典鋼琴 (Piano)',
+                        default_location: s.default_location || '音符琴房 A303',
+                        rate_per_lesson: s.rate_per_lesson || 1600
+                    });
+                }
+            });
+
+            // 2) 載入 Supabase 學員名冊
             if (supabaseStudents.length > 0) {
                 supabaseStudents.forEach(s => {
                     if (!seen.has(s.name)) {
@@ -335,7 +357,7 @@ const MusiMateDB = (() => {
                             user_id: s.id,
                             name: s.name,
                             avatar_url: isLin ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80' : `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(s.name)}`,
-                            line_user_id: customLineId || (isLin ? (globalTestLineId || 'Uf2457bf35e0d6d3060b60838d9a9c91c') : (isMing ? 'U_student_ming_001' : null)),
+                            line_user_id: customLineId || (isLin ? 'Uf2457bf35e0d6d3060b60838d9a9c91c' : (isMing ? 'U_student_ming_001' : null)),
                             default_instrument: s.instrument ? `${s.instrument} (Piano)` : '鋼琴 (Piano)',
                             default_location: '音符琴房 A303',
                             rate_per_lesson: 2000
@@ -344,7 +366,7 @@ const MusiMateDB = (() => {
                 });
             }
 
-            // 2) 補入本地種子學生
+            // 3) 補入本地種子學生
             db.students.forEach(s => {
                 if (!seen.has(s.name)) {
                     seen.add(s.name);
@@ -356,7 +378,7 @@ const MusiMateDB = (() => {
                         user_id: s.user_id,
                         name: s.name,
                         avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-                        line_user_id: customLineId || (isLin ? (globalTestLineId || 'Uf2457bf35e0d6d3060b60838d9a9c91c') : (isMing ? (globalTestLineId || 'U_student_ming_001') : null)),
+                        line_user_id: customLineId || (isLin ? 'Uf2457bf35e0d6d3060b60838d9a9c91c' : (isMing ? 'U_student_ming_001' : null)),
                         default_instrument: s.default_instrument || '鋼琴 (Piano)',
                         default_location: s.default_location || '音符琴房 A303',
                         rate_per_lesson: s.rate_per_lesson || 1600
@@ -365,6 +387,39 @@ const MusiMateDB = (() => {
             });
 
             return list;
+        },
+
+        // 註冊/新增自訂學員 (支援 LINE 動態加入的同學如久美)
+        registerCustomStudent(student) {
+            if (!student || !student.name) return null;
+            const db = getDB();
+            if (!db.students.some(s => s.name === student.name || s.id === student.id)) {
+                db.students.push(student);
+                saveDB(db);
+            }
+            const customRaw = localStorage.getItem('musimate_custom_students');
+            let customList = [];
+            try { customList = customRaw ? JSON.parse(customRaw) : []; } catch(e) {}
+            const existingIdx = customList.findIndex(s => s.name === student.name || (s.line_user_id && s.line_user_id === student.line_user_id));
+            if (existingIdx >= 0) {
+                customList[existingIdx] = { ...customList[existingIdx], ...student };
+            } else {
+                customList.push(student);
+            }
+            localStorage.setItem('musimate_custom_students', JSON.stringify(customList));
+            return student;
+        },
+
+        // 切換與取得當前作用中學員
+        setActiveStudent(studentIdOrName) {
+            if (!studentIdOrName) return;
+            localStorage.setItem('musimate_active_student_id', studentIdOrName);
+        },
+        getActiveStudent() {
+            const savedId = localStorage.getItem('musimate_active_student_id');
+            if (!savedId) return null;
+            const students = this.getStudents();
+            return students.find(s => s.student_id === savedId || s.id === savedId || s.name === savedId) || null;
         },
 
         // 2. 取得所有教師清單 (來自 Supabase 20 位教師)
@@ -399,7 +454,10 @@ const MusiMateDB = (() => {
                 .filter(a => 
                     a.student_id === studentIdentifier || 
                     a.student_name === studentIdentifier || 
-                    (a.student_name && a.student_name.includes(studentIdentifier))
+                    (a.student_name && studentIdentifier && (
+                        a.student_name.toLowerCase().includes(studentIdentifier.toLowerCase()) ||
+                        studentIdentifier.toLowerCase().includes(a.student_name.toLowerCase())
+                    ))
                 )
                 .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
         },
@@ -585,50 +643,82 @@ const MusiMateDB = (() => {
         bindStudentLineUserId(studentNameOrId, lineUserId) {
             if (!studentNameOrId || !lineUserId) return;
             localStorage.setItem(`line_user_id_${studentNameOrId}`, lineUserId);
-            localStorage.setItem('custom_test_line_user_id', lineUserId);
             console.log(`🔗 已將 LINE ID: ${lineUserId} 成功綁定至學員: ${studentNameOrId}`);
         },
 
-        // 13. LINE LIFF 自動身份辨識
+        // 13. LINE LIFF 自動身份辨識 (精準匹配或動態建立學員，絕不強制劫持為單一舊學員)
         authLiffUser(liffProfile) {
+            if (!liffProfile) return null;
             const { userId, displayName, pictureUrl } = liffProfile;
             const students = this.getStudents();
 
-            // 1. 優先找已綁定此 userId 的學生
-            let matched = students.find(s => s.line_user_id === userId);
+            // 1. 優先找已精準綁定此 userId 的學生
+            let matched = students.find(s => s.line_user_id && s.line_user_id === userId);
 
-            // 2. 若無，比對名稱
+            // 2. 若無，比對 LINE 暱稱 / 姓名 (例如「久美」比對「久美」或「張久美」)
             if (!matched && displayName) {
+                const dName = displayName.trim().toLowerCase();
                 matched = students.find(s => s.name && (
-                    s.name.toLowerCase().includes(displayName.toLowerCase()) ||
-                    displayName.toLowerCase().includes(s.name.toLowerCase())
+                    s.name.trim().toLowerCase() === dName ||
+                    s.name.toLowerCase().includes(dName) ||
+                    dName.includes(s.name.toLowerCase())
                 ));
             }
 
-            // 3. 若仍無，預設綁定至全組統一 Demo 學員：劉心悅 (Lin)
+            // 3. 檢查是否有先前手動切換的作用中學員
             if (!matched) {
-                matched = students.find(s => s.name.includes('劉心悅') || s.name.includes('Lin')) || students.find(s => s.name === '林小明') || students[0];
+                const active = this.getActiveStudent();
+                if (active) matched = active;
             }
 
-            // 自動記錄綁定
+            // 4. 若為全新使用者 (例如新加入的久美)，動態為其註冊專屬學員檔案！
+            if (!matched && displayName) {
+                const cleanName = displayName.trim();
+                const newStudent = {
+                    student_id: `stu-line-${userId ? userId.slice(-8) : Date.now()}`,
+                    id: `stu-line-${userId ? userId.slice(-8) : Date.now()}`,
+                    user_id: userId || `u-${Date.now()}`,
+                    name: cleanName,
+                    avatar_url: pictureUrl || `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(cleanName)}`,
+                    line_user_id: userId,
+                    default_instrument: '古典鋼琴 (Piano)',
+                    default_location: '音符琴房 A303',
+                    rate_per_lesson: 1600
+                };
+                this.registerCustomStudent(newStudent);
+                matched = newStudent;
+            }
+
+            // 5. 保底回退 (若完全無法取得名稱)
+            if (!matched) {
+                matched = students[0] || {
+                    student_id: 'guest-student',
+                    name: '學員',
+                    default_instrument: '古典鋼琴 (Piano)',
+                    avatar_url: pictureUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80'
+                };
+            }
+
+            // 綁定當前 LINE User ID 並設定為作用中學員
             if (matched && userId) {
                 this.bindStudentLineUserId(matched.name, userId);
                 this.bindStudentLineUserId(matched.student_id, userId);
+                this.setActiveStudent(matched.student_id);
             }
 
             return {
-                isNewUser: false,
+                isNewUser: Boolean(!matched.created_at && !matched.rate_per_lesson),
                 student: matched,
                 user: {
                     id: matched.user_id || matched.student_id,
-                    name: (matched.name && matched.name.includes('劉心悅')) ? '劉心悅 (Lin)' : (matched.name || displayName || '劉心悅 (Lin)'),
+                    name: matched.name || displayName || '學員',
                     avatar_url: pictureUrl || matched.avatar_url,
                     line_user_id: userId
                 }
             };
         },
 
-        // 13. 取得學生剩餘時數
+        // 14. 取得學生剩餘時數
         getRemainingHours(studentId) {
             const key = REMAINING_HOURS_PREFIX + studentId;
             const saved = localStorage.getItem(key);

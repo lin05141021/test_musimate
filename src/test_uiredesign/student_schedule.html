@@ -35,9 +35,10 @@
                 <div class="brand-icon">🎵</div>
                 <span>MusiMate</span>
             </div>
-            <div id="studentNamePill" style="display: flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(206, 171, 152, 0.2); border: 1px solid #CEAB98; font-size: 13px; font-weight: 700; color: #4A3A31;">
+            <div id="studentNamePill" onclick="openStudentSwitcherModal()" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: rgba(206, 171, 152, 0.25); border: 1px solid #CEAB98; font-size: 13px; font-weight: 700; color: #4A3A31; cursor: pointer; transition: all 0.2s ease;">
                 <span id="studentAvatarIcon">👤</span>
-                <span id="studentDisplayName">劉心悅 (Lin)</span>
+                <span id="studentDisplayName">載入中...</span>
+                <span style="font-size: 10px; color: #8C6D58; margin-left: 2px;">▼</span>
             </div>
         </div>
 
@@ -48,10 +49,10 @@
                     <h1 class="page-title">我的課表</h1>
                     <span id="dbStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;">🟢 Supabase 連線中</span>
                 </div>
-                <p id="studentBannerSubtitle" class="page-subtitle">林佩芬 老師 · 劉心悅 (Lin) 個人專屬課表</p>
+                <p id="studentBannerSubtitle" class="page-subtitle">林佩芬 老師 · 個人專屬課表</p>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 12px;">
                     <span id="lineIdDisplayTag" style="font-size: 11px; color: #5B524E; background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 8px;">🆔 LINE: 載入中...</span>
-                    <button onclick="promptBindMyLineId()" style="background: transparent; border: 1px dashed #CEAB98; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #8C6D58; cursor: pointer; font-weight: 700;">✏️ 綁定我的 LINE ID</button>
+                    <button onclick="promptBindMyLineId()" style="background: transparent; border: 1px dashed #CEAB98; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #8C6D58; cursor: pointer; font-weight: 700;">✏️ 綁定/切換學員</button>
                 </div>
             </div>
 
@@ -78,6 +79,28 @@
     <!-- 底部 Home Bar -->
     <div class="home-bar-wrapper">
         <div class="home-bar"></div>
+    </div>
+</div>
+
+<!-- ============================================================
+     學員切換 Modal (方便教師與多學員測試)
+     ============================================================ -->
+<div id="studentSwitcherModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 16px;">
+    <div style="width: 100%; max-width: 360px; background: white; border-radius: 24px; padding: 24px; box-shadow: 0 16px 40px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="font-size: 16px; font-weight: 700; color: #2B3049;">👥 切換學員課表</div>
+            <button onclick="closeStudentSwitcherModal()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #8C827A;">✖</button>
+        </div>
+        <p style="font-size: 12px; color: #7A736E; margin: 0;">點選欲切換檢視的學員，或輸入新學員姓名：</p>
+        
+        <div id="switcherStudentList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+            <!-- 由 JS 動態產生 -->
+        </div>
+
+        <div style="border-top: 1px dashed #E0D9D0; padding-top: 12px; display: flex; gap: 8px;">
+            <input id="newStudentNameInput" type="text" placeholder="輸入新學員姓名 (如: 久美)" style="flex: 1; padding: 8px 12px; border: 1px solid #CEAB98; border-radius: 10px; font-size: 13px;" />
+            <button onclick="addNewCustomStudent()" style="padding: 8px 14px; background: #CEAB98; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;">新增</button>
+        </div>
     </div>
 </div>
 
@@ -152,27 +175,74 @@ function createAppointmentCardHtml(appt) {
 
 let currentActiveStudent = null;
 
-function populateStudentSwitcher() {
+// 學員切換 Modal 控制
+function openStudentSwitcherModal() {
     if (!window.MusiMateDB) return;
     const students = window.MusiMateDB.getStudents();
-    const sel = document.getElementById('studentSelectSwitcher');
-    if (!sel || students.length === 0) return;
+    const container = document.getElementById('switcherStudentList');
+    if (!container) return;
 
-    const currentVal = sel.value;
-    sel.innerHTML = students.map(s => `
-        <option value="${s.student_id}">${s.name}</option>
-    `).join('');
+    container.innerHTML = students.map(s => {
+        const isCurrent = currentActiveStudent && (currentActiveStudent.student_id === s.student_id || currentActiveStudent.name === s.name);
+        return `
+            <div onclick="selectStudentFromModal('${s.student_id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: ${isCurrent ? 'rgba(206, 171, 152, 0.2)' : '#F9F7F5'}; border: 1px solid ${isCurrent ? '#CEAB98' : '#ECE8E3'}; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="${s.avatar_url || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;" />
+                    <span style="font-size: 14px; font-weight: ${isCurrent ? '700' : '500'}; color: #2B3049;">${s.name}</span>
+                </div>
+                ${isCurrent ? '<span style="color: #CEAB98; font-weight: 700; font-size: 13px;">✓ 目前</span>' : ''}
+            </div>
+        `;
+    }).join('');
 
-    if (currentVal && students.some(s => s.student_id === currentVal)) {
-        sel.value = currentVal;
-    } else if (currentActiveStudent) {
-        sel.value = currentActiveStudent.student_id;
-    }
+    document.getElementById('studentSwitcherModal').style.display = 'flex';
 }
 
-function switchStudentView(studentId) {
+function closeStudentSwitcherModal() {
+    document.getElementById('studentSwitcherModal').style.display = 'none';
+}
+
+function selectStudentFromModal(studentId) {
     if (!studentId || !window.MusiMateDB) return;
-    renderSchedule(studentId);
+    const students = window.MusiMateDB.getStudents();
+    const target = students.find(s => s.student_id === studentId || s.id === studentId);
+    if (target) {
+        window.MusiMateDB.setActiveStudent(target.student_id);
+        currentActiveStudent = target;
+        updateStudentHeader(target);
+        renderSchedule(target.student_id);
+    }
+    closeStudentSwitcherModal();
+}
+
+function addNewCustomStudent() {
+    const input = document.getElementById('newStudentNameInput');
+    if (!input) return;
+    const name = input.value.trim();
+    if (!name) {
+        alert('請輸入學員姓名！');
+        return;
+    }
+    if (!window.MusiMateDB) return;
+    
+    const newStudent = {
+        student_id: `custom-stu-${Date.now()}`,
+        id: `custom-stu-${Date.now()}`,
+        name: name,
+        avatar_url: `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(name)}`,
+        line_user_id: null,
+        default_instrument: '古典鋼琴 (Piano)',
+        default_location: '音符琴房 A303',
+        rate_per_lesson: 1600
+    };
+    window.MusiMateDB.registerCustomStudent(newStudent);
+    window.MusiMateDB.setActiveStudent(newStudent.student_id);
+    currentActiveStudent = newStudent;
+    updateStudentHeader(newStudent);
+    renderSchedule(newStudent.student_id);
+    input.value = '';
+    closeStudentSwitcherModal();
+    alert(`✅ 已成功切換至學員【${name}】專屬課表！`);
 }
 
 function updateStudentHeader(student, lineDisplayName) {
@@ -182,7 +252,7 @@ function updateStudentHeader(student, lineDisplayName) {
     const nameEl = document.getElementById('studentDisplayName');
     const lineTag = document.getElementById('lineIdDisplayTag');
 
-    const displayName = lineDisplayName || student.name || '劉心悅 (Lin)';
+    const displayName = lineDisplayName || student.name || '學員';
     if (nameEl) {
         nameEl.innerText = displayName;
     }
@@ -193,30 +263,14 @@ function updateStudentHeader(student, lineDisplayName) {
         subTitleEl.innerText = `林佩芬 老師 · ${displayName} 個人專屬課表`;
     }
     if (lineTag) {
-        const lineId = student.line_user_id || localStorage.getItem('custom_test_line_user_id') || 'Uf2457bf35e0d6d3060b60838d9a9c91c';
-        lineTag.innerText = lineId ? `🆔 LINE: ${lineId.slice(0, 10)}... (已綁定)` : '🆔 LINE: 尚未綁定';
+        const lineId = student.line_user_id || localStorage.getItem(`line_user_id_${student.name}`) || localStorage.getItem(`line_user_id_${student.student_id}`);
+        lineTag.innerText = lineId ? `🆔 LINE: ${lineId.slice(0, 8)}... (已綁定)` : '🆔 LINE: 尚未綁定';
         lineTag.style.color = lineId ? '#2E7D32' : '#8C827A';
     }
 }
 
 function promptBindMyLineId() {
-    const currentId = (currentActiveStudent && currentActiveStudent.line_user_id) || localStorage.getItem('custom_test_line_user_id') || 'Uf2457bf35e0d6d3060b60838d9a9c91c';
-    const newId = prompt('請輸入您的 LINE User ID（例如: U1234567890abcdef...）：', currentId);
-    if (newId !== null) {
-        const trimmed = newId.trim();
-        if (trimmed) {
-            localStorage.setItem('custom_test_line_user_id', trimmed);
-            if (currentActiveStudent && window.MusiMateDB) {
-                window.MusiMateDB.bindStudentLineUserId(currentActiveStudent.name, trimmed);
-                window.MusiMateDB.bindStudentLineUserId(currentActiveStudent.student_id, trimmed);
-            }
-            alert(`✅ 已成功將您的 LINE ID:\n${trimmed}\n綁定至學員【${currentActiveStudent ? currentActiveStudent.name : '劉心悅 (Lin)'}】！`);
-        } else {
-            localStorage.removeItem('custom_test_line_user_id');
-            alert('已清除自訂 LINE ID 設定。');
-        }
-        location.reload();
-    }
+    openStudentSwitcherModal();
 }
 
 function renderSchedule(studentId) {
@@ -225,34 +279,44 @@ function renderSchedule(studentId) {
 
     const urlParams = new URLSearchParams(window.location.search);
     const lineIdParam = urlParams.get('line_user_id') || urlParams.get('line_id');
+    const queryStudentParam = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name') || urlParams.get('student_name');
 
     const students = window.MusiMateDB.getStudents();
     let targetStudent = null;
 
-    if (studentId) {
-        targetStudent = students.find(s => s.student_id === studentId || s.name === studentId || s.name.includes(studentId));
+    // 1. 優先由傳入的 studentId 或 URL query 尋找
+    const targetKey = studentId || queryStudentParam;
+    if (targetKey) {
+        targetStudent = students.find(s => 
+            s.student_id === targetKey || 
+            s.id === targetKey || 
+            s.name === targetKey || 
+            s.name.includes(targetKey) ||
+            targetKey.includes(s.name)
+        );
     }
+
+    // 2. 其次由 LINE user ID 比對
     if (!targetStudent && lineIdParam) {
         targetStudent = students.find(s => s.line_user_id === lineIdParam);
-        if (!targetStudent) {
-            targetStudent = students.find(s => s.name.includes('劉心悅') || s.name.includes('Lin')) || students[0];
-            if (targetStudent) {
-                window.MusiMateDB.bindStudentLineUserId(targetStudent.name, lineIdParam);
-                window.MusiMateDB.bindStudentLineUserId(targetStudent.student_id, lineIdParam);
-            }
-        }
     }
+
+    // 3. 再次由上次作用中學員取得
     if (!targetStudent) {
-        // 預設以全組統一 Demo 學生劉心悅 (Lin) 呈現
-        targetStudent = students.find(s => s.name.includes('劉心悅') || s.name.includes('Lin'))
-            || students.find(s => s.name === '林小明')
+        targetStudent = window.MusiMateDB.getActiveStudent();
+    }
+
+    // 4. 若無，依序以「久美」、「劉心悅」或首位學員呈現
+    if (!targetStudent) {
+        targetStudent = students.find(s => s.name && s.name.includes('久美'))
+            || students.find(s => s.name && (s.name.includes('劉心悅') || s.name.includes('Lin')))
             || students[0];
     }
     if (!targetStudent) return;
 
     currentActiveStudent = targetStudent;
     updateStudentHeader(targetStudent);
-    const targetStudentId = targetStudent.student_id;
+    const targetStudentId = targetStudent.student_id || targetStudent.id;
 
     // 同步查詢學生預約課表 (支援姓名與 ID 交叉檢索)
     let appts = window.MusiMateDB.getAppointmentsByStudent(targetStudent.name);
@@ -291,7 +355,8 @@ function handleRescheduleClick(appointmentId) {
 }
 
 function goToBookNew() {
-    window.location.href = `../newclass/oldstudent_newclass.html`;
+    const sId = currentActiveStudent ? (currentActiveStudent.student_id || currentActiveStudent.id) : '';
+    window.location.href = `../newclass/oldstudent_newclass.html${sId ? '?student_id=' + sId : ''}`;
 }
 
 async function initLiffAuth() {
@@ -299,8 +364,7 @@ async function initLiffAuth() {
         if (typeof liff !== 'undefined') {
             await liff.init({ liffId: '2011164851-lGsEnQWB' });
             
-            // 關鍵修正：只有在手機 LINE App 內部才執行強制登入；
-            // 若在一般電腦桌機瀏覽器開啟，略過 liff.login() 避免被強制跳轉至 LINE OAuth 登入頁面
+            // 只有在手機 LINE App 內部才執行強制登入
             if (liff.isInClient()) {
                 if (!liff.isLoggedIn()) {
                     liff.login();
@@ -315,15 +379,15 @@ async function initLiffAuth() {
                     const result = window.MusiMateDB.authLiffUser(profile);
                     if (result && result.student) {
                         currentActiveStudent = result.student;
-                        updateStudentHeader(result.student, result.user ? result.user.name : profile.displayName);
+                        const sName = result.student.name || profile.displayName || '學員';
+                        updateStudentHeader(result.student, sName);
                         renderSchedule(result.student.student_id || result.student.id);
                         const sub = document.getElementById('studentBannerSubtitle');
-                        const sName = result.student ? result.student.name : (result.user ? result.user.name : profile.displayName);
-                        if (sub) sub.innerText = `張芷嫣 老師 · ${sName} 個人課表 (🟢 LINE 帳號已連線)`;
+                        if (sub) sub.innerText = `林佩芬 老師 · ${sName} 個人課表 (🟢 LINE 帳號已連線)`;
                     }
                 }
             } else {
-                console.log('💻 偵測為外部電腦瀏覽器環境，略過強制跳轉，直接以 Demo 學生林小明進行預覽。');
+                console.log('💻 外部瀏覽器預覽模式');
             }
         }
     } catch (e) {
@@ -334,7 +398,6 @@ async function initLiffAuth() {
 // 監聽 Supabase 雲端即時同步
 window.addEventListener('musimate_db_synced', () => {
     console.log('⚡ 學生端收到 Supabase 最新課表同步！');
-    populateStudentSwitcher();
     if (currentActiveStudent) {
         renderSchedule(currentActiveStudent.student_id || currentActiveStudent.id);
     }
@@ -397,8 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    populateStudentSwitcher();
-    const paramStudentId = urlParams.get('student_id') || urlParams.get('student');
+    const paramStudentId = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name');
     renderSchedule(paramStudentId);
     initLiffAuth();
 });

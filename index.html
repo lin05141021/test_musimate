@@ -42,18 +42,19 @@
                     if (hash) page = hash;
                 }
 
+                const searchStr = window.location.search;
                 if (page === 'schedule') {
-                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                    window.location.replace(`src/test_uiredesign/student_schedule.html${searchStr}`);
                 } else if (page === 'leave' || page === 'reschedule') {
-                    window.location.replace('src/test_uiredesign/student_changeclass.html');
+                    window.location.replace(`src/test_uiredesign/student_changeclass.html${searchStr}`);
                 } else if (page === 'courses' || page === 'newclass') {
-                    window.location.replace('src/newclass/oldstudent_newclass.html');
+                    window.location.replace(`src/newclass/oldstudent_newclass.html${searchStr}`);
                 } else if (page === 'teachers' || page === 'homepage') {
-                    window.location.replace('src/newclass/newclass_homepage.html');
+                    window.location.replace(`src/newclass/newclass_homepage.html${searchStr}`);
                 } else if (page === 'billing') {
-                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                    window.location.replace(`src/test_uiredesign/student_schedule.html${searchStr}`);
                 } else if (page === 'contact-book') {
-                    window.location.replace('src/test_uiredesign/student_schedule.html');
+                    window.location.replace(`src/test_uiredesign/student_schedule.html${searchStr}`);
                 }
             } catch (err) {
                 console.warn('LIFF route parse error:', err);

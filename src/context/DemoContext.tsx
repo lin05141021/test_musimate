@@ -50,14 +50,14 @@ export const MOCK_STUDENT_CHARLES_USER: User = {
   line_user_id: 'U_student_charles_002',
 };
 
-// 林家雙寶家庭（Johnny 強尼）
+// 學員：Johnny (阿堅/陳子翔)
 export const MOCK_STUDENT_JOHNNY_USER: User = {
   id: 'u0000000-0000-0000-0000-000000000004',
   role: 'student',
-  name: 'Johnny (強尼)',
+  name: 'Johnny (阿堅/陳子翔)',
   email: 'johnny.student@harmony.edu',
   avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-  line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c', // 同樣綁定林媽媽 LINE ID (多小孩家庭)
+  line_user_id: 'U2a2f432d824e353e8eb3fbe579def2cf',
 };
 
 export const MOCK_TEACHER: Teacher = {

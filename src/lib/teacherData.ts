@@ -187,7 +187,7 @@ const INITIAL_BILLING_STUDENTS: TeacherStudentBilling[] = [
     paid_at: '2026-08-30 09:45',
     payment_method: 'LINE Pay',
     delay_days: -8,
-    line_user_id: 'U_student_hsu_yating',
+    line_user_id: 'U26ed3c0e48864aebdc244594cf780df0',
     parent_phone: '0922-333-444',
   },
   {
