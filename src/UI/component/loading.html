@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="globals.css">
+    <link rel="stylesheet" href="styleguide.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        /** @type {import('tailwindcss').Config} */
+        tailwind.config = {
+
+            corePlugins: {
+                preflight: false,
+            },
+            theme: {
+                extend: {
+
+                    colors: {
+                        "blue": "var(--blue)",
+                        "darkblue": "var(--darkblue)",
+                        "gray": "var(--gray)",
+                        "green": "var(--green)",
+                        "light": "var(--light)",
+                        "purple": "var(--purple)",
+                        "red": "var(--red)",
+                        "yellow": "var(--yellow)",
+
+                    },
+                },
+            },
+            plugins: [],
+        }
+    </script>
+</head>
+
+<body>
+    <div class="bg-[#f9f7f2] w-full min-w-[390px] min-h-[844px] relative"><img
+            class="absolute w-[65.13%] h-[51.66%] top-[48.34%] left-[34.87%]" src="img/treble-clef.png" />
+        <img class="absolute w-[55.99%] h-[50.90%] top-[49.10%] left-[44.01%]" src="img/beamed-notes.png" />
+        <img class="absolute w-[42.14%] h-[51.20%] top-[48.80%] left-[57.86%]" src="img/eighth-note.png" />
+        <div
+            class="absolute top-[497px] left-[158px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#8c7f72] text-base text-center tracking-[0] leading-[normal] whitespace-nowrap">
+            Loading...</div>
+    </div>
+</body>
+
+</html>

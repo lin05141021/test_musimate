@@ -1,0 +1,208 @@
+/* ============================================================
+   MusiMate Design Tokens — Typography & Spacing (Desktop 1440)
+   依據教師列表頁 / 課程列表頁 / 教師詳情頁 / 課表頁 Dev Mode 程式碼整理
+   最後更新：v3 —— Nav 目標樣式已確認但尚未套用到任何頁面（見下方註解）；
+   Footer 字重 400/500 不一致待確認；slot-time 11px 已併入 12px
+   ============================================================ */
+
+:root {
+    /* ---------- Font Families ---------- */
+    --font-family-serif: 'Noto Serif TC', serif;
+    /* 標題專用 */
+    --font-family-sans: 'Noto Sans TC', -apple-system, sans-serif;
+    /* 內文/UI 專用 */
+
+    /* ---------- Typography Scale ---------- */
+
+    /* Hero H1（首頁大標）*/
+    --font-hero-family: var(--font-family-serif);
+    --font-hero-weight: 700;
+    --font-hero-size: 56px;
+    --font-hero-line-height: 70px;
+    /* 1.25 */
+
+    /* H2（頁面標題 / Section 標題：我的課表、名師陣容、課表設定）
+     🔴 注意：Nav 選單裡的「我的課表」active 項目目前被誤套用此樣式，
+     應維持 --font-nav-active，請檢查並修正回 15px */
+    --font-h2-family: var(--font-family-serif);
+    --font-h2-weight: 700;
+    --font-h2-size: 32px;
+
+    /* 卡片標題（教師姓名，如「林雅琴」）*/
+    --font-card-title-family: var(--font-family-serif);
+    --font-card-title-weight: 700;
+    --font-card-title-size: 24px;
+
+    /* 卡片標題（小型，如樂器課程卡「吉他」「鋼琴」）
+     與上者同屬 Serif Bold 系統，但用於較小的卡片，暫列為獨立層級 */
+    --font-card-title-sm-family: var(--font-family-serif);
+    --font-card-title-sm-weight: 700;
+    --font-card-title-sm-size: 20px;
+
+    /* Hero 副標 / 說明文字 */
+    --font-subtitle-family: var(--font-family-sans);
+    --font-subtitle-weight: 400;
+    --font-subtitle-size: 18px;
+    --font-subtitle-line-height: 28.8px;
+    /* 1.6 */
+
+    /* Nav 選單
+     🔴 v3 更新：目標樣式已確認（見下方），但截至最新一輪比對，
+     課表頁／教師詳情頁／課程列表頁三個頁面實際呈現都還沒套用此樣式
+     （分別錯成 16px Serif、Sora 字體、32px Serif），屬於「元件未共用」
+     的實作問題，非規範本身的問題。建議 Nav 改為共用 Component。
+     active 與一般項目字體樣式完全相同，僅靠背景藥丸（pill）區分視覺焦點。 */
+    --font-nav-active-family: var(--font-family-sans);
+    --font-nav-active-weight: 500;
+    --font-nav-active-size: 15px;
+
+    --font-nav-family: var(--font-family-sans);
+    --font-nav-weight: 500;
+    --font-nav-size: 15px;
+
+    /* 內文段落（教師介紹、Footer 說明文字）*/
+    --font-body-family: var(--font-family-sans);
+    --font-body-weight: 400;
+    --font-body-size: 14px;
+    --font-body-line-height: 22.4px;
+    /* 1.6 */
+
+    /* 按鈕文字（大，如：登出／+新增開放時段）*/
+    --font-button-family: var(--font-family-sans);
+    --font-button-weight: 500;
+    --font-button-size: 14px;
+
+    /* 按鈕文字（小，如：查看個人頁面／預約試上課程／上一週下一週／探索樂器課程）*/
+    --font-button-sm-family: var(--font-family-sans);
+    --font-button-sm-weight: 500;
+    --font-button-sm-size: 12px;
+
+    /* 按鈕文字（小，強調字重，如：加入常態課表／加入開放時段）
+     🔴 與上面 --font-button-sm 同尺寸卻字重不同（700 vs 500），
+     待你確認是否要統一 */
+    --font-button-sm-strong-family: var(--font-family-sans);
+    --font-button-sm-strong-weight: 700;
+    --font-button-sm-strong-size: 12px;
+
+    /* 標籤 Tag（樂器專長標籤）*/
+    --font-tag-family: var(--font-family-sans);
+    --font-tag-weight: 500;
+    --font-tag-size: 12px;
+
+    /* Badge（PIANO MATE / MUSIMATE）*/
+    --font-badge-family: var(--font-family-sans);
+    --font-badge-weight: 500;
+    --font-badge-size: 12px;
+    --font-badge-letter-spacing: 0.12px;
+
+    /* 表單標籤（學生對象／選擇日期／上課時間）*/
+    --font-form-label-family: var(--font-family-sans);
+    --font-form-label-weight: 700;
+    --font-form-label-size: 12px;
+
+    /* 表單輸入值 */
+    --font-form-value-family: var(--font-family-sans);
+    --font-form-value-weight: 500;
+    --font-form-value-size: 12px;
+
+    /* 日曆日期數字（08/17）*/
+    --font-calendar-date-family: var(--font-family-sans);
+    --font-calendar-date-weight: 700;
+    --font-calendar-date-size: 14px;
+
+    /* 日曆星期（週一 Mon）*/
+    --font-calendar-weekday-family: var(--font-family-sans);
+    --font-calendar-weekday-weight: 500;
+    --font-calendar-weekday-size: 12px;
+
+    /* 時段卡片標籤（開放時段／學生姓名）*/
+    --font-slot-label-family: var(--font-family-sans);
+    --font-slot-label-weight: 700;
+    --font-slot-label-size: 12px;
+
+    /* 時段時間範圍（11:00-12:00）
+     v3 更新：原為全站最小的 11px 特例，已於最新版本統一併入 12px，
+     不再需要獨立 token，直接使用 --font-slot-label-size 即可 */
+    --font-slot-time-family: var(--font-family-sans);
+    --font-slot-time-weight: 500;
+    --font-slot-time-size: 12px;
+
+    /* Footer 內文說明（結合生活美學…／專業音樂教育…）
+     🟡 v3 發現新的不一致：課表頁 weight 500，
+     教師詳情頁／教師列表頁／課程列表頁 weight 400。
+     暫定採用 500（你最後附上的最新校正版本也是 500），
+     待你確認後再統一套用到另外三頁。 */
+    --font-footer-body-family: var(--font-family-sans);
+    --font-footer-body-weight: 500;
+    /* 🟡 待確認：另外 3 頁目前是 400 */
+    --font-footer-body-size: 14px;
+    --font-footer-body-line-height: 22.4px;
+
+    /* Footer 版權小字（© 2026 MusiMate...）
+     v3 更新：字級已從 11px 統一為 12px；字重同樣有 400/500 不一致，暫定 500 */
+    --font-caption-family: var(--font-family-sans);
+    --font-caption-weight: 500;
+    /* 🟡 待確認：另外 3 頁目前是 400 */
+    --font-caption-size: 12px;
+
+    /* ---------- Spacing ---------- */
+
+    /* 頁面水平間距（已統一，取代先前 80px/60px 混用）*/
+    --page-margin-x: 80px;
+
+    /* 垂直節奏 */
+    --section-gap: 32px;
+    /* 最外層大區塊間距 */
+    --hero-inner-gap: 20px;
+    /* Hero 內部（badge→標題→副標）*/
+    --hero-padding-top: 60px;
+    --hero-padding-bottom: 24px;
+    --footer-padding-top: 48px;
+    --footer-padding-bottom: 36px;
+
+    /* 卡片 */
+    --card-padding: 24px;
+    --card-gap-teacher: 32px;
+    /* 教師卡片間距 */
+    --card-gap-instrument: 24px;
+    /* 樂器課程卡片間距 */
+
+    /* 課表元件 */
+    --panel-padding: 32px;
+    /* 課表設定 / 週曆主面板 */
+    --slot-padding: 10px;
+    /* 週曆時段格子 */
+    --slot-add-btn-padding-x: 10px;
+    --slot-add-btn-padding-y: 7px;
+
+    /* 按鈕內距 */
+    --btn-padding-x-lg: 24px;
+    --btn-padding-y-lg: 12px;
+    --btn-padding-x-sm: 24px;
+    --btn-padding-y-sm: 10px;
+
+    /* 標籤 / Nav */
+    --tag-padding-x: 12px;
+    --tag-padding-y: 4px;
+    --nav-item-padding-x: 12px;
+    --nav-item-padding-y: 8px;
+
+    /* 圓角（附帶整理，供參考）*/
+    --radius-pill: 100px;
+    --radius-lg: 24px;
+    --radius-md: 20px;
+    --radius-sm: 16px;
+    --radius-xs: 12px;
+}
+
+/* ============================================================
+   使用範例
+   ============================================================ */
+/*
+.hero-title {
+  font-family: var(--font-hero-family);
+  font-weight: var(--font-hero-weight);
+  font-size: var(--font-hero-size);
+  line-height: var(--font-hero-line-height);
+}
+*/
