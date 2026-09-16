@@ -165,25 +165,21 @@ export default function StudentSchedulePage() {
     .filter((a) => a.student_id === currentStudentId)
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-  // 依時間劃分「本期已過課程」與「即將到來的課程」
-  // 基準時間：以今日 2026-09-04 為劃分界線 (9/4 之前或狀態為 completed 皆屬已過課程)
-  const nowPivot = typeof window !== 'undefined' && new Date().getFullYear() >= 2026
-    ? new Date().getTime()
-    : new Date('2026-09-04T00:00:00+08:00').getTime();
-
-  // 依規範倒序排列 (最近的課程排在最上方：9/2 -> 8/29 -> 8/26 -> 8/19 -> 8/12)
+  // 依狀態與課堂進度精準劃分「本期已過課程」與「即將到來的課程」
+  // 已過課程：狀態為已完課 (completed) 的正式課堂
   const pastAppointments = studentAppointments
-    .filter((a) => a.status === 'completed' || new Date(a.start_time).getTime() < nowPivot)
+    .filter((a) => a.status === 'completed')
     .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
 
-  // 即將到來的課程：尚未完成且開課時間在今天之後 (未來課程)
+  // 即將到來的課程：本期尚未完成的預約課堂
   const upcomingAppointments = studentAppointments
-    .filter((a) => a.status !== 'completed' && new Date(a.start_time).getTime() >= nowPivot)
+    .filter((a) => a.status !== 'completed')
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
-  // 本期總堂數 (由資料庫 package_total_lessons 決定，預設 10 堂)
+  // 本期總堂數 (由資料庫與合約 package_total_lessons 決定，預設 10 堂)
   const totalLessons = currentStudentInfo?.student?.package_total_lessons || 10;
-  const progressCount = pastAppointments.length;
+  // 本期進度：精準反映已完課堂數，絕不超出合約總堂數
+  const progressCount = Math.min(totalLessons, pastAppointments.length);
   const progressPercent = Math.min(100, Math.round((progressCount / totalLessons) * 100));
 
   // 老師開放的可用調課時段 (整合 API 與本機時段)
