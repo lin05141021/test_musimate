@@ -2,150 +2,279 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>舊生加選 / 新增預約課程 - MusiMate</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- 樣式庫 -->
-    <link rel="stylesheet" href="../../UI/style_0824.css">
-    <link rel="stylesheet" href="../test_uiredesign/schedule_styles.css">
+    <!-- LINE LIFF SDK & Database -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../data/musimate_db.js"></script>
+
+    <!-- 100% 內嵌獨立樣式表 (完全避免外部 CSS 檔案 404 遺失問題) -->
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-brown: #CEAB98;
+            --primary-dark: #2B3049;
+            --bg-cream: #FAF6F0;
+            --bg-outer: #EAE6DF;
+            --card-border: #F0EAE1;
+            --text-main: #2B3049;
+            --text-muted: #7A736E;
+        }
+
+        body {
+            background: var(--bg-outer);
+            font-family: 'Sora', 'Noto Sans TC', -apple-system, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            max-width: 100%;
+            min-height: 800px;
+            background: var(--bg-cream);
+            border-radius: 36px;
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .nav-header {
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            background: var(--bg-cream);
+            border-bottom: 1px solid #F0EBE1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .student-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(206, 171, 152, 0.2);
+            border: 1px solid var(--primary-brown);
+            font-size: 13px;
+            font-weight: 700;
+            color: #4A3A31;
+        }
+
+        .main-content {
+            padding: 16px 18px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .page-header {
+            text-align: center;
+        }
+
+        .page-title {
+            color: var(--primary-brown);
+            font-size: 24px;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* 彈窗樣式 */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 16px;
+            animation: fadeIn 0.2s ease-out;
         }
+
         .modal-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
             background: white;
-            box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.25);
+            box-shadow: 0px 16px 36px rgba(0, 0, 0, 0.25);
             border-radius: 24px;
-            padding: 24px;
+            padding: 22px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            animation: modalFadeIn 0.25s ease-out;
+            gap: 14px;
+            animation: scaleIn 0.25s ease-out;
         }
-        @keyframes modalFadeIn {
-            from { transform: scale(0.95); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+
         .field-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
+
         .field-label {
-            color: #6F6F6F;
-            font-size: 13px;
+            color: var(--text-muted);
+            font-size: 11px;
             font-weight: 700;
         }
+
         .field-select, .field-input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 10px 12px;
             border-radius: 12px;
-            border: 1.5px solid #FAF6F0;
+            border: 1.5px solid #EFECE6;
             background: #FDFBF7;
-            color: #2B3049;
-            font-size: 14px;
+            color: var(--text-main);
+            font-size: 13px;
             font-weight: 600;
             outline: none;
             box-sizing: border-box;
+            transition: border-color 0.2s;
         }
+
         .field-select:focus, .field-input:focus {
-            border-color: #CEAB98;
+            border-color: var(--primary-brown);
             background: white;
         }
+
         .btn-submit-modal {
             width: 100%;
-            padding: 14px;
-            background: #CEAB98;
+            padding: 12px;
+            background: var(--primary-brown);
             color: white;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 14px;
             border-radius: 12px;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(206, 171, 152, 0.35);
+            box-shadow: 0 4px 14px rgba(206, 171, 152, 0.4);
             transition: background 0.2s;
         }
+
         .btn-submit-modal:hover {
             background: #BA9682;
         }
+
         .btn-cancel-modal {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             background: #FAF6F0;
             color: #6F6F6F;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             border-radius: 12px;
-            border: none;
+            border: 1px solid #EFECE6;
             cursor: pointer;
             text-align: center;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
-<body class="mobile-view">
+<body>
 
 <!-- 底層學生課表背景 (符合隱私規範，僅呈現學生個人排程) -->
-<div class="mobile-frame" style="opacity: 0.4; pointer-events: none;">
+<div class="mobile-frame" style="opacity: 0.35; pointer-events: none;">
     <div class="status-bar">
         <span>9:41</span>
         <span>📶 🔋</span>
     </div>
     <div class="nav-header">
-        <div class="brand-logo"><div class="brand-icon">🎵</div><span>MusiMate</span></div>
-        <span id="bgStudentTag" style="font-size: 12px; font-weight: bold; color: #7B1FA2; background: #F3E5F5; padding: 4px 10px; border-radius: 12px;">Lin (林同學)</span>
+        <div class="brand-logo">
+            <img src="../../UI/logo.png" alt="MusiMate" style="height: 36px; object-fit: contain;" onerror="this.src='https://lin05141021.github.io/test_musimate/UI/logo.png'" />
+        </div>
+        <span id="bgStudentTag" class="student-pill">載入中...</span>
     </div>
     <div class="main-content">
-        <div class="page-header"><h1 class="page-title">我的課表</h1><p class="page-subtitle">林佩芬老師 · 預約課堂清單</p></div>
-        <div class="lesson-item">
-            <div class="date-badge"><div class="day-number">8/26</div><div class="day-weekday">(三)</div></div>
-            <div class="lesson-card-right"><div class="info-card"><div class="info-card-left"><div class="time-text">10:00 - 12:00</div><div class="course-title">林佩芬老師古典鋼琴課</div></div></div></div>
-        </div>
+        <div class="page-header"><h1 class="page-title">我的課表</h1><p class="page-subtitle">林佩芬 老師 · 預約課堂清單</p></div>
     </div>
 </div>
 
 <!-- 新增課程 Modal 彈窗 -->
 <div class="modal-overlay">
     <div class="modal-card">
-        <!-- 彈窗頂部標題 -->
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <!-- 彈窗頂部標題與 Logo -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F0EBE1; padding-bottom: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="width: 10px; height: 10px; background: #CEAB98; border-radius: 50%;"></div>
-                <div style="color: #2B3049; font-size: 18px; font-weight: 800; font-family: 'Noto Serif TC', serif;">舊生加選預約課程</div>
+                <img src="../../UI/logo.png" alt="MusiMate" style="height: 28px; object-fit: contain;" onerror="this.src='https://lin05141021.github.io/test_musimate/UI/logo.png'" />
+                <div style="color: #2B3049; font-size: 16px; font-weight: 800; font-family: 'Noto Serif TC', serif;">加選 / 預約新課程</div>
             </div>
-            <button onclick="handleCancel()" style="width: 32px; height: 32px; background: #FAF6F0; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #2B3049;">
+            <button onclick="handleCancel()" style="width: 28px; height: 28px; background: #FAF6F0; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #2B3049;">
                 ✕
             </button>
         </div>
 
         <!-- 已繳費剩餘時數提示卡片 -->
-        <div id="remainingHoursCard" style="padding: 10px 14px; background: #FFF8E1; border: 1px solid #FFE082; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
+        <div id="remainingHoursCard" style="padding: 8px 12px; background: #FFF8E1; border: 1px solid #FFE082; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 16px;">🎟️</span>
-                <span style="color: #E65100; font-size: 12px; font-weight: 700;">已繳費未排時數：</span>
+                <span style="font-size: 15px;">🎟️</span>
+                <span style="color: #E65100; font-size: 11px; font-weight: 700;">已繳費未排時數：</span>
             </div>
-            <span id="remainingHoursDisplay" style="color: #E65100; font-size: 14px; font-weight: 800;">0 小時</span>
+            <span id="remainingHoursDisplay" style="color: #E65100; font-size: 13px; font-weight: 800;">0 小時</span>
         </div>
 
         <!-- 表單欄位 -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
             <div class="field-group">
                 <label class="field-label">預約學員</label>
                 <select id="studentSelect" class="field-select" onchange="updateStudentInfo(this.value)">
@@ -158,23 +287,23 @@
                 <select class="field-select" id="courseTypeSelect">
                     <option value="piano" selected>個別古典鋼琴課 (2小時)</option>
                     <option value="violin">小提琴演奏精修課 (1小時)</option>
-                    <option value="theory">音樂理論與聽寫視唱班 (1小時)</option>
+                    <option value="theory">音樂理論與聽寫視唱 (1小時)</option>
                 </select>
             </div>
 
             <div class="field-group">
-                <label class="field-label">選擇林佩芬老師開放上課時段</label>
+                <label class="field-label">上課時段 (林佩芬老師開放時段)</label>
                 <select class="field-select" id="timeSlotSelect">
-                    <!-- JS 動態填入 -->
+                    <!-- JS 動態填入開放時段 -->
                 </select>
             </div>
 
             <div class="field-group">
-                <label class="field-label">繳費 / 折抵方式</label>
+                <label class="field-label">付款方式與時數折抵</label>
                 <select class="field-select" id="paymentMethodSelect">
-                    <option value="use_hours" id="optUseHours">🎟️ 使用已繳費剩餘時數折抵 (0 小時)</option>
-                    <option value="postpaid" selected>💳 單堂付現 / 課後付款 (NT$ 2,000 / 堂)</option>
-                    <option value="prepaid_10">📦 包堂預付 10 堂優惠 (NT$ 20,000)</option>
+                    <option value="postpaid" selected>💳 單堂現金/轉帳 (完課後付 $3,200)</option>
+                    <option value="prepaid_10">📦 預付 10 堂期繳 (享雙軌履約保證)</option>
+                    <option value="use_hours" id="optUseHours" disabled>🎟️ 使用已繳費剩餘時數折抵</option>
                 </select>
             </div>
         </div>
@@ -185,21 +314,21 @@
                 確認送出預約
             </button>
             <button class="btn-cancel-modal" onclick="handleCancel()">
-                取消返回
+                取消返回課表
             </button>
         </div>
     </div>
 </div>
 
 <script>
-let currentStudentId = 's0000000-0000-0000-0000-000000000005'; // Lin
+let currentStudentId = 's-lin';
 
 function updateStudentInfo(studentId) {
     currentStudentId = studentId;
     if (!window.MusiMateDB) return;
 
     const students = window.MusiMateDB.getStudents();
-    const current = students.find(s => s.student_id === studentId);
+    const current = students.find(s => s.student_id === studentId || s.id === studentId || s.name === studentId);
     if (current) {
         document.getElementById('bgStudentTag').innerText = current.name;
     }
@@ -248,10 +377,10 @@ function handleSubmit() {
     const eh = String(endDate.getHours()).padStart(2, '0');
     const em = String(endDate.getMinutes()).padStart(2, '0');
 
-    let studentName = 'Lin (林同學)';
+    let studentName = '學員';
     if (window.MusiMateDB) {
         const students = window.MusiMateDB.getStudents();
-        const cur = students.find(s => s.student_id === currentStudentId);
+        const cur = students.find(s => s.student_id === currentStudentId || s.id === currentStudentId || s.name === currentStudentId);
         if (cur) studentName = cur.name;
     }
 
@@ -260,10 +389,12 @@ function handleSubmit() {
     const newAppt = {
         student_id: currentStudentId,
         student_name: studentName,
+        teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+        teacher_name: '林佩芬 老師',
         start_time: `${y}-${m}-${d}T${sh}:${sm}:00+08:00`,
         end_time: `${y}-${m}-${d}T${eh}:${em}:00+08:00`,
         status: 'confirmed',
-        instrument: courseVal === 'violin' ? '小提琴 (Violin)' : (courseVal === 'theory' ? '音樂理論聽寫' : '鋼琴 (Piano)'),
+        instrument: courseVal === 'violin' ? '小提琴 (Violin)' : (courseVal === 'theory' ? '音樂理論聽寫' : '古典鋼琴 (Piano)'),
         location: '音符琴房 A303',
         payment_status: isPrepaidOrHours ? 'paid' : 'pay_per_lesson',
         payment_type: paymentVal === 'use_hours' ? 'prepaid_hours' : (paymentVal === 'prepaid_10' ? 'prepaid' : 'postpaid'),
@@ -278,15 +409,14 @@ function handleSubmit() {
         }
     }
 
-    alert(`🎉 預約成功！\n\n已為 ${studentName} 成功加選：\n【${courseText}】\n時段：${slotText}\n\n已即時加入課表與資料庫！`);
-    location.href = `../test_uiredesign/student_schedule.html?student_id=${currentStudentId}`;
+    alert(`🎉 預約成功！\n\n已為 ${studentName} 成功預約：\n【${courseText}】\n時段：${slotText}\n\n已即時加入課表與資料庫！`);
+    location.href = `../test_uiredesign/student_schedule.html?student_id=${encodeURIComponent(currentStudentId)}`;
 }
 
 function handleCancel() {
-    location.href = `../test_uiredesign/student_schedule.html?student_id=${currentStudentId}`;
+    location.href = `../test_uiredesign/student_schedule.html?student_id=${encodeURIComponent(currentStudentId)}`;
 }
 
-// 格式化輔助
 function formatSlotOption(startIso, endIso, loc) {
     const d = new Date(startIso);
     const month = d.getMonth() + 1;
@@ -299,26 +429,32 @@ function formatSlotOption(startIso, endIso, loc) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 取得 URL query 中的 student_id
     const params = new URLSearchParams(window.location.search);
-    const queryStudentId = params.get('student_id');
+    const queryStudentId = params.get('student_id') || params.get('student') || params.get('name');
 
     if (window.MusiMateDB) {
         const students = window.MusiMateDB.getStudents();
         const studentSelect = document.getElementById('studentSelect');
-        studentSelect.innerHTML = students.map(s => `
-            <option value="${s.student_id}" ${s.student_id === queryStudentId || (queryStudentId === null && s.student_id === currentStudentId) ? 'selected' : ''}>
-                ${s.name} (${s.default_instrument})
-            </option>
-        `).join('');
-
+        
+        let initialStudent = null;
         if (queryStudentId) {
-            currentStudentId = queryStudentId;
+            initialStudent = students.find(s => s.student_id === queryStudentId || s.id === queryStudentId || s.name.includes(queryStudentId));
         }
+        if (!initialStudent) {
+            initialStudent = students[0];
+        }
+
+        if (initialStudent) {
+            currentStudentId = initialStudent.student_id || initialStudent.id;
+        }
+
+        studentSelect.innerHTML = students.map(s => {
+            const isSel = (s.student_id === currentStudentId || s.id === currentStudentId || s.name === currentStudentId);
+            return `<option value="${s.student_id || s.id}" ${isSel ? 'selected' : ''}>${s.name} (${s.default_instrument})</option>`;
+        }).join('');
 
         updateStudentInfo(currentStudentId);
 
-        // 載入林佩芬老師開放時段
         const slots = window.MusiMateDB.getAvailableSlots();
         const timeSelect = document.getElementById('timeSlotSelect');
         if (slots.length > 0) {

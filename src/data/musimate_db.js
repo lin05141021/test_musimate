@@ -7,7 +7,7 @@
  */
 
 const MusiMateDB = (() => {
-    const STORAGE_KEY = 'musimate_supabase_cached_db_v4';
+    const STORAGE_KEY = 'musimate_supabase_cached_db_v5';
     const RECONCILED_KEY = 'musimate_reconciled_ids';
     const REMAINING_HOURS_PREFIX = 'musimate_remaining_hours_';
 
@@ -41,6 +41,14 @@ const MusiMateDB = (() => {
                 line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c'
             },
             {
+                id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u',
+                role: 'student',
+                name: '許雅婷 (Charles)',
+                email: 'yating.student@harmony.edu',
+                avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+                line_user_id: 'U26ed3c0e48864aebdc244594cf780df0'
+            },
+            {
                 id: 'u-kumei-student',
                 role: 'student',
                 name: '久美',
@@ -54,15 +62,7 @@ const MusiMateDB = (() => {
                 name: '林小明 (Ming)',
                 email: 'ming.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
-            },
-            {
-                id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u',
-                role: 'student',
-                name: '許雅婷 (Charles / 查爾斯)',
-                email: 'yating.student@harmony.edu',
-                avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
-                line_user_id: 'U26ed3c0e48864aebdc244594cf780df0'
+                line_user_id: 'U_student_ming_001'
             }
         ],
         teachers: [
@@ -75,10 +75,10 @@ const MusiMateDB = (() => {
             }
         ],
         students: [
-            { id: 's-lin', user_id: 'u-lin-student', name: '劉心悅 (Lin)', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 2000, default_location: '音符琴房 A303', period: 3 },
+            { id: 's-lin', user_id: 'u-lin-student', name: '劉心悅 (Lin)', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 2000, default_location: '音符琴房 A303', period: 3, line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c' },
+            { id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s', user_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u', name: '許雅婷 (Charles)', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '音符琴房 A303', period: 1, line_user_id: 'U26ed3c0e48864aebdc244594cf780df0' },
             { id: 's-kumei', user_id: 'u-kumei-student', name: '久美', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '音符琴房 A303', is_new_student: true },
-            { id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', user_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', name: '林小明', default_instrument: '小提琴 (Violin)', rate_per_lesson: 1200, default_location: '大安琴房 A 室' },
-            { id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s', user_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u', name: '許雅婷', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '大安琴房 A 室' }
+            { id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', user_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', name: '林小明 (Ming)', default_instrument: '小提琴 (Violin)', rate_per_lesson: 1200, default_location: '大安琴房 A 室', line_user_id: 'U_student_ming_001' }
         ],
         schedule_slots: [
             { id: 's1', start_time: '2026-09-18T14:00:00+08:00', end_time: '2026-09-18T15:00:00+08:00', location: '音符琴房 A301', is_available: true },
@@ -151,7 +151,103 @@ const MusiMateDB = (() => {
             { id: 'app-lin-t4-7', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-04T19:00:00+08:00', end_time: '2026-11-04T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第7堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 7 堂課' },
             { id: 'app-lin-t4-8', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-11T19:00:00+08:00', end_time: '2026-11-11T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第8堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 8 堂課' },
             { id: 'app-lin-t4-9', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-18T19:00:00+08:00', end_time: '2026-11-18T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第9堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 9 堂課' },
-            { id: 'app-lin-t4-10', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-25T19:00:00+08:00', end_time: '2026-11-25T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第10堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 10 堂課' }
+            { id: 'app-lin-t4-10', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-25T19:00:00+08:00', end_time: '2026-11-25T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第10堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 10 堂課' },
+
+            // ==========================================
+            // 許雅婷 (Charles) - 每週固定預約課程 (4 堂課)
+            // ==========================================
+            {
+                id: 'app-charles-1',
+                student_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s',
+                student_name: '許雅婷 (Charles)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-17T14:00:00+08:00',
+                end_time: '2026-09-17T16:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (中級)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '徹爾尼 599 第 15 首'
+            },
+            {
+                id: 'app-charles-2',
+                student_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s',
+                student_name: '許雅婷 (Charles)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-24T14:00:00+08:00',
+                end_time: '2026-09-24T16:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (中級)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '巴哈小步舞曲'
+            },
+            {
+                id: 'app-charles-3',
+                student_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s',
+                student_name: '許雅婷 (Charles)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-10-01T14:00:00+08:00',
+                end_time: '2026-10-01T16:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (中級)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '古典鋼琴定期課堂'
+            },
+            {
+                id: 'app-charles-4',
+                student_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s',
+                student_name: '許雅婷 (Charles)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-10-08T14:00:00+08:00',
+                end_time: '2026-10-08T16:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (中級)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '古典鋼琴定期課堂'
+            },
+
+            // ==========================================
+            // 林小明 (Ming) - 小提琴課程 (2 堂課)
+            // ==========================================
+            {
+                id: 'app-ming-1',
+                student_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',
+                student_name: '林小明 (Ming)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-19T10:00:00+08:00',
+                end_time: '2026-09-19T11:00:00+08:00',
+                location: '大安琴房 A 室',
+                status: 'confirmed',
+                instrument: '小提琴 (Violin)',
+                payment_status: 'paid',
+                payment_type: 'postpaid'
+            },
+            {
+                id: 'app-ming-2',
+                student_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',
+                student_name: '林小明 (Ming)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-26T10:00:00+08:00',
+                end_time: '2026-09-26T11:00:00+08:00',
+                location: '大安琴房 A 室',
+                status: 'confirmed',
+                instrument: '小提琴 (Violin)',
+                payment_status: 'paid',
+                payment_type: 'postpaid'
+            }
         ],
         lessons: [
             {
@@ -506,15 +602,43 @@ const MusiMateDB = (() => {
         getAppointmentsByStudent(studentIdentifier) {
             const db = getDB();
             if (!studentIdentifier) return db.appointments;
+            const target = String(studentIdentifier).trim().toLowerCase();
+
             return db.appointments
-                .filter(a => 
-                    a.student_id === studentIdentifier || 
-                    a.student_name === studentIdentifier || 
-                    (a.student_name && studentIdentifier && (
-                        a.student_name.toLowerCase().includes(studentIdentifier.toLowerCase()) ||
-                        studentIdentifier.toLowerCase().includes(a.student_name.toLowerCase())
-                    ))
-                )
+                .filter(a => {
+                    const sId = (a.student_id || '').toLowerCase();
+                    const sName = (a.student_name || '').toLowerCase();
+
+                    // 1. 精準 ID 比對
+                    if (sId === target || sName === target) return true;
+
+                    // 2. 許雅婷 (Charles) 多重別名合一比對
+                    if ((target.includes('charles') || target.includes('雅婷') || target.includes('查爾斯') || target.includes('26b2f3dd')) &&
+                        (sName.includes('charles') || sName.includes('雅婷') || sId.includes('26b2f3dd'))) {
+                        return true;
+                    }
+
+                    // 3. 劉心悅 (Lin) 多重別名合一比對
+                    if ((target.includes('lin') || target.includes('心悅') || target.includes('劉心悅') || target.includes('s-lin')) &&
+                        (sName.includes('lin') || sName.includes('心悅') || sName.includes('劉心悅') || sId.includes('s-lin'))) {
+                        return true;
+                    }
+
+                    // 4. 久美 (Kumei) 比對
+                    if ((target.includes('久美') || target.includes('kumei') || target.includes('s-kumei')) &&
+                        (sName.includes('久美') || sName.includes('kumei') || sId.includes('s-kumei'))) {
+                        return true;
+                    }
+
+                    // 5. 林小明 (Ming) 比對
+                    if ((target.includes('小明') || target.includes('ming') || target.includes('bbbbbbbb')) &&
+                        (sName.includes('小明') || sName.includes('ming') || sId.includes('bbbbbbbb'))) {
+                        return true;
+                    }
+
+                    // 6. 模糊包含比對
+                    return sName.includes(target) || target.includes(sName);
+                })
                 .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
         },
 
@@ -702,18 +826,31 @@ const MusiMateDB = (() => {
             console.log(`🔗 已將 LINE ID: ${lineUserId} 成功綁定至學員: ${studentNameOrId}`);
         },
 
-        // 13. LINE LIFF 自動身份辨識 (精準匹配或動態建立學員，絕不強制劫持為單一舊學員)
+        // 13. LINE LIFF 自動身份辨識 (精準匹配學員，絕不將既有學生拆分成幽靈帳號)
         authLiffUser(liffProfile) {
             if (!liffProfile) return null;
             const { userId, displayName, pictureUrl } = liffProfile;
             const students = this.getStudents();
+            const dName = (displayName || '').trim().toLowerCase();
 
-            // 1. 優先找已精準綁定此 userId 的學生
+            // 1. 優先嚴格比對 LINE User ID (單一事實來源)
             let matched = students.find(s => s.line_user_id && s.line_user_id === userId);
 
-            // 2. 若無，比對 LINE 暱稱 / 姓名 (例如「久美」比對「久美」或「張久美」)
+            // 2. 嚴格比對官方預設學員代號與中英別名
+            if (!matched) {
+                if (dName.includes('charles') || dName.includes('雅婷') || dName.includes('查爾斯') || userId === 'U26ed3c0e48864aebdc244594cf780df0') {
+                    matched = students.find(s => s.student_id === '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s' || s.name.includes('許雅婷') || s.name.includes('Charles'));
+                } else if (dName.includes('lin') || dName.includes('心悅') || dName.includes('劉心悅') || userId === 'Uf2457bf35e0d6d3060b60838d9a9c91c') {
+                    matched = students.find(s => s.student_id === 's-lin' || s.name.includes('劉心悅') || s.name.includes('Lin'));
+                } else if (dName.includes('久美') || dName.includes('kumei')) {
+                    matched = students.find(s => s.student_id === 's-kumei' || s.name.includes('久美'));
+                } else if (dName.includes('小明') || dName.includes('ming')) {
+                    matched = students.find(s => s.student_id === 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb' || s.name.includes('林小明'));
+                }
+            }
+
+            // 3. 一般名稱精準比對
             if (!matched && displayName) {
-                const dName = displayName.trim().toLowerCase();
                 matched = students.find(s => s.name && (
                     s.name.trim().toLowerCase() === dName ||
                     s.name.toLowerCase().includes(dName) ||
@@ -721,13 +858,13 @@ const MusiMateDB = (() => {
                 ));
             }
 
-            // 3. 檢查是否有先前手動切換的作用中學員
+            // 4. 檢查是否有先前手動切換的作用中學員
             if (!matched) {
                 const active = this.getActiveStudent();
                 if (active) matched = active;
             }
 
-            // 4. 若為全新使用者 (例如新加入的久美)，動態為其註冊專屬學員檔案！
+            // 5. 若確實為未在名冊的新生 (例如全新 LINE 加入者)，動態為其註冊專屬學員檔案
             if (!matched && displayName) {
                 const cleanName = displayName.trim();
                 const newStudent = {
@@ -739,31 +876,28 @@ const MusiMateDB = (() => {
                     line_user_id: userId,
                     default_instrument: '古典鋼琴 (Piano)',
                     default_location: '音符琴房 A303',
-                    rate_per_lesson: 1600
+                    rate_per_lesson: 1600,
+                    is_new_student: true
                 };
                 this.registerCustomStudent(newStudent);
                 matched = newStudent;
             }
 
-            // 5. 保底回退 (若完全無法取得名稱)
+            // 6. 保底回退至 劉心悅
             if (!matched) {
-                matched = students[0] || {
-                    student_id: 'guest-student',
-                    name: '學員',
-                    default_instrument: '古典鋼琴 (Piano)',
-                    avatar_url: pictureUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80'
-                };
+                matched = students.find(s => s.name.includes('劉心悅')) || students[0];
             }
 
-            // 綁定當前 LINE User ID 並設定為作用中學員
+            // 永久鎖定該學生的 LINE User ID
             if (matched && userId) {
+                matched.line_user_id = userId;
                 this.bindStudentLineUserId(matched.name, userId);
                 this.bindStudentLineUserId(matched.student_id, userId);
                 this.setActiveStudent(matched.student_id);
             }
 
             return {
-                isNewUser: Boolean(!matched.created_at && !matched.rate_per_lesson),
+                isNewUser: Boolean(matched.is_new_student),
                 student: matched,
                 user: {
                     id: matched.user_id || matched.student_id,

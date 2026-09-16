@@ -536,8 +536,7 @@
         <!-- 導航列 (嚴格鎖定學生身份，拒絕互相查看他人課表) -->
         <div class="nav-header">
             <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'">
-                <div class="brand-icon">🎵</div>
-                <span>MusiMate</span>
+                <img src="../../UI/logo.png" alt="MusiMate" style="height: 36px; object-fit: contain; cursor: pointer;" onerror="this.src='https://lin05141021.github.io/test_musimate/UI/logo.png'" />
             </div>
             <div id="studentNamePill" class="student-pill">
                 <span id="studentAvatarIcon">👤</span>
@@ -767,8 +766,12 @@ function updateStudentHeader(student) {
     if (statusTextEl) {
         if (student.name.includes('久美')) {
             statusTextEl.innerText = '✨ 新學員專屬 · 尚未排課';
-        } else {
+        } else if (student.name.includes('許雅婷') || student.name.includes('Charles')) {
+            statusTextEl.innerText = '📚 第 1 期進行中 · 個人課表 (4 堂課)';
+        } else if (student.name.includes('劉心悅') || student.name.includes('Lin')) {
             statusTextEl.innerText = '📚 第 3 期進行中 · 已續約第 4 期 (共 13 堂課)';
+        } else {
+            statusTextEl.innerText = '📚 個人專屬課表';
         }
     }
     if (lineTag) {
