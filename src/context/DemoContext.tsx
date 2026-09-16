@@ -1088,27 +1088,31 @@ const INITIAL_LESSONS: LessonRecord[] = [
     appointment_id: 'app-lin-5',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
     raw_transcript:
-      '今天心悅在蕭邦升c小調圓舞曲 Op.64 No.2 的速度彈性 (Rubato) 與右手裝飾音表現得非常優異。左手三拍子圓舞曲伴奏的第二拍與第三拍要輕盈彈跳，襯托右手如歌般的哀愁旋律。回家作業請把第 33 到 64 小節的連續音階與琶音用 BPM 88 穩定慢練，注意指法放鬆！',
+      '今天小明彈徹爾尼 599 第 20 首，右手顆粒感進步很多，但第 12 小節左手伴奏太重，請放輕手腕帶動。作業練第 20 首速度 80，加上巴哈初步第 3 首前四小節。',
     clean_summary_json: {
-      highlights: ['右手速度彈性 (Rubato) 富有音樂性', '裝飾音與琶音輕巧流暢'],
+      highlights: [
+        '徹爾尼 599 第 20 首右手顆粒感顯著進步，手指獨立性佳',
+        '音色清晰純淨，樂句整體流暢度大幅提升',
+      ],
       technical_tips: [
-        '第 33 小節琶音右手指法放鬆，注意第四指落點準確度與手腕支撐。',
-        '左手圓舞曲伴奏「重-輕-輕」律動要鮮明，第 2、3 拍手腕自然微提。',
+        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
+        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。',
       ],
       theory_tips: [
-        '升 c 小調調性色彩分析，注意主和弦與拿坡里六和弦的和聲張力。',
-        '圓舞曲結構中 Piu mosso 與 Tempo I 的速度對比切換。',
+        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
+        '巴哈複調音樂雙手各自獨立，注意二聲部對位線條清晰度。',
       ],
       homework: [
-        '第 33 至 64 小節以 BPM 88 慢練並使用節拍器校對 10 遍',
-        '每日音階琶音手指獨立性練習 15 分鐘',
-        '錄製一段 15 秒打卡音訊供老師檢視',
+        '徹爾尼 599 第 20 首：配合節拍器由慢練漸進提升至目標速度 BPM 80，每日練習 15 分鐘',
+        '巴哈初步第 3 首：雙手分開單獨慢練第 1 至 4 小節，熟記指法與聲部進行',
+        '針對第 12 小節左手伴奏手腕放鬆度錄製 15 秒打卡音訊供批改',
       ],
-      encouragement: '音樂感受力與觸鍵層次大幅提升，旋律非常有感染力！繼續保持！',
-      bpm_recommendation: 88,
+      encouragement:
+        '右手顆粒感的進步非常亮眼！只要把左手的手腕放鬆、伴奏輕下來，整首曲子的層次就會如同水晶般清澈。繼續加油！',
+      bpm_recommendation: 80,
     },
-    created_at: '2026-09-16T10:00:00+08:00',
-    song_title: '蕭邦：升c小調圓舞曲 Op.64 No.2 速度彈性與觸鍵',
+    created_at: '2026-09-18T10:00:00+08:00',
+    song_title: '徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
 ];
@@ -1117,10 +1121,10 @@ const INITIAL_DEMO_VIDEOS: TeacherDemoVideo[] = [
   {
     id: 'demo-1',
     teacher_id: MOCK_TEACHER.id,
-    title: '巴哈：E大調協奏曲 第一樂章範例 (林佩芬老師示範)',
+    title: '巴哈：二聲部創意曲 第一首示範 (林佩芬老師示範)',
     video_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    midi_data: { bpm: 96, key: 'E Major' },
-    tags: ['小提琴', '鋼琴', '經典名曲'],
+    midi_data: { bpm: 84, key: 'C Major' },
+    tags: ['古典鋼琴', '複調對位', '名師示範'],
     pitch_tolerance: 5,
     tempo_tolerance: 8,
     created_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),

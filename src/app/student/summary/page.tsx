@@ -7,8 +7,8 @@ export default function StudentSummaryRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // 預設導向至最新課堂聯絡簿 (lesson-1)
-    router.replace('/student/summary/lesson-1');
+    // 預設導向至最新課堂聯絡簿 (第 7 堂課 / 9月18日)
+    router.replace('/student/summary/lesson-7');
   }, [router]);
 
   return (

@@ -53,8 +53,155 @@ function StudentPracticeContent() {
     summary: string;
   } | null>(null);
 
-  // 打卡成功慶祝彈窗
-  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+  // 歷史練習紀錄詳情彈窗狀態
+  const [selectedHistoryLog, setSelectedHistoryLog] = useState<{
+    id: string;
+    date: string;
+    fullDate: string;
+    song: string;
+    score: number;
+    duration: string;
+    tag: string;
+    keywords: string[];
+    metrics: {
+      pitch: number;
+      rhythm: number;
+      clarity: number;
+      bpm: number;
+      cv: string;
+    };
+    ai_summary: string;
+    teacher_name: string;
+    teacher_comment: string;
+    status: string;
+  } | null>(null);
+
+  // 歷史音訊播放模擬
+  const [isHistoryAudioPlaying, setIsHistoryAudioPlaying] = useState(false);
+  const [historyAudioSec, setHistoryAudioSec] = useState(0);
+  const historyAudioTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const toggleHistoryAudio = () => {
+    if (isHistoryAudioPlaying) {
+      setIsHistoryAudioPlaying(false);
+      if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+    } else {
+      setIsHistoryAudioPlaying(true);
+      setHistoryAudioSec(0);
+      if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+      historyAudioTimerRef.current = setInterval(() => {
+        setHistoryAudioSec((prev) => {
+          if (prev >= 15) {
+            setIsHistoryAudioPlaying(false);
+            if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+            return 0;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+    };
+  }, []);
+
+  const PRACTICE_HISTORY = [
+    {
+      id: 'log-1',
+      date: '09/16 (三)',
+      fullDate: '2026/09/16 19:30',
+      song: '徹爾尼 599 第 20 首',
+      score: 94,
+      duration: '15 秒自主打卡',
+      tag: '右手顆粒清晰',
+      keywords: ['右手顆粒清晰', '換指流暢', '觸鍵穩定', '節奏精準'],
+      metrics: {
+        pitch: 96,
+        rhythm: 93,
+        clarity: 95,
+        bpm: 80,
+        cv: '0.032 (優良)',
+      },
+      ai_summary:
+        '本次 15 秒打卡在 BPM 80 速度下節奏穩定，右手高音區顆粒感極佳，換指過渡均勻！第 12 小節左手伴奏力道已有顯著改善。',
+      teacher_name: '林佩芬 老師',
+      teacher_comment:
+        '「心悅，右手第 4、5 指的掌關節支撐做得很好！繼續維持這個手型，配合節拍器穩定慢練！」',
+      status: '已批改',
+    },
+    {
+      id: 'log-2',
+      date: '09/14 (一)',
+      fullDate: '2026/09/14 18:45',
+      song: '拜爾鋼琴教本 No.66',
+      score: 91,
+      duration: '15 秒自主打卡',
+      tag: '觸鍵俐落',
+      keywords: ['節奏穩定', '雙手平衡', '拍頻均勻', '觸鍵俐落'],
+      metrics: {
+        pitch: 92,
+        rhythm: 90,
+        clarity: 91,
+        bpm: 76,
+        cv: '0.041 (良好)',
+      },
+      ai_summary:
+        '雙手合奏聲部平衡佳，十六分音符節奏精準踩在拍點上，整體旋律線條清晰流暢。',
+      teacher_name: '林佩芬 老師',
+      teacher_comment:
+        '「切分音拍子抓得很穩！在家練習時記得左手伴奏要比右手旋律再輕一點點。」',
+      status: '已批改',
+    },
+    {
+      id: 'log-3',
+      date: '09/11 (五)',
+      fullDate: '2026/09/11 20:15',
+      song: '巴哈初步第 3 首前四小節',
+      score: 89,
+      duration: '15 秒自主打卡',
+      tag: '複調對位清晰',
+      keywords: ['聲部獨立', '複調清晰', '斷奏乾淨', '手腕放鬆'],
+      metrics: {
+        pitch: 91,
+        rhythm: 88,
+        clarity: 89,
+        bpm: 68,
+        cv: '0.048 (良好)',
+      },
+      ai_summary:
+        '巴洛克複調對位線條清楚，左右手主題對答分明，句尾收音自然。',
+      teacher_name: '林佩芬 老師',
+      teacher_comment:
+        '「二聲部對位感出來了！注意雙手分開練習時維持指尖垂直站立。」',
+      status: '已批改',
+    },
+    {
+      id: 'log-4',
+      date: '09/08 (二)',
+      fullDate: '2026/09/08 17:50',
+      song: '蕭邦：降E大調夜曲 Op.9 No.2',
+      score: 93,
+      duration: '15 秒自主打卡',
+      tag: '踏板層次優美',
+      keywords: ['踏板乾淨', '歌唱性佳', '色彩豐富', '弱音細膩'],
+      metrics: {
+        pitch: 95,
+        rhythm: 92,
+        clarity: 94,
+        bpm: 60,
+        cv: '0.035 (優良)',
+      },
+      ai_summary:
+        '右手歌唱性旋律富有感情，踏板更換乾淨無混濁，琶音聲部輕柔流動。',
+      teacher_name: '林佩芬 老師',
+      teacher_comment:
+        '「弱音觸鍵很美，很有詩意！高潮段落可以再放膽給予手臂重量。」',
+      status: '已批改',
+    },
+  ];
 
   // 開始 15 秒錄音
   const startRecording = () => {
@@ -198,10 +345,11 @@ function StudentPracticeContent() {
             disabled={recordState === 'recording'}
             className="w-full p-2.5 bg-[#FAF6F0] rounded-xl border border-[#E8E1D5] text-[13px] font-semibold text-[#2B3049] outline-none cursor-pointer"
           >
+            <option value="徹爾尼 599 第 20 首">徹爾尼 599 第 20 首</option>
             <option value="拜爾鋼琴教本 No.66">拜爾鋼琴教本 No.66</option>
             <option value="小奏鳴曲 Op.36 No.1">小奏鳴曲 Op.36 No.1</option>
-            <option value="鈴木小提琴第一冊 嘉禾舞曲">鈴木小提琴第一冊 嘉禾舞曲</option>
-            <option value="巴哈 G大調小步舞曲">巴哈 G大調小步舞曲</option>
+            <option value="巴哈初步第 3 首前四小節">巴哈初步第 3 首前四小節</option>
+            <option value="蕭邦：升c小調圓舞曲 Op.64 No.2">蕭邦：升c小調圓舞曲 Op.64 No.2</option>
             <option value="自選練琴片段">自選練琴片段</option>
           </select>
         </div>
@@ -370,42 +518,259 @@ function StudentPracticeContent() {
         </p>
       </div>
 
-      {/* 5. 歷史練習日誌 */}
+      {/* 5. 歷史練習日誌 (點擊卡片可開啟詳細 AI 診斷與老師評語彈窗) */}
       <div className="flex flex-col gap-2 pt-1">
         <div className="flex justify-between items-center">
           <span className="text-[14px] font-bold text-[#2B3049]">
             近期練習紀錄
           </span>
-          <span className="text-[11px] text-[#A3A7BA]">過去 3 天</span>
+          <span className="text-[11px] text-[#A3A7BA]">點擊查看 AI 診斷與老師回饋</span>
         </div>
 
         <div className="flex flex-col gap-2">
-          {[
-            { date: '09/03 (三)', song: '巴哈 G大調小步舞曲', score: 91, tag: '節奏穩定' },
-            { date: '09/02 (二)', song: '拜爾鋼琴教本 No.66', score: 88, tag: '觸鍵俐落' },
-            { date: '09/01 (一)', song: '小奏鳴曲 Op.36 No.1', score: 94, tag: '音準極佳' },
-          ].map((log, idx) => (
+          {PRACTICE_HISTORY.map((log) => (
             <div
-              key={idx}
-              className="p-3 bg-white rounded-xl border border-[rgba(43,48,73,0.06)] flex items-center justify-between shadow-2xs"
+              key={log.id}
+              onClick={() => {
+                setSelectedHistoryLog(log);
+                setIsHistoryAudioPlaying(false);
+                setHistoryAudioSec(0);
+              }}
+              className="p-3 bg-white hover:bg-[#FAF6F0] rounded-xl border border-[rgba(43,48,73,0.08)] flex items-center justify-between shadow-2xs cursor-pointer transition-all active:scale-[0.99] group"
             >
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold text-[#2B3049]">{log.song}</span>
-                <span className="text-[11px] text-[#A3A7BA]">{log.date} · #{log.tag}</span>
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[13px] font-bold text-[#2B3049] group-hover:text-[#CEAB98] transition-colors">
+                    {log.song}
+                  </span>
+                  <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded border border-emerald-200">
+                    {log.status}
+                  </span>
+                </div>
+                <div className="text-[11px] text-[#A3A7BA] flex items-center gap-1.5">
+                  <span>{log.date}</span>
+                  <span>·</span>
+                  <span className="text-[#CEAB98] font-medium">#{log.tag}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[14px] font-bold text-[#CEAB98]">{log.score} 分</span>
-                <CheckCircle2 className="w-4 h-4 text-[#68C5AB]" />
+
+              <div className="flex items-center gap-2">
+                <div className="flex flex-col items-end">
+                  <span className="text-[14px] font-extrabold text-[#CEAB98]">
+                    {log.score} 分
+                  </span>
+                  <span className="text-[10px] text-[#A3A7BA]">點擊詳情</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#A3A7BA] group-hover:text-[#CEAB98] group-hover:translate-x-0.5 transition-all" />
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 打卡成功慶祝彈窗 */}
+      {/* ======================================================== */}
+      {/* 6. 歷史練習紀錄 AI 診斷與老師評語詳情彈窗 (點擊背景關閉)   */}
+      {/* ======================================================== */}
+      {selectedHistoryLog && (
+        <div
+          onClick={() => {
+            setSelectedHistoryLog(null);
+            setIsHistoryAudioPlaying(false);
+            if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+          }}
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[360px] max-h-[85vh] overflow-y-auto bg-white rounded-[24px] p-5 shadow-2xl flex flex-col gap-4 border border-[#EBDCB9] animate-in zoom-in-95 [scrollbar-width:thin]"
+          >
+            {/* 彈窗頂部標題與關閉按鈕 */}
+            <div className="flex items-center justify-between border-b border-[#FAF6F0] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#FAF6F0] flex items-center justify-center text-[#CEAB98] border border-[#E8E1D5]">
+                  <Music className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-bold text-[#2B3049] leading-tight">
+                    {selectedHistoryLog.song}
+                  </h3>
+                  <p className="text-[11px] text-[#7A7E90]">
+                    {selectedHistoryLog.fullDate} · 15 秒打卡
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedHistoryLog(null);
+                  setIsHistoryAudioPlaying(false);
+                  if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+                }}
+                className="w-7 h-7 rounded-full bg-[#FAF6F0] hover:bg-[#F2EDE4] flex items-center justify-center text-[#6F6F6F] cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* AI 評分與評級橫幅 */}
+            <div className="p-3.5 bg-gradient-to-br from-[#FAF6F0] to-[#F5ECE0] rounded-2xl border border-[#E8E1D5] flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-[#885424]">AI 音訊特徵分析</span>
+                <span className="text-[12px] text-[#6F6F6F]">librosa 拍頻與音準診斷</span>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-[24px] font-black text-[#68C5AB]">
+                  {selectedHistoryLog.score}
+                </span>
+                <span className="text-[12px] font-bold text-[#2B3049]">/ 100 分</span>
+              </div>
+            </div>
+
+            {/* 15 秒錄音回放模擬 */}
+            <div className="p-3 bg-[#FAF6F0] rounded-xl border border-[#EFE8DC] flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#2B3049] flex items-center gap-1">
+                  <Volume2 className="w-3.5 h-3.5 text-[#CEAB98]" />
+                  <span>打卡錄音回放 (15 秒)</span>
+                </span>
+                <span className="text-[11px] font-mono text-[#7A7E90]">
+                  00:{String(historyAudioSec).padStart(2, '0')} / 00:15
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={toggleHistoryAudio}
+                  className="w-9 h-9 rounded-full bg-[#68C5AB] hover:bg-[#5BB39A] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all shrink-0"
+                >
+                  {isHistoryAudioPlaying ? (
+                    <Pause className="w-4 h-4 fill-white" />
+                  ) : (
+                    <Play className="w-4 h-4 ml-0.5 fill-white" />
+                  )}
+                </button>
+
+                {/* 動態波形長條 */}
+                <div className="flex-1 flex items-center gap-1 h-6">
+                  {[30, 60, 95, 70, 40, 85, 100, 65, 45, 90, 75, 50, 80, 60, 40, 70].map((h, i) => {
+                    const isPassed = (i / 16) * 15 <= historyAudioSec;
+                    return (
+                      <div
+                        key={i}
+                        className={`flex-1 rounded-full transition-all duration-150 ${
+                          isPassed
+                            ? 'bg-[#68C5AB]'
+                            : isHistoryAudioPlaying
+                            ? 'bg-[#CEAB98]/40 animate-pulse'
+                            : 'bg-[#D1C9BE]'
+                        }`}
+                        style={{ height: `${h}%` }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* AI 診斷指標與關鍵字 */}
+            <div className="flex flex-col gap-2">
+              <div className="text-[12px] font-bold text-[#2B3049] flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-[#C9A259]" />
+                <span>AI 特徵指標</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col">
+                  <span className="text-[10px] text-[#7A7E90]">音準準確度</span>
+                  <span className="text-[14px] font-bold text-slate-800">
+                    {selectedHistoryLog.metrics.pitch}%
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col">
+                  <span className="text-[10px] text-[#7A7E90]">節奏穩定度</span>
+                  <span className="text-[14px] font-bold text-slate-800">
+                    {selectedHistoryLog.metrics.rhythm}%
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col">
+                  <span className="text-[10px] text-[#7A7E90]">觸鍵清晰度</span>
+                  <span className="text-[14px] font-bold text-slate-800">
+                    {selectedHistoryLog.metrics.clarity}%
+                  </span>
+                </div>
+                <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col">
+                  <span className="text-[10px] text-[#7A7E90]">拍頻變異係數 (CV)</span>
+                  <span className="text-[13px] font-bold text-emerald-700">
+                    {selectedHistoryLog.metrics.cv}
+                  </span>
+                </div>
+              </div>
+
+              {/* 標籤 */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {selectedHistoryLog.keywords.map((kw, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-0.5 rounded-md bg-[#68C5AB]/15 text-[#2E7D68] text-[11px] font-bold"
+                  >
+                    #{kw}
+                  </span>
+                ))}
+              </div>
+
+              {/* AI 診斷建議內容 */}
+              <div className="p-3 bg-[#FAF6F0] rounded-xl border border-[#E8E1D5] text-[12px] text-[#6F6F6F] leading-relaxed">
+                {selectedHistoryLog.ai_summary}
+              </div>
+            </div>
+
+            {/* 老師課後評語叮嚀 */}
+            <div className="p-3.5 bg-[#FFF9E6] rounded-2xl border border-[#FFE8A3] shadow-2xs flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#D97706]" />
+                  <span className="text-[12px] font-bold text-[#92400E]">
+                    {selectedHistoryLog.teacher_name} 評語
+                  </span>
+                </div>
+                <span className="text-[10px] font-semibold text-[#B45309] bg-[#FEF3C7] px-1.5 py-0.2 rounded-full border border-[#FDE68A]">
+                  已審核送出
+                </span>
+              </div>
+              <p className="text-[12px] text-[#78350F] leading-relaxed">
+                {selectedHistoryLog.teacher_comment}
+              </p>
+            </div>
+
+            {/* 關閉按鈕 */}
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedHistoryLog(null);
+                setIsHistoryAudioPlaying(false);
+                if (historyAudioTimerRef.current) clearInterval(historyAudioTimerRef.current);
+              }}
+              className="w-full py-2.5 bg-[#CEAB98] hover:bg-[#C29D89] text-white font-bold text-[13px] rounded-xl shadow-sm transition-all cursor-pointer text-center"
+            >
+              關閉詳情
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 7. 打卡成功慶祝彈窗 (點擊背景關閉)                          */}
+      {/* ======================================================== */}
       {showCelebrationModal && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-[310px] bg-white rounded-[24px] p-5 shadow-2xl flex flex-col items-center text-center gap-3 border border-slate-100 animate-in zoom-in-95">
+        <div
+          onClick={() => setShowCelebrationModal(false)}
+          className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[310px] bg-white rounded-[24px] p-5 shadow-2xl flex flex-col items-center text-center gap-3 border border-slate-100 animate-in zoom-in-95"
+          >
             <div className="w-16 h-16 rounded-full bg-[#D1F2EB] flex items-center justify-center text-[30px] shadow-inner">
               🎉
             </div>

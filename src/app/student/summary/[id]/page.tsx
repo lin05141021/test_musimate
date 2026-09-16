@@ -24,7 +24,7 @@ export default function StudentSummaryDetailPage() {
   const router = useRouter();
   const { lessonRecords, activeStudentId, allStudents, switchStudent } = useDemoContext();
 
-  const recordId = (params?.id as string) || 'lesson-1';
+  const recordId = (params?.id as string) || 'lesson-7';
 
   // 自動依據使用者 LINE ID 或全組 Demo 學生切換身分防呆
   useEffect(() => {
@@ -44,17 +44,17 @@ export default function StudentSummaryDetailPage() {
     }
   }, [activeStudentId, allStudents, switchStudent]);
 
-  // 取得完整課堂紀錄列表（依時間順序排序：第 1 堂課到第 5 堂課）
+  // 取得完整課堂紀錄列表（依時間順序排序：第 1 堂課到最新第 7 堂課）
   const allLessons = (lessonRecords && lessonRecords.length > 0)
     ? [...lessonRecords].sort(
         (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
       )
     : [];
 
-  // 計算當前課堂在清單中的索引
+  // 計算當前課堂在清單中的索引 (預設為最新一堂課)
   const currentIndex = allLessons.findIndex((r) => r.id === recordId);
-  const safeIndex = currentIndex !== -1 ? currentIndex : 0;
-  const currentRecord = allLessons[safeIndex] || allLessons[0];
+  const safeIndex = currentIndex !== -1 ? currentIndex : (allLessons.length > 0 ? allLessons.length - 1 : 0);
+  const currentRecord = allLessons[safeIndex] || allLessons[allLessons.length - 1] || allLessons[0];
 
   // 左右切換按鈕邊界禁用邏輯
   const isPrevDisabled = safeIndex <= 0;
@@ -76,11 +76,10 @@ export default function StudentSummaryDetailPage() {
     router.push(`/student/summary/${id}`);
   };
 
-  // 格式化日期標籤
+  // 格式化日期標籤 (動態依 created_at 計算)
   const formatLessonHeaderDate = (isoString: string, id: string) => {
-    if (id === 'lesson-1') return '8月15日（五）的課程';
-    const d = new Date(isoString);
-    if (isNaN(d.getTime())) return '8月15日（五）的課程';
+    const d = new Date(isoString || '2026-09-18T10:00:00+08:00');
+    if (isNaN(d.getTime())) return '9月18日（五）的課程';
     const month = d.getMonth() + 1;
     const date = d.getDate();
     const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
@@ -89,9 +88,8 @@ export default function StudentSummaryDetailPage() {
   };
 
   const formatCardDate = (isoString: string, id: string) => {
-    if (id === 'lesson-1') return '2026/08/15';
-    const d = new Date(isoString);
-    if (isNaN(d.getTime())) return '2026/08/15';
+    const d = new Date(isoString || '2026-09-18T10:00:00+08:00');
+    if (isNaN(d.getTime())) return '2026/09/18';
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const date = String(d.getDate()).padStart(2, '0');
@@ -158,29 +156,29 @@ export default function StudentSummaryDetailPage() {
   const technicalTips = summary.technical_tips && summary.technical_tips.length > 0
     ? summary.technical_tips
     : [
-        '右手持弓姿勢注意放鬆，避免過度緊繃，以保持弓速的流暢度與琴弦共鳴。',
-        '左手第二指按弦精準度，在高把位轉換時應維持指尖垂直落指，防止音準偏低。',
+        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
+        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。',
       ];
 
   const theoryTips = summary.theory_tips && summary.theory_tips.length > 0
     ? summary.theory_tips
     : [
-        '注意十六分音符的均勻度，切分音符需準確踩在拍點上，不能隨意搶拍。',
-        'E大調升分號 (C#) 的按弦位置需特別貼近一指，維持半音關係精準度。',
+        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
+        '巴哈複調音樂雙手各自獨立，注意二聲部對位線條清晰度。',
       ];
 
   const homeworkList = summary.homework && summary.homework.length > 0
     ? summary.homework
     : [
-        '第15至32小節慢速練習並分段重複10次',
-        '錄製一段節拍器輔助的穩定演奏音訊供批改',
-        '熟記第一樂章前奏的左手把位指法與弓法',
+        '徹爾尼 599 第 20 首：配合節拍器由慢練漸進提升至目標速度 BPM 80，每日練習 15 分鐘',
+        '巴哈初步第 3 首：雙手分開單獨慢練第 1 至 4 小節，熟記指法與聲部進行',
+        '針對第 12 小節左手伴奏手腕放鬆度錄製 15 秒打卡音訊供批改',
       ];
 
   const encouragementText =
-    summary.encouragement || '每一次的練習都是進步的累積，老師看到你的努力了！';
+    summary.encouragement || '右手顆粒感的進步非常亮眼！只要把左手的手腕放鬆、伴奏輕下來，整首曲子的層次就會如同水晶般清澈。繼續加油！';
 
-  const currentSongTitle = currentRecord?.song_title || '巴哈：E大調小提琴協奏曲 第一樂章';
+  const currentSongTitle = currentRecord?.song_title || '徹爾尼 599 第 20 首 & 巴哈初步第 3 首';
   const teacherName = currentRecord?.teacher_name || '林佩芬 老師 (Teacher Lin)';
 
   return (

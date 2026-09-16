@@ -19,7 +19,7 @@ export const ContactSupportModal: React.FC<ContactSupportModalProps> = ({ isOpen
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-sm bg-[#FAF6F0] rounded-3xl border border-[#EBDCB9] p-6 shadow-2xl flex flex-col gap-5 relative animate-in zoom-in-95 duration-200"
+        className="w-full max-w-sm max-h-[85vh] overflow-y-auto bg-[#FAF6F0] rounded-3xl border border-[#EBDCB9] p-6 shadow-2xl flex flex-col gap-5 relative animate-in zoom-in-95 duration-200 [scrollbar-width:thin]"
       >
         {/* 右上角關閉按鈕 */}
         <button
