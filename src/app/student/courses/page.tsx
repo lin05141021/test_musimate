@@ -678,11 +678,17 @@ function CoursesContent() {
         {/* STEP 4: 預約試上彈出視窗 (Trial Booking Modal) */}
         {/* ============================================================ */}
         {isBookingModalOpen && (
-          <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="w-full bg-white shadow-[0px_8px_20px_rgba(0,0,0,0.25)] rounded-3xl p-5 flex flex-col gap-4 animate-in zoom-in-95 duration-200 border border-[#F0EAE1]">
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-pointer"
+            onClick={() => setIsBookingModalOpen(false)}
+          >
+            <div 
+              className="w-full max-w-[360px] max-h-[88vh] overflow-y-auto bg-white shadow-[0px_8px_20px_rgba(0,0,0,0.25)] rounded-3xl p-5 flex flex-col gap-4 animate-in zoom-in-95 duration-200 border border-[#F0EAE1] cursor-default [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent]"
+              onClick={(e) => e.stopPropagation()}
+            >
               
               {/* Modal 頂部標題與關閉按鈕 */}
-              <div className="w-full flex justify-between items-center">
+              <div className="w-full flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-2">
                   {/* 彩色漸層小圓點 */}
                   <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-b from-[#C9A259] via-[#68C5AB] to-[#B58EBE]" />
@@ -700,7 +706,7 @@ function CoursesContent() {
               </div>
 
               {/* 試上導師預覽 */}
-              <div className="px-3 py-2 bg-[#F8F5F0] rounded-xl flex items-center justify-between">
+              <div className="px-3 py-2 bg-[#F8F5F0] rounded-xl flex items-center justify-between shrink-0">
                 <span className="text-[12px] font-semibold text-[#6F6F6F]">指定導師 / 科目</span>
                 <span className="text-[13px] font-bold text-[#B58EBE]">
                   {selectedTeacher.name} 老師 · {selectedInstrument.name}
@@ -708,7 +714,7 @@ function CoursesContent() {
               </div>
 
               {/* 試上須知 */}
-              <div className="p-3.5 bg-[#FAF6F0] rounded-2xl border border-[#FAF6F0] flex flex-col gap-2">
+              <div className="p-3.5 bg-[#FAF6F0] rounded-2xl border border-[#FAF6F0] flex flex-col gap-2 shrink-0">
                 <div className="text-[#2B3049] text-[14px] font-bold">
                   試上須知
                 </div>
@@ -720,7 +726,7 @@ function CoursesContent() {
               </div>
 
               {/* 試上費用 */}
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 shrink-0">
                 <div className="text-[#6F6F6F] text-[13px] font-bold">
                   試上費用
                 </div>
@@ -735,7 +741,7 @@ function CoursesContent() {
               </div>
 
               {/* 選擇試上時間 (下拉選擇) */}
-              <div className="flex flex-col gap-1.5 relative">
+              <div className="flex flex-col gap-1.5 relative shrink-0">
                 <div className="text-[#6F6F6F] text-[13px] font-bold">
                   選擇試上時間
                 </div>
@@ -772,7 +778,7 @@ function CoursesContent() {
               </div>
 
               {/* 操作按鈕群 */}
-              <div className="flex flex-col gap-2 pt-1">
+              <div className="flex flex-col gap-2 pt-1 shrink-0">
                 <button
                   type="button"
                   disabled={isSubmitting}
@@ -797,8 +803,14 @@ function CoursesContent() {
         {/* 預約成功反饋彈窗 */}
         {/* ============================================================ */}
         {bookingSuccessModal && (
-          <div className="absolute inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="w-full bg-white shadow-2xl rounded-3xl p-6 flex flex-col items-center gap-4 text-center border border-[#F0EAE1] animate-in zoom-in-95">
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-pointer"
+            onClick={() => setBookingSuccessModal(null)}
+          >
+            <div 
+              className="w-full max-w-[340px] max-h-[85vh] overflow-y-auto bg-white shadow-2xl rounded-3xl p-6 flex flex-col items-center gap-4 text-center border border-[#F0EAE1] animate-in zoom-in-95 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <Check className="w-7 h-7" strokeWidth={2.5} />
               </div>

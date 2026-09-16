@@ -108,8 +108,17 @@ function StudentScheduleContent() {
   const currentStudentId = resolvedStudentId;
   const currentStudentInfo = allStudents.find((s) => s.student.id === currentStudentId);
 
+  // LIFF 初始化安全核對狀態 (避免畫面閃爍訪客頁)
+  const [isLiffChecking, setIsLiffChecking] = useState<boolean>(true);
+  // 已打卡報到之課堂 ID 記錄
+  const [checkedInIds, setCheckedInIds] = useState<string[]>([]);
+
   // LINE LIFF Native 運行環境身分自動校準
   useEffect(() => {
+    let timer = setTimeout(() => {
+      setIsLiffChecking(false);
+    }, 800);
+
     async function checkLiffProfile() {
       try {
         const liff = (await import('@line/liff')).default;
@@ -150,9 +159,12 @@ function StudentScheduleContent() {
         }
       } catch (e) {
         console.warn('LIFF init error in schedule page:', e);
+      } finally {
+        setIsLiffChecking(false);
       }
     }
     checkLiffProfile();
+    return () => clearTimeout(timer);
   }, [switchStudent]);
 
   // 實時資料庫資料 State
@@ -674,6 +686,7 @@ function StudentScheduleContent() {
   // 報到按鈕點擊處理
   const handleCheckin = (appt: Appointment) => {
     checkInAppointment(appt.id);
+    setCheckedInIds((prev) => [...prev, appt.id]);
     showToast('報到成功！已完成課前出席報到');
     setCheckinToast(`🎉 ${formatDateBadge(appt.start_time).monthDate} 堂課報到成功！已即時通知 ${teacherName}。`);
     setTimeout(() => {
@@ -740,6 +753,26 @@ function StudentScheduleContent() {
     const record = lessonRecords.find((r) => r.appointment_id === apptId);
     return record?.id || 'lesson-1';
   };
+
+  // LIFF 身分核對過渡狀態：顯示雅緻載入畫面，避免閃現訪客畫面
+  if (isLiffChecking) {
+    return (
+      <div className="w-full min-h-[65vh] flex flex-col items-center justify-center gap-4 text-center p-6 select-none animate-in fade-in duration-300">
+        <div className="w-16 h-16 rounded-full bg-[rgba(206,171,152,0.15)] border border-[#CEAB98]/30 flex items-center justify-center text-[#CEAB98] shadow-sm">
+          <Sparkles className="w-8 h-8 animate-spin" style={{ animationDuration: '3s' }} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <div className="text-[17px] font-bold text-[#2B3049] flex items-center justify-center gap-2">
+            <span>LINE 身分安全核對中</span>
+            <span className="inline-block animate-bounce">🎵</span>
+          </div>
+          <p className="text-[13px] text-[#7A7E90] max-w-[260px] leading-relaxed">
+            正在為您即時載入專屬課表、最新期數進度與教材大腦...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // 未驗證或新訪客：顯示專屬新生歡迎詞與 8 大樂器探索預約，嚴格防護現有學員隱私
   if (!isVerifiedStudent) {
@@ -931,6 +964,34 @@ function StudentScheduleContent() {
         </div>
       </div>
 
+      {/* 待繳費提醒橫幅 (例如第 4 期已排定尚未繳費核銷) */}
+      {activeContractIndex > 0 && (
+        <div className="w-full p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200/80 shadow-xs flex flex-col gap-2.5 animate-in fade-in">
+          <div className="flex items-start gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center shrink-0 text-amber-700">
+              <AlertTriangle className="w-4 h-4" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <div className="text-[14px] font-bold text-amber-900">
+                {contractsList[activeContractIndex]?.title || '第 4 期課堂'} · 待完成繳費對帳
+              </div>
+              <div className="text-[12px] text-amber-800/90 leading-relaxed">
+                老師已為您排定並保留專屬時段（保留期限 14 天）。請盡速前往「上傳繳費證明」完成核銷，正式開通新期課堂！
+              </div>
+            </div>
+          </div>
+          <div className="pt-0.5 flex items-center gap-2">
+            <Link
+              href="/student/billing"
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-[12px] rounded-xl transition-all shadow-xs inline-flex items-center gap-1.5"
+            >
+              <CreditCard className="w-3.5 h-3.5" />
+              <span>前往繳費對帳 (NT$ 8,000)</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ======================================================== */}
       {/* 1. 查看本期已過課程 (顯示可收合列表，點擊直達鋼琴聯絡簿)  */}
       {/* ======================================================== */}
@@ -1080,31 +1141,33 @@ function StudentScheduleContent() {
                     </div>
                   </div>
 
-                  {/* 動作按鈕：第 7 堂 (9/16) 提供 15 分鐘前報到與請假調課 */}
+                  {/* 動作按鈕：首堂即將到來課程提供 15 分鐘前報到與請假調課 */}
                   {isFirstUpcoming ? (
                     <div className="w-full flex flex-col gap-2 pt-1">
-                      {appt.status === 'attended' || (appt as any).attendance === 'attended' ? (
-                        <div className="w-full py-2.5 px-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl flex justify-center items-center gap-2 font-bold text-[13px]">
+                      {appt.status === 'attended' || (appt as any).attendance === 'attended' || (appt as any).student_checkin_at || checkedInIds.includes(appt.id) ? (
+                        <div className="w-full py-2.5 px-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl flex justify-center items-center gap-2 font-bold text-[13px] select-none">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>✔ 已完成課前報到（出席狀態）</span>
+                          <span>✔ 已成功報到（準時出席）</span>
                         </div>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => handleCheckin(appt)}
-                          className="w-full py-2.5 px-3 bg-[#CEAB98] hover:bg-[#C29D89] active:scale-[0.99] rounded-xl flex justify-center items-center gap-2 text-white font-bold text-[14px] shadow-sm shadow-[#CEAB98]/25 transition-all cursor-pointer"
-                        >
-                          <CheckCircle2 className="w-4 h-4 text-white" />
-                          <span>課前15分鐘開放報到</span>
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleCheckin(appt)}
+                            className="w-full py-2.5 px-3 bg-[#CEAB98] hover:bg-[#C29D89] active:scale-[0.99] rounded-xl flex justify-center items-center gap-2 text-white font-bold text-[14px] shadow-sm shadow-[#CEAB98]/25 transition-all cursor-pointer"
+                          >
+                            <CheckCircle2 className="w-4 h-4 text-white" />
+                            <span>課前15分鐘開放報到</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleCardRescheduleClick(appt)}
+                            className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
+                          >
+                            <span>請於課前24小時前完成請假/調課</span>
+                          </button>
+                        </>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => handleCardRescheduleClick(appt)}
-                        className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
-                      >
-                        <span>請於課前24小時前完成請假/調課</span>
-                      </button>
                     </div>
                   ) : (
                     <button
