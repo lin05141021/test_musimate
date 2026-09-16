@@ -879,7 +879,10 @@ async function initLiffAuth() {
                     const result = window.MusiMateDB.authLiffUser(profile);
                     if (result && result.student) {
                         currentActiveStudent = result.student;
-                        updateStudentHeader(result.student);
+                        if (profile.pictureUrl) {
+                            currentActiveStudent.avatar_url = profile.pictureUrl;
+                        }
+                        updateStudentHeader(currentActiveStudent);
                         renderSchedule(result.student.student_id || result.student.id || result.student.name);
                     }
                 }
