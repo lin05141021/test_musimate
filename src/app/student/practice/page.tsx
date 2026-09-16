@@ -16,6 +16,8 @@ import {
   Award,
   Sparkles,
   MessageCircle,
+  Volume2,
+  X,
 } from 'lucide-react';
 
 function StudentPracticeContent() {
@@ -52,6 +54,9 @@ function StudentPracticeContent() {
     keywords: string[];
     summary: string;
   } | null>(null);
+
+  // 打卡成功慶祝彈窗
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
 
   // 歷史練習紀錄詳情彈窗狀態
   const [selectedHistoryLog, setSelectedHistoryLog] = useState<{

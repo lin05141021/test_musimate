@@ -52,7 +52,7 @@ export default function StudentBillingPage() {
 
   // 當前學生資訊
   const currentStudentInfo = allStudents.find((s) => s.student.id === activeStudentId) || allStudents[0];
-  const studentNameFromDb = currentStudentInfo?.user?.name?.replace(/\s*\(.*?\)\s*/g, '').trim() || '陳小明';
+  const studentNameFromDb = currentStudentInfo?.user?.name?.replace(/\s*\(.*?\)\s*/g, '').trim() || '劉心悅';
 
   // 狀態管理：'before_upload' (未上傳) | 'scanning' (AI辨識中) | 'after_upload' (已辨識核銷)
   const [uploadState, setUploadState] = useState<'before_upload' | 'scanning' | 'after_upload'>('before_upload');
@@ -72,8 +72,8 @@ export default function StudentBillingPage() {
 
   // 辨識結果資料 (對齊使用者提供之富邦企鵝轉帳截圖: NT$ 8,000, 轉出 50638, 轉入 36610)
   const [billingData, setBillingData] = useState({
-    studentName: '王小明',
-    paymentItem: '週二團體低音提琴 10堂',
+    studentName: '劉心悅',
+    paymentItem: '古典鋼琴個別課 (第 4 期 10堂)',
     amount: 'NT$ 8,000',
     numericAmount: 8000,
     deadline: '2026/09/20',
@@ -81,6 +81,15 @@ export default function StudentBillingPage() {
     receivingAccount: '012 台北富邦銀行 (36610)',
     last5Digits: '50638',
   });
+
+  useEffect(() => {
+    if (studentNameFromDb) {
+      setBillingData((prev) => ({
+        ...prev,
+        studentName: studentNameFromDb,
+      }));
+    }
+  }, [studentNameFromDb]);
 
   // 處理實際檔案上傳
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -588,8 +597,14 @@ export default function StudentBillingPage() {
         {/* 核銷成功彈窗 Modal                                       */}
         {/* ======================================================== */}
         {showSuccessModal && (
-          <div className="absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs animate-in fade-in">
-            <div className="w-full max-w-[320px] bg-white rounded-3xl p-5 shadow-2xl flex flex-col items-center gap-4 border border-slate-100 animate-in zoom-in-95 text-center">
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in cursor-pointer"
+            onClick={() => setShowSuccessModal(false)}
+          >
+            <div 
+              className="w-full max-w-[320px] bg-white rounded-3xl p-5 shadow-2xl flex flex-col items-center gap-4 border border-slate-100 animate-in zoom-in-95 text-center cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <CheckCircle2 className="w-8 h-8 stroke-[2.5]" />
               </div>
@@ -635,8 +650,14 @@ export default function StudentBillingPage() {
         {/* 手動修正彈窗 Modal (依據 Figma 規範完整精準切版)           */}
         {/* ======================================================== */}
         {showEditModal && (
-          <div className="absolute inset-0 z-50 bg-[rgba(17,17,22,0.52)] flex items-center justify-center px-4 py-6 backdrop-blur-2xs animate-in fade-in">
-            <div className="w-full max-w-[328px] max-h-[92vh] overflow-y-auto bg-white rounded-[24px] p-5 shadow-[0px_8px_24px_rgba(43,48,73,0.14)] flex flex-col gap-4.5 [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent] animate-in zoom-in-95">
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in cursor-pointer"
+            onClick={() => setShowEditModal(false)}
+          >
+            <div 
+              className="w-full max-w-[328px] max-h-[85vh] overflow-y-auto bg-white rounded-[24px] p-5 shadow-[0px_8px_24px_rgba(43,48,73,0.14)] flex flex-col gap-4.5 [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent] animate-in zoom-in-95 cursor-default"
+              onClick={(e) => e.stopPropagation()}
+            >
               
               {/* 頂部標題列與關閉按鈕 */}
               <div className="w-full flex justify-between items-center shrink-0">

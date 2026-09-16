@@ -1294,16 +1294,15 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           urlParams.get('mock_user');
 
         let targetId: string | null = queryId;
+        let liveLineId: string | null = null;
+        let displayName: string | null = null;
+        let pictureUrl: string | undefined = undefined;
 
         // 1. 嘗試由 LINE LIFF Native SDK 取得身分
         try {
           const liff = (await import('@line/liff')).default;
           const liffId = process.env.NEXT_PUBLIC_LIFF_ID || '2011164851-lGsEnQWB';
           await liff.init({ liffId });
-
-          let liveLineId: string | null = null;
-          let displayName: string | null = null;
-          let pictureUrl: string | undefined = undefined;
 
           if (liff.isLoggedIn() || liff.isInClient()) {
             try {

@@ -129,47 +129,11 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 </div>
               </div>
             </div>
-
-            {/* 快速切換學生身分 (僅正式學員測試模式顯示，訪客完全隱藏) */}
-            {isVerified && (
-              <div className="flex flex-col gap-1.5 pt-2.5 border-t border-[#EAE6E1]">
-                <span className="text-[10px] font-bold text-[#7A7E90] uppercase tracking-wider">
-                  👤 切換測試學員：
-                </span>
-                <div className="grid grid-cols-3 gap-1">
-                  {[
-                    { id: '55555555-5555-4555-b555-555555555555', label: '劉心悅' },
-                    { id: '89e45974-7f00-4bfd-bd84-3eb26351a150', label: '許雅婷' },
-                    { id: 'b0000000-0000-0000-0000-000000000001', label: '陳子翔(堅)' },
-                  ].map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => {
-                        switchStudent(s.id);
-                        localStorage.setItem('musimate_student_id', s.id);
-                        localStorage.setItem('musimate_active_student_id', s.id);
-                        onClose();
-                        router.push(`/student/schedule?student_id=${s.id}`);
-                      }}
-                      className={`py-1 px-1 text-center rounded-lg text-[10px] font-bold transition-all truncate ${
-                        currentStudentId === s.id
-                          ? 'bg-[#68C5AB] text-white shadow-xs'
-                          : 'bg-white text-[#2B3049] border border-[#F0EAE1] hover:bg-[#FAF6F0]'
-                      }`}
-                      title={s.label}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Section 1: 功能選單 */}
-          <div className="pt-6 pb-4 px-6 flex flex-col gap-2">
-            <div className="text-[#7A7E90] text-[12px] font-semibold uppercase tracking-wider font-['Sora']">
+          <div className="pt-5 pb-4 px-6 flex flex-col gap-2">
+            <div className="text-[#7A7E90] text-[11px] font-bold uppercase tracking-wider font-['Sora']">
               功能選單
             </div>
 
@@ -181,14 +145,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/schedule'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#E8734A] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#FDF1EC] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#E8734A]" />
+                  <div className="w-8 h-8 rounded-full bg-[#FDF1EC] flex items-center justify-center shrink-0">
+                    <Calendar className="w-4 h-4 text-[#E8734A]" strokeWidth={2.2} />
                   </div>
-                  <Calendar className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">我的課表</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -202,14 +164,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/schedule?action=reschedule'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#E8734A] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#FDF1EC] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#E8734A]" />
+                  <div className="w-8 h-8 rounded-full bg-[#FDF1EC] flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-[#E8734A]" strokeWidth={2.2} />
                   </div>
-                  <Clock className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">請假/調課</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -223,14 +183,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/summary'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#E5A100] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#FEF7E6] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#E5A100]" />
+                  <div className="w-8 h-8 rounded-full bg-[#FEF7E6] flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-[#E5A100]" strokeWidth={2.2} />
                   </div>
-                  <BookOpen className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">智慧聯絡簿</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -244,14 +202,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/practice'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#49BB87] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#ECFAF3] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#49BB87]" />
+                  <div className="w-8 h-8 rounded-full bg-[#ECFAF3] flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-[#49BB87]" strokeWidth={2.2} />
                   </div>
-                  <CheckCircle2 className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">練習打卡</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -265,14 +221,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/stamps'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#49BB87] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#ECFAF3] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#49BB87]" />
+                  <div className="w-8 h-8 rounded-full bg-[#EEF4FC] flex items-center justify-center shrink-0">
+                    <Award className="w-4 h-4 text-[#4A72E8]" strokeWidth={2.2} />
                   </div>
-                  <Award className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">成就徽章</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -286,14 +240,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/history'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#4A8FD9] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#EEF4FC] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#4A90D9]" />
+                  <div className="w-8 h-8 rounded-full bg-[#EEF4FC] flex items-center justify-center shrink-0">
+                    <CreditCard className="w-4 h-4 text-[#4A8FD9]" strokeWidth={2.2} />
                   </div>
-                  <CreditCard className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">課程與繳費紀錄</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -307,14 +259,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/billing'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#4A8FD9] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#EEF4FC] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#4A90D9]" />
+                  <div className="w-8 h-8 rounded-full bg-[#F0F5FA] flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-[#82AAD8]" strokeWidth={2.2} />
                   </div>
-                  <FileText className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">上傳繳費證明</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -328,14 +278,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push(getNavUrl('/student/courses'));
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#9B7EC8] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#F6F2FB] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
+                  <div className="w-8 h-8 rounded-full bg-[#F6F2FB] flex items-center justify-center shrink-0">
+                    <Plus className="w-4 h-4 text-[#9B7EC8]" strokeWidth={2.2} />
                   </div>
-                  <Plus className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">開始新課程</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -347,8 +295,8 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
           <div className="w-full h-0 border-b-2 border-[#EAE6E1]" />
 
           {/* Section 2: 其他與管理 */}
-          <div className="pt-5 pb-6 px-6 flex flex-col gap-2">
-            <div className="text-[#7A7E90] text-[12px] font-semibold uppercase tracking-wider font-['Sora']">
+          <div className="pt-4 pb-6 px-6 flex flex-col gap-2">
+            <div className="text-[#7A7E90] text-[11px] font-bold uppercase tracking-wider font-['Sora']">
               其他與管理
             </div>
 
@@ -360,14 +308,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                   onClose();
                   router.push('/student/faq');
                 }}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#B3B3B3] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#F3F1ED] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#A3A7BA]" />
+                  <div className="w-8 h-8 rounded-full bg-[#F3F1ED] flex items-center justify-center shrink-0">
+                    <HelpCircle className="w-4 h-4 text-[#7A7E90]" strokeWidth={2.2} />
                   </div>
-                  <HelpCircle className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">FAQ 常見問題</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
@@ -378,14 +324,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
               <button
                 type="button"
                 onClick={() => setIsSupportModalOpen(true)}
-                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
+                className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-xl px-1 transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#B3B3B3] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#F3F1ED] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#A3A7BA]" />
+                  <div className="w-8 h-8 rounded-full bg-[#F3F1ED] flex items-center justify-center shrink-0">
+                    <Headphones className="w-4 h-4 text-[#7A7E90]" strokeWidth={2.2} />
                   </div>
-                  <Headphones className="w-4.5 h-4.5 text-[#2B3049] shrink-0" strokeWidth={2} />
                   <span className="text-[14px] font-semibold text-[#2B3049] font-['Sora']">聯繫系統客服</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[#A3A7BA] shrink-0" strokeWidth={2} />
