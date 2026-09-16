@@ -92,7 +92,7 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
     {
       key: 'summary' as const,
       label: '聯絡簿',
-      href: '/student/summary/lesson-1',
+      href: '/student/summary/lesson-7',
       icon: (
         // 聯絡簿清單：實體彩虹漸層剪貼簿 + 純白打勾挖空標記
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

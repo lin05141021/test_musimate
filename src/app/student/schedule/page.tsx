@@ -1141,43 +1141,65 @@ function StudentScheduleContent() {
                     </div>
                   </div>
 
-                  {/* 動作按鈕：首堂即將到來課程提供 15 分鐘前報到與請假調課 */}
-                  {isFirstUpcoming ? (
-                    <div className="w-full flex flex-col gap-2 pt-1">
-                      {appt.status === 'attended' || (appt as any).attendance === 'attended' || (appt as any).student_checkin_at || checkedInIds.includes(appt.id) ? (
-                        <div className="w-full py-2.5 px-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl flex justify-center items-center gap-2 font-bold text-[13px] select-none">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          <span>✔ 已成功報到（準時出席）</span>
+                  {/* 動作按鈕：僅當前進行中契約且為今日課堂開放 15 分鐘前報到 */}
+                  {(() => {
+                    // 1. 僅限當前正在進行的契約 (第 3 期，activeContractIndex === 0)
+                    // 2. 僅限即將到來的第一堂課
+                    // 3. 判斷上課日期是否為今天 (以 Demo 設定 2026-09-16 或系統今天日期為準)
+                    const apptDate = new Date(appt.start_time);
+                    const now = new Date();
+                    const isDemoToday =
+                      (apptDate.getFullYear() === 2026 && apptDate.getMonth() === 8 && apptDate.getDate() === 16) ||
+                      (apptDate.toDateString() === now.toDateString());
+                    const isCheckinEligible = activeContractIndex === 0 && isFirstUpcoming && isDemoToday;
+
+                    if (isCheckinEligible) {
+                      const isAttended =
+                        appt.status === 'attended' ||
+                        (appt as any).attendance === 'attended' ||
+                        (appt as any).student_checkin_at ||
+                        checkedInIds.includes(appt.id);
+
+                      return (
+                        <div className="w-full flex flex-col gap-2 pt-1">
+                          {isAttended ? (
+                            <div className="w-full py-2.5 px-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl flex justify-center items-center gap-2 font-bold text-[13px] select-none">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                              <span>✔ 已成功報到（準時出席）</span>
+                            </div>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleCheckin(appt)}
+                                className="w-full py-2.5 px-3 bg-[#CEAB98] hover:bg-[#C29D89] active:scale-[0.99] rounded-xl flex justify-center items-center gap-2 text-white font-bold text-[14px] shadow-sm shadow-[#CEAB98]/25 transition-all cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-4 h-4 text-white" />
+                                <span>課前15分鐘開放報到</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleCardRescheduleClick(appt)}
+                                className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
+                              >
+                                <span>請於課前24小時前完成請假/調課</span>
+                              </button>
+                            </>
+                          )}
                         </div>
-                      ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => handleCheckin(appt)}
-                            className="w-full py-2.5 px-3 bg-[#CEAB98] hover:bg-[#C29D89] active:scale-[0.99] rounded-xl flex justify-center items-center gap-2 text-white font-bold text-[14px] shadow-sm shadow-[#CEAB98]/25 transition-all cursor-pointer"
-                          >
-                            <CheckCircle2 className="w-4 h-4 text-white" />
-                            <span>課前15分鐘開放報到</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleCardRescheduleClick(appt)}
-                            className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
-                          >
-                            <span>請於課前24小時前完成請假/調課</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleCardRescheduleClick(appt)}
-                      className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
-                    >
-                      <span>請於課前24小時前完成請假/調課</span>
-                    </button>
-                  )}
+                      );
+                    }
+
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => handleCardRescheduleClick(appt)}
+                        className="w-full py-2 px-3 bg-[#FAF6F0] hover:bg-[#F2ECE1] active:scale-[0.99] rounded-xl flex justify-center items-center gap-1.5 text-[#6F6F6F] font-bold text-[13px] transition-all cursor-pointer border border-[#EBDCB9]"
+                      >
+                        <span>請於課前24小時前完成請假/調課</span>
+                      </button>
+                    );
+                  })()}
                 </div>
               );
             })
@@ -1187,20 +1209,26 @@ function StudentScheduleContent() {
             </div>
           )}
 
-          {/* 預約下一期課程按鈕 (原老師續約) */}
+          {/* 預約下一期課程按鈕 (動態依當前期數計算) */}
           <div className="w-full pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setNewTermStep(1);
-                  setIsNewTermModalOpen(true);
-                }}
-                className="w-full py-3.5 px-4 bg-gradient-to-r from-[#CEAB98] to-[#BA947F] hover:brightness-105 active:scale-[0.99] rounded-2xl flex items-center justify-center gap-2 text-white font-bold text-[15px] shadow-md transition-all cursor-pointer"
-              >
-                <Calendar className="w-4 h-4 text-white" />
-                <span>預約下一期課程 (第 4 期續約)</span>
-              </button>
-            </div>
+            {(() => {
+              const currentTermNumber = contractsList[activeContractIndex]?.term_number || (activeContractIndex + 3);
+              const nextTermNumber = currentTermNumber + 1;
+              return (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewTermStep(1);
+                    setIsNewTermModalOpen(true);
+                  }}
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-[#CEAB98] to-[#BA947F] hover:brightness-105 active:scale-[0.99] rounded-2xl flex items-center justify-center gap-2 text-white font-bold text-[15px] shadow-md transition-all cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4 text-white" />
+                  <span>預約下一期課程 (第 {nextTermNumber} 期續約)</span>
+                </button>
+              );
+            })()}
+          </div>
         </div>
       </div>
 

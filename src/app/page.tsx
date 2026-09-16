@@ -36,7 +36,7 @@ export default function LiffEntryPage() {
             if (liffState.includes('faq')) redirect = '/student/faq';
             else if (liffState.includes('reschedule') || liffState.includes('leave')) action = 'reschedule';
             else if (liffState.includes('practice')) redirect = '/student/practice';
-            else if (liffState.includes('summary') || liffState.includes('report')) redirect = '/student/summary/lesson-1';
+            else if (liffState.includes('summary') || liffState.includes('report')) redirect = '/student/summary/lesson-7';
             else if (liffState.includes('stamps')) redirect = '/student/stamps';
             else if (liffState.includes('billing')) redirect = '/student/billing';
             else if (liffState.includes('history')) redirect = '/student/history';
@@ -56,7 +56,7 @@ export default function LiffEntryPage() {
       } else if (page === 'practice') {
         router.replace('/student/practice');
       } else if (page === 'summary' || page === 'report') {
-        router.replace('/student/summary/lesson-1');
+        router.replace('/student/summary/lesson-7');
       } else if (page === 'stamps') {
         router.replace('/student/stamps');
       } else if (page === 'contracts' || page === 'billing') {

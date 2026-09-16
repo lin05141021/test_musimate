@@ -44,28 +44,31 @@ export async function POST(request: NextRequest) {
     const cleanedTips: string[] = [];
     const cleanedHomework: string[] = [];
 
-    if (raw_transcript.includes('巴哈') || raw_transcript.includes('曲目') || raw_transcript.includes('音高')) {
-      cleanedHighlights.push('音高穩定度掌握優良，曲目整體音樂流暢性佳');
+    if (raw_transcript.includes('巴哈') || raw_transcript.includes('徹爾尼') || raw_transcript.includes('顆粒感')) {
+      cleanedHighlights.push('右手高音區顆粒感顯著進步，手指獨立性佳');
+      cleanedHighlights.push('曲目整體聲部線條清晰，視奏與音樂性良好');
     } else {
-      cleanedHighlights.push('課堂展現積極學習態度，基礎音色建立完整');
+      cleanedHighlights.push('課堂展現積極學習態度，觸鍵音色建立完整');
     }
 
-    if (raw_transcript.includes('弓法') || raw_transcript.includes('手型') || raw_transcript.includes('右手') || raw_transcript.includes('姿勢')) {
-      cleanedTips.push('右手持弓手腕維持放鬆與彈性，避免換弓時肌肉緊繃');
-      cleanedTips.push('注意發音起弓時弓毛與琴弦的接觸角度');
+    if (raw_transcript.includes('左手') || raw_transcript.includes('伴奏') || raw_transcript.includes('手腕')) {
+      cleanedTips.push('左手伴奏和弦觸鍵放輕，以手腕自然呼吸帶動，避免手臂下壓過重。');
+    }
+    if (raw_transcript.includes('掌關節') || raw_transcript.includes('指法') || raw_transcript.includes('觸鍵') || raw_transcript.includes('右手')) {
+      cleanedTips.push('掌關節保持穩定支撐拱形，指尖垂直落鍵確保快速音群顆粒分明。');
     } else {
-      cleanedTips.push('按弦第一關節保持站立，避免塌指影響音準');
+      cleanedTips.push('手腕保持彈性放鬆，隨旋律音型自然微幅呼吸起伏。');
     }
 
     if (raw_transcript.includes('十六分音符') || raw_transcript.includes('拍子') || raw_transcript.includes('搶拍')) {
-      cleanedTips.push('樂理重點：十六分音符節奏需均勻分配，注意拍點精準度');
+      cleanedTips.push('樂理重點：注意主從和聲平衡與十六分音符拍點均勻度。');
     }
 
-    if (raw_transcript.includes('小節') || raw_transcript.includes('練習') || raw_transcript.includes('遍')) {
-      cleanedHomework.push(`針對重點樂句進行分段練習 10 次`);
-      cleanedHomework.push(`配合節拍器由 BPM ${detectedBpm} 開始慢練，漸進提升至目標速度`);
+    if (raw_transcript.includes('小節') || raw_transcript.includes('練習') || raw_transcript.includes('作業')) {
+      cleanedHomework.push(`徹爾尼 599 第 20 首：配合節拍器由 BPM ${detectedBpm} 慢練 10 次`);
+      cleanedHomework.push(`巴哈初步第 3 首：雙手分開單獨練習前 4 小節，熟記指法與對位`);
     } else {
-      cleanedHomework.push(`每天練習 20 分鐘，重點加強弱拍發音與連音順暢度`);
+      cleanedHomework.push(`每天練習 20 分鐘，重點加強弱拍伴奏手腕放鬆度`);
       cleanedHomework.push(`使用節拍器設定 BPM ${detectedBpm} 穩固基礎節拍`);
     }
 
@@ -73,7 +76,7 @@ export async function POST(request: NextRequest) {
       highlights: cleanedHighlights,
       technical_tips: cleanedTips,
       homework: cleanedHomework,
-      encouragement: '音樂的魅力在於不斷雕琢後的純粹，這週你已經大步邁進，繼續保持專注與熱情！',
+      encouragement: '每一次的觸鍵都是音樂感的累積，右手顆粒感的進步非常亮眼！繼續加油！',
       bpm_recommendation: detectedBpm,
     };
 

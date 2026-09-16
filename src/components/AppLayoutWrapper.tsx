@@ -42,7 +42,7 @@ export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ chil
         // 關鍵字模糊匹配
         if (!target && !action && !page) {
           if (decoded.includes('practice')) target = '/student/practice';
-          else if (decoded.includes('summary')) target = '/student/summary/lesson-1';
+          else if (decoded.includes('summary')) target = '/student/summary/lesson-7';
           else if (decoded.includes('stamps')) target = '/student/stamps';
           else if (decoded.includes('billing')) target = '/student/billing';
           else if (decoded.includes('history')) target = '/student/history';
@@ -56,7 +56,7 @@ export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ chil
       // 2. 檢查 page 參數
       if (!target && page) {
         if (page === 'practice') target = '/student/practice';
-        else if (page === 'summary') target = '/student/summary/lesson-1';
+        else if (page === 'summary') target = '/student/summary/lesson-7';
         else if (page === 'stamps') target = '/student/stamps';
         else if (page === 'billing') target = '/student/billing';
         else if (page === 'history') target = '/student/history';

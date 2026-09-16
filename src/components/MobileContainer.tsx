@@ -112,7 +112,7 @@ export function MobileContainer({ children }: { children: ReactNode }) {
         if (!target && !action && !page) {
           if (decoded.includes('faq')) target = '/student/faq';
           else if (decoded.includes('practice')) target = '/student/practice';
-          else if (decoded.includes('summary') || decoded.includes('report')) target = '/student/summary/lesson-1';
+          else if (decoded.includes('summary') || decoded.includes('report')) target = '/student/summary/lesson-7';
           else if (decoded.includes('stamps')) target = '/student/stamps';
           else if (decoded.includes('billing')) target = '/student/billing';
           else if (decoded.includes('history')) target = '/student/history';
@@ -127,7 +127,7 @@ export function MobileContainer({ children }: { children: ReactNode }) {
       if (!target && page) {
         if (page === 'faq') target = '/student/faq';
         else if (page === 'practice') target = '/student/practice';
-        else if (page === 'summary' || page === 'report') target = '/student/summary/lesson-1';
+        else if (page === 'summary' || page === 'report') target = '/student/summary/lesson-7';
         else if (page === 'stamps') target = '/student/stamps';
         else if (page === 'billing') target = '/student/billing';
         else if (page === 'history') target = '/student/history';

@@ -5,6 +5,25 @@ export async function GET(request: NextRequest) {
 
   const mockReports = [
     {
+      id: 'lesson-7',
+      lesson_id: 'app-lin-5',
+      lesson_index: 7,
+      lesson_title: '第 7 堂：徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
+      date: '2026/09/16',
+      summary:
+        '今日心悅彈徹爾尼 599 第 20 首，右手顆粒感進步很多，手指獨立性非常好。但第 12 小節左手和弦伴奏有點太重了，手腕要放鬆帶動，不要用力往下砸。',
+      technique_tips: [
+        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
+        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。',
+        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
+      ],
+      assignment: {
+        song: '徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
+        target_bpm: 80,
+        daily_minutes: 30,
+      },
+    },
+    {
       id: 'lesson-6',
       lesson_id: 'app-lin-4',
       lesson_index: 6,

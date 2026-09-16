@@ -175,7 +175,7 @@ function StudentMoreContent() {
         {/* 3. 智慧聯絡簿 */}
         <button
           type="button"
-          onClick={() => router.push('/student/summary/lesson-1')}
+          onClick={() => router.push('/student/summary/lesson-7')}
           className="w-full p-3 flex justify-between items-center hover:bg-[#FAF6F0] active:bg-[#F4ECE1] rounded-xl transition-colors text-left cursor-pointer"
         >
           <div className="flex items-center gap-3">

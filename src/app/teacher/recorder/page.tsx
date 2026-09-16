@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { CleanSummaryJSON } from '@/types';
 
-const SAMPLE_TRANSCRIPT = `小明今天來練習巴哈 E 大調小提琴協奏曲。整體音高表現不錯，但是到了第 24 小節換弓的地方右手姿勢太緊繃了，導致聲音有點乾硬！昨天我養的貓生病帶去看獸醫搞到半夜超累的... 總之你按弦第一關節要站立起來，不要塌下去！還有樂理部分要特別注意十六分音符的拍子，不要搶拍！回家作業請把第 16 到 32 小節用 BPM 72 慢練 10 遍，把音準跟弓法拉平順。加油！你這周進步很多！`;
+const SAMPLE_TRANSCRIPT = `心悅今天彈徹爾尼 599 第 20 首，右手高音區顆粒感進步很多，手指獨立性非常好。但到了第 12 小節左手和弦伴奏有點太重了，手腕要自然放鬆帶動，不要用力往下砸。昨天我養的貓生病帶去看獸醫搞到半夜超累的... 總之掌關節要站穩，觸鍵要俐落！作業請把第 20 首以 BPM 80 慢練 10 遍，加上巴哈初步第 3 首前四小節雙手分開練習。加油！你這週進步很多！`;
 
 export default function TeacherRecorderPage() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function TeacherRecorderPage() {
 
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState(SAMPLE_TRANSCRIPT);
-  const [songTitle, setSongTitle] = useState('巴哈：E大調小提琴協奏曲 第一樂章');
+  const [songTitle, setSongTitle] = useState('徹爾尼 599 第 20 首 & 巴哈初步第 3 首');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [cleanSummary, setCleanSummary] = useState<CleanSummaryJSON | null>(null);
   const [savedRecordId, setSavedRecordId] = useState<string | null>(null);

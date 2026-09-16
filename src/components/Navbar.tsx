@@ -53,7 +53,7 @@ export const Navbar: React.FC = () => {
   const studentNavs = [
     { href: '/student/schedule', label: '個人課表與調課 (P3)', icon: Calendar },
     { href: '/student/practice', label: '作業學習中心 (P4)', icon: BookOpen },
-    { href: '/student/summary/lesson-1', label: 'P5 AI筆記', icon: FileText },
+    { href: '/student/summary/lesson-7', label: 'P5 AI筆記', icon: FileText },
     { href: '/student/compare/practice-1', label: 'P6 雙圖比對', icon: Sliders },
   ];
 
