@@ -40,23 +40,33 @@ export const MOCK_STUDENT_USER: User = {
   line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c', // 使用者指定之 LINE ID
 };
 
-// Charles (單一學生帳號，獨立 LINE ID)
+// 許雅婷 (Charles / 查爾斯) (林佩芬名師學員，已綁定 Charles LINE ID)
 export const MOCK_STUDENT_CHARLES_USER: User = {
-  id: 'u0000000-0000-0000-0000-000000000003',
+  id: '89e45974-7f00-4bfd-bd84-3eb26351a150',
   role: 'student',
-  name: 'Charles (查爾斯)',
+  name: '許雅婷 (Charles / 查爾斯)',
   email: 'charles.student@harmony.edu',
-  avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
-  line_user_id: 'U_student_charles_002',
+  avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+  line_user_id: 'U26ed3c0e48864aebdc244594cf780df0',
 };
 
-// 學員：Johnny (阿堅/陳子翔)
+// 學員：陳子翔 (Johnny / 阿堅) (已綁定 Johnny LINE ID)
 export const MOCK_STUDENT_JOHNNY_USER: User = {
-  id: 'u0000000-0000-0000-0000-000000000004',
+  id: 'b0000000-0000-0000-0000-000000000001',
   role: 'student',
-  name: 'Johnny (阿堅/陳子翔)',
-  email: 'johnny.student@harmony.edu',
-  avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+  name: '陳子翔 (Johnny / 阿堅)',
+  email: 'zixiang.student@harmony.edu',
+  avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+  line_user_id: 'U2a2f432d824e353e8eb3fbe579def2cf',
+};
+
+// 陳子翔 (Chen Zi-xiang)
+export const MOCK_STUDENT_CHEN_USER: User = {
+  id: 'b0000000-0000-0000-0000-000000000001',
+  role: 'student',
+  name: '陳子翔 (Johnny / 阿堅)',
+  email: 'chen.student@harmony.edu',
+  avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
   line_user_id: 'U2a2f432d824e353e8eb3fbe579def2cf',
 };
 
@@ -75,25 +85,54 @@ export const MOCK_STUDENT: Student = {
 };
 
 export const MOCK_STUDENT_CHARLES: Student = {
-  id: 's0000000-0000-0000-0000-000000000003',
+  id: '89e45974-7f00-4bfd-bd84-3eb26351a150',
   user_id: MOCK_STUDENT_CHARLES_USER.id,
   teacher_id: MOCK_TEACHER.id,
+  package_total_lessons: 10,
 };
 
 export const MOCK_STUDENT_LIN: Student = MOCK_STUDENT;
 export const MOCK_STUDENT_LIN_USER: User = MOCK_STUDENT_USER;
 
 export const MOCK_STUDENT_JOHNNY: Student = {
-  id: 's0000000-0000-0000-0000-000000000004',
+  id: 'b0000000-0000-0000-0000-000000000001',
   user_id: MOCK_STUDENT_JOHNNY_USER.id,
   teacher_id: MOCK_TEACHER.id,
 };
 
+export const MOCK_STUDENT_CHEN: Student = {
+  id: 'b0000000-0000-0000-0000-000000000001',
+  user_id: MOCK_STUDENT_CHEN_USER.id,
+  teacher_id: MOCK_TEACHER.id,
+  package_total_lessons: 10,
+};
+
 export const ALL_MOCK_STUDENTS: StudentInfo[] = [
-  { student: MOCK_STUDENT, user: MOCK_STUDENT_USER, instrument: '鋼琴 (Piano)' },
-  { student: MOCK_STUDENT_JOHNNY, user: MOCK_STUDENT_JOHNNY_USER, instrument: '小提琴 (Violin)' },
-  { student: MOCK_STUDENT_CHARLES, user: MOCK_STUDENT_CHARLES_USER, instrument: '鋼琴 (Piano)' },
+  { student: MOCK_STUDENT, user: MOCK_STUDENT_USER, instrument: '古典鋼琴 (Piano)' },
+  { student: MOCK_STUDENT_CHARLES, user: MOCK_STUDENT_CHARLES_USER, instrument: '古典鋼琴 (Piano)' },
+  { student: MOCK_STUDENT_JOHNNY, user: MOCK_STUDENT_JOHNNY_USER, instrument: '古典鋼琴 (Piano)' },
 ];
+
+export const NEW_STUDENT_USER: User = {
+  id: 'new_student',
+  role: 'student',
+  name: '新生訪客',
+  email: 'guest@musimate.app',
+  avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+};
+
+export const NEW_STUDENT: Student = {
+  id: 'new_student',
+  user_id: 'new_student',
+  teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+  package_total_lessons: 0,
+};
+
+export const NEW_STUDENT_INFO: StudentInfo = {
+  student: NEW_STUDENT,
+  user: NEW_STUDENT_USER,
+  instrument: '探索 8 大樂器',
+};
 
 // Initial Slots
 const getDynamicDate = (daysToAdd: number, hours: number) => {
@@ -163,14 +202,17 @@ const INITIAL_SLOTS: ScheduleSlot[] = [
 ];
 
 const INITIAL_APPOINTMENTS: Appointment[] = [
+  // ===== 劉心悅 (Lin) 第 3 期：共 10 堂 (6 堂已完成 + 4 堂即將上課) =====
   {
     id: 'app-lin-past-1',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-08-12T10:00:00+08:00',
-    end_time: '2026-08-12T12:00:00+08:00',
+    start_time: '2026-08-15T10:00:00+08:00',
+    end_time: '2026-08-15T12:00:00+08:00',
     status: 'completed',
     instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
@@ -179,6 +221,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
   },
   {
     id: 'app-lin-past-2',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -193,6 +237,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
   },
   {
     id: 'app-lin-1',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -207,6 +253,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
   },
   {
     id: 'app-lin-2',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -221,6 +269,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
   },
   {
     id: 'app-lin-3',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -234,21 +284,9 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     payment_type: 'postpaid',
   },
   {
-    id: 'app-lin-urgent',
-    student_id: MOCK_STUDENT.id,
-    student_name: '劉心悅 (Lin)',
-    teacher_id: MOCK_TEACHER.id,
-    teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-09-05T10:00:00+08:00',
-    end_time: '2026-09-05T12:00:00+08:00',
-    status: 'completed',
-    instrument: '古典鋼琴 (Piano)',
-    location: '音符琴房 A303',
-    payment_status: 'pay_per_lesson',
-    payment_type: 'postpaid',
-  },
-  {
     id: 'app-lin-4',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -262,7 +300,9 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     payment_type: 'postpaid',
   },
   {
-    id: 'app-lin-5',
+    id: 'app-lin-6',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -276,21 +316,25 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     payment_type: 'postpaid',
   },
   {
-    id: 'app-lin-6',
+    id: 'app-lin-7',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-09-19T10:00:00+08:00',
-    end_time: '2026-09-19T12:00:00+08:00',
+    start_time: '2026-09-19T14:00:00+08:00',
+    end_time: '2026-09-19T16:00:00+08:00',
     status: 'confirmed',
     instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'paid',
+    payment_status: 'pay_per_lesson',
     payment_type: 'postpaid',
   },
   {
-    id: 'app-lin-7',
+    id: 'app-lin-8',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
     student_id: MOCK_STUDENT.id,
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
@@ -304,32 +348,569 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     payment_type: 'postpaid',
   },
   {
-    id: 'app-charles-1',
-    student_id: MOCK_STUDENT_CHARLES.id,
-    student_name: 'Charles',
+    id: 'app-lin-9',
+    contract_id: 'contract-lin-term-3',
+    term_period: 3,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-08-26T19:30:00+08:00',
-    end_time: '2026-08-26T21:30:00+08:00',
+    start_time: '2026-09-30T10:00:00+08:00',
+    end_time: '2026-09-30T12:00:00+08:00',
     status: 'confirmed',
-    instrument: '鋼琴 (Piano)',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  // ===== 劉心悅 (Lin) 第 4 期：已排定 10 堂 =====
+  {
+    id: 'app-lin-p4-1',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-06T19:00:00+08:00',
+    end_time: '2026-10-06T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-2',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-13T19:00:00+08:00',
+    end_time: '2026-10-13T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-3',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-20T19:00:00+08:00',
+    end_time: '2026-10-20T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-4',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-27T19:00:00+08:00',
+    end_time: '2026-10-27T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-5',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-03T19:00:00+08:00',
+    end_time: '2026-11-03T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-6',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-10T19:00:00+08:00',
+    end_time: '2026-11-10T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-7',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-17T19:00:00+08:00',
+    end_time: '2026-11-17T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-8',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-24T19:00:00+08:00',
+    end_time: '2026-11-24T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-9',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-12-01T19:00:00+08:00',
+    end_time: '2026-12-01T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  {
+    id: 'app-lin-p4-10',
+    contract_id: 'contract-lin-term-4',
+    term_period: 4,
+    student_id: MOCK_STUDENT.id,
+    student_name: '劉心悅 (Lin)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-12-08T19:00:00+08:00',
+    end_time: '2026-12-08T21:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A303',
+    payment_status: 'pay_per_lesson',
+    payment_type: 'postpaid',
+  },
+  // ===== 許雅婷 (Charles / 查爾斯) 第 1 期：共 10 堂 (每週三 19:30-21:30，7 堂已完課 + 3 堂即將上課) =====
+  {
+    id: 'app-charles-1',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-07-29T19:30:00+08:00',
+    end_time: '2026-07-29T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A301',
     payment_status: 'paid',
     payment_type: 'prepaid',
   },
   {
+    id: 'app-charles-2',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-05T19:30:00+08:00',
+    end_time: '2026-08-05T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-3',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-12T19:30:00+08:00',
+    end_time: '2026-08-12T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-4',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-19T19:30:00+08:00',
+    end_time: '2026-08-19T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-5',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-26T19:30:00+08:00',
+    end_time: '2026-08-26T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-6',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-02T19:30:00+08:00',
+    end_time: '2026-09-02T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-7',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-09T19:30:00+08:00',
+    end_time: '2026-09-09T21:30:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-8',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-16T19:30:00+08:00',
+    end_time: '2026-09-16T21:30:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-9',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-23T19:30:00+08:00',
+    end_time: '2026-09-23T21:30:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-10',
+    contract_id: 'contract-charles-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-30T19:30:00+08:00',
+    end_time: '2026-09-30T21:30:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  // ===== 許雅婷 (Charles / 查爾斯) 第 2 期：已排定 10 堂 =====
+  {
+    id: 'app-charles-p2-1',
+    contract_id: 'contract-charles-term-2',
+    term_period: 2,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-07T19:30:00+08:00',
+    end_time: '2026-10-07T21:30:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-charles-p2-2',
+    contract_id: 'contract-charles-term-2',
+    term_period: 2,
+    student_id: MOCK_STUDENT_CHARLES.id,
+    student_name: '許雅婷 (Charles / 查爾斯)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-14T19:30:00+08:00',
+    end_time: '2026-10-14T21:30:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A301',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  // ===== Johnny (阿堅/陳子翔) 第 1 期：共 10 堂 (每週一 17:00-19:00，3 堂已完課 + 7 堂即將上課) =====
+  {
     id: 'app-johnny-1',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
     student_id: MOCK_STUDENT_JOHNNY.id,
-    student_name: 'Johnny',
+    student_name: '陳子翔 (Johnny / 阿堅)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
     start_time: '2026-08-24T17:00:00+08:00',
     end_time: '2026-08-24T19:00:00+08:00',
-    status: 'confirmed',
-    instrument: '小提琴 (Violin)',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A302',
-    payment_status: 'pay_per_lesson',
-    payment_type: 'postpaid',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-2',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-08-31T17:00:00+08:00',
+    end_time: '2026-08-31T19:00:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-3',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-07T17:00:00+08:00',
+    end_time: '2026-09-07T19:00:00+08:00',
+    status: 'completed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-4',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-14T17:00:00+08:00',
+    end_time: '2026-09-14T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-5',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-21T17:00:00+08:00',
+    end_time: '2026-09-21T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-6',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-09-28T17:00:00+08:00',
+    end_time: '2026-09-28T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-7',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-05T17:00:00+08:00',
+    end_time: '2026-10-05T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-8',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-12T17:00:00+08:00',
+    end_time: '2026-10-12T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-9',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-19T17:00:00+08:00',
+    end_time: '2026-10-19T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-10',
+    contract_id: 'contract-johnny-term-1',
+    term_period: 1,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-10-26T17:00:00+08:00',
+    end_time: '2026-10-26T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  // ===== Johnny (阿堅/陳子翔) 第 2 期：已排定 10 堂 =====
+  {
+    id: 'app-johnny-p2-1',
+    contract_id: 'contract-johnny-term-2',
+    term_period: 2,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-02T17:00:00+08:00',
+    end_time: '2026-11-02T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
+  },
+  {
+    id: 'app-johnny-p2-2',
+    contract_id: 'contract-johnny-term-2',
+    term_period: 2,
+    student_id: MOCK_STUDENT_JOHNNY.id,
+    student_name: '陳子翔 (Johnny / 阿堅)',
+    teacher_id: MOCK_TEACHER.id,
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+    start_time: '2026-11-09T17:00:00+08:00',
+    end_time: '2026-11-09T19:00:00+08:00',
+    status: 'confirmed',
+    instrument: '古典鋼琴 (Piano)',
+    location: '音符琴房 A302',
+    payment_status: 'paid',
+    payment_type: 'prepaid',
   },
 ];
 
@@ -338,127 +919,132 @@ const INITIAL_LESSONS: LessonRecord[] = [
     id: 'lesson-1',
     appointment_id: 'app-lin-past-1',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天練習整體音高表現不錯，但是到了第24小節換指的地方右手姿勢太緊繃了，導致聲音有點乾硬。樂理部分要特別注意十六分音符的拍子，不要搶拍！回家作業請把第16到32小節用 BPM 72 慢練10遍，把音準跟弓法拉平順。加油！你這周進步很多！',
+    raw_transcript:
+      '今天心悅在車爾尼 Op.599 的音準與指法掌握非常穩定，右手高音區觸鍵清晰具顆粒感。在踏板切換時需注意不要踩得太深，避免低音共鳴混濁。回家作業請把第 16 到 32 小節用 BPM 72 慢練 10 遍，手指關節站穩，加油！',
     clean_summary_json: {
-      highlights: ['音高控制穩定', '讀譜速度提升明顯'],
+      highlights: ['右手高音觸鍵清晰具顆粒感', '視奏流暢度明顯提升'],
       technical_tips: [
-        '右手持弓姿勢注意放鬆，避免過度緊繃，以保持弓速的流暢度與琴弦共鳴。',
-        '左手第二指按弦精準度，在高把位轉換時應維持指尖垂直落指，防止音準偏低。',
+        '右手第 4、5 指落指時掌關節需支撐站穩，避免塌陷以保持觸鍵清脆。',
+        '手腕保持彈性放鬆，隨旋律音型自然微幅呼吸起伏，切勿聳肩。',
       ],
       theory_tips: [
-        '注意十六分音符的均勻度，切分音符需準確踩在拍點上，不能隨意搶拍。',
-        'E大調升分號 (C#) 的按弦位置需特別貼近一指，維持半音關係精準度。',
+        '十六分音符節奏需均勻踩在拍點上，注意三連音轉分音的時值切換。',
+        '注意 C 大調主和弦與屬七和弦在低音部的聲部導向。',
       ],
       homework: [
-        '第15至32小節慢速練習並分段重複10次',
-        '錄製一段節拍器輔助的穩定演奏音訊供批改',
-        '熟記第一樂章前奏的左手把位指法與弓法',
+        '第 16 至 32 小節慢速練習並分段重複 10 次 (BPM 72)',
+        '每日哈農第 1 首指法獨立性暖身 15 分鐘',
+        '錄製一段節拍器輔助的穩定彈奏音訊供批改',
       ],
-      encouragement: '每一次的練習都是進步的累積，老師看到你的努力了！',
+      encouragement: '每一次的觸鍵都是音樂感的累積，老師看到你的進步了！加油！',
       bpm_recommendation: 72,
     },
     created_at: '2026-08-15T10:00:00+08:00',
-    song_title: '巴哈：E大調小提琴協奏曲 第一樂章',
+    song_title: '車爾尼：Op.599 No.50 視奏與高音顆粒感',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-2',
     appointment_id: 'app-lin-past-2',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天進行了踏板延音練習與琶音流暢度訓練，整體彈奏節奏掌握得很好。',
+    raw_transcript:
+      '今天進行了踏板延音層次與左手和聲分解練習，整體彈奏節奏與歌唱性掌握得非常好。注意左手伴奏觸鍵要輕巧如水，不要搶過右手主旋律。回家作業請加強第 32 到 64 小節的華彩裝飾音練習。',
     clean_summary_json: {
-      highlights: ['踏板切換時機精準', '右手琶音音色均勻'],
+      highlights: ['踏板切換時機乾淨精準', '右手旋律線條優美富歌唱性'],
       technical_tips: [
-        '注意左手伴奏觸鍵輕巧，手腕避免過度下沉以減輕手部負擔。',
-        '第48小節強弱對比需更加鮮明，高潮段落注意肩膀放鬆。',
+        '左手低音伴奏觸鍵輕巧柔和，手腕避免過度下沉，讓大姆指落鍵最輕。',
+        '第 48 小節強弱對比 (p 到 f) 需更加鮮明，高潮段落利用手臂自然重量下沉。',
       ],
       theory_tips: [
-        '降E大調轉調段落和聲走向需清楚呈現主音穩定度。',
-        '裝飾音要輕快俐落，勿佔用主音符拍長。',
+        '降 E 大調轉調段落和聲走向需清楚呈現主音穩定度。',
+        '裝飾音要輕快俐落如珍珠般均勻，勿佔用主音符的時值。',
       ],
       homework: [
-        '每日琶音練習20分鐘並以節拍器校對',
-        '全曲完整背譜並錄製第32-64小節影音',
+        '每日琶音練習 20 分鐘並以節拍器校對 (BPM 80)',
+        '全曲完整背譜並錄製第 32-64 小節演奏影音',
         '慢練左手伴奏分解和弦 10 次',
       ],
-      encouragement: '手指獨立性大有進步，旋律線條非常優美！加油！',
+      encouragement: '手指獨立性與樂句歌唱感大有進步，旋律線條非常優美！繼續保持！',
       bpm_recommendation: 80,
     },
     created_at: '2026-08-19T10:00:00+08:00',
-    song_title: '蕭邦：降E大調夜曲 Op.9 No.2',
+    song_title: '蕭邦：降E大調夜曲 Op.9 No.2 踏板層次與歌唱性',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-3',
     appointment_id: 'app-lin-1',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天重點在於月光第三樂章的狂暴氣勢與連續琶音，整體指法與爆發力都做得非常好。',
+    raw_transcript:
+      '今天重點在於月光第三樂章的狂暴氣勢與連續琶音，整體指法與爆發力都做得非常好。主和弦強音著地時肩膀放鬆避免聳肩，藉助重力自然落鍵。回家作業請把第 1 到 32 小節重音加強慢練 5 遍。',
     clean_summary_json: {
-      highlights: ['急板節奏控制極佳', '左手低音清晰紮實'],
+      highlights: ['急板節奏控制極佳', '左手低音清晰紮實具震撼力'],
       technical_tips: [
-        '主和弦強音著地時肩膀放鬆避免聳肩，藉助重力自然落鍵。',
-        '注意中段漸強的音量推進層次，避免過早達到最大音量。',
+        '主和弦強音 (sfz) 著地時肩膀放鬆，藉助整條手臂的重力自然落鍵，防止手腕僵硬。',
+        '連續上升琶音第 1 指 (大拇指) 轉指需提前穿過掌心，維持指尖靈敏度。',
       ],
       theory_tips: [
-        '升C小調調性重音需落於第一拍，維持強烈的戲劇張力。',
+        '升 C 小調調性重音需精準落於第一拍，維持強烈的戲劇張力。',
         '切分節奏點避免搶拍，手腕隨呼吸彈性調適。',
       ],
       homework: [
-        '第 1-32 小節重音加強練習，分組連音慢練5次',
+        '第 1-32 小節重音加強練習，分組連音慢練 5 次',
         '每日左手單獨練習 15 分鐘確保觸鍵顆粒分明',
         '錄製一段 BPM 120 穩定彈奏供老師檢視',
       ],
-      encouragement: '月光第三樂章的狂暴氣勢有充分展現出來，彈奏極具張力！加油！',
-      bpm_recommendation: 132,
+      encouragement: '月光第三樂章的狂暴氣勢有充分展現出來，彈奏極具戲劇張力！太棒了！',
+      bpm_recommendation: 120,
     },
     created_at: '2026-08-26T10:00:00+08:00',
-    song_title: '貝多芬：第十四號鋼琴奏鳴曲《月光》第三樂章',
+    song_title: '貝多芬：第十四號鋼琴奏鳴曲《月光》第三樂章 急板琶音',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-4',
     appointment_id: 'app-lin-2',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天進行莫札特小提琴協奏曲的換把位練習，第一把位換至第三把位平順很多。',
+    raw_transcript:
+      '今天進行巴哈二聲部創意曲第一首的雙手獨立性訓練，左右手主題對答的清晰度進步很多。注意左手模仿主題時音量要與右手等重，指尖要站立彈出非連音 (non legato) 的清晰感。',
     clean_summary_json: {
-      highlights: ['第一樂章開頭主題音準精確', '揉弦頻率自然均勻'],
+      highlights: ['雙手聲部對位清晰', '主題動機對答層次分明'],
       technical_tips: [
-        '第三把位換至第一把位時大拇指保持鬆弛滑移，防止虎口緊掐琴頸。',
-        '跳弓部分弓根力量要均勻，依靠弓桿天然彈性起跳。',
+        '左手模仿主題時指尖垂直站穩，彈出巴洛克時期特有的斷奏與清晰顆粒感。',
+        '雙手同時彈奏不同節奏型態時，維持手腕水平穩定，切勿左右搖晃。',
       ],
       theory_tips: [
-        'G大調自然音階半音關係注意升F音位置。',
-        '古典時期典雅樂句收尾需做輕柔收音（diminuendo）。',
+        'C 大調二聲部對位結構解析，注意倒影模仿與轉位聲部。',
+        '樂句終止式 (Cadence) 需做適度的微幅漸慢 (ritenuto)。',
       ],
       homework: [
-        '換把位音階慢練 5 遍，注意拇指放鬆',
-        '第 45-60 小節跳弓慢練，錄製 1 分鐘音訊',
-        '重點小節音階節奏打拍練習 10 次',
+        '左右手單手分開背譜各彈奏 5 遍',
+        '以 BPM 84 雙手合奏慢練，錄製第 1-12 小節音訊',
+        '重點標記樂譜中的主題與答題聲部',
       ],
-      encouragement: '莫札特的優雅韻味掌握得相當出色，音色純淨！加油！',
-      bpm_recommendation: 96,
+      encouragement: '巴哈複調音樂的嚴謹與邏輯掌握得越來越好，雙手平衡感極佳！',
+      bpm_recommendation: 84,
     },
-    created_at: '2026-08-29T15:30:00+08:00',
-    song_title: '莫札特：G大調第三號小提琴協奏曲 第一樂章',
+    created_at: '2026-08-29T10:00:00+08:00',
+    song_title: '巴哈：二聲部創意曲 No.1 C大調 對位複調與獨立性',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-5',
     appointment_id: 'app-lin-3',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天彈奏德布西月光，弱音觸鍵與色彩表現非常有進步，意境很棒。',
+    raw_transcript:
+      '今天彈奏德布西月光，弱音觸鍵與色彩表現非常有進步，意境很棒。中段高潮處低音踏板及時更換避免混濁，留住乾淨泛音。琶音聲部像流水般流動，手腕帶動手指輕拂琴鍵。',
     clean_summary_json: {
       highlights: ['弱音觸鍵細膩動人', '九八拍複合拍子律動自然'],
       technical_tips: [
-        '中段高潮處低音踏板及時更換避免混濁，留住乾淨泛音。',
-        '琶音聲部像流水般流動，手腕帶動手指輕拂琴鍵。',
+        '中段高潮處低音踏板及時半踏更換避免混濁，留住純淨琴弦泛音。',
+        '琶音聲部像流水般流動，手腕水平劃圓帶動手指指腹輕拂琴鍵。',
       ],
       theory_tips: [
-        '降D大調黑鍵手型維持微拱，指尖垂直落指。',
-        '注意九八拍大三連音拍點重音分佈。',
+        '降 D 大調黑鍵手型維持微拱，指腹肉墊接觸琴鍵營造柔和音色。',
+        '注意九八拍大三連音的律動感，保持平穩不急躁。',
       ],
       homework: [
-        '全曲踏板乾淨度訓練，慢速背譜彈奏',
+        '全曲踏板乾淨度訓練，慢速背譜彈奏 3 遍',
         '專注第 27-36 小節雙音色彩層次練習 8 次',
         '錄製一組雙手合奏音檔',
       ],
@@ -466,37 +1052,63 @@ const INITIAL_LESSONS: LessonRecord[] = [
       bpm_recommendation: 54,
     },
     created_at: '2026-09-02T10:00:00+08:00',
-    song_title: '德布西：《貝加馬斯克組曲》第三首〈月光〉',
+    song_title: '德布西：《貝加馬斯克組曲》第三首〈月光〉 印象派色彩',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
   {
     id: 'lesson-6',
-    appointment_id: 'app-lin-6',
+    appointment_id: 'app-lin-4',
     audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
-    raw_transcript: '今天小明彈徹爾尼 599 第 20 首，右手顆粒感進步很多，但第 12 小節左手伴奏太重，請放輕手腕帶動。作業練第 20 首速度 80，加上巴哈初步第 3 首前四小節。',
+    raw_transcript:
+      '今天驗收莫札特 K.545 第一樂章，古典時期的典雅與活潑感詮釋得很到位。左手阿爾貝蒂低音 (Alberti bass) 伴奏要注意音量控制在 pp 到 p，烘托右手流暢的十六分音符音階。',
     clean_summary_json: {
-      highlights: [
-        '徹爾尼 599 第 20 首右手顆粒感顯著進步，手指獨立性佳',
-        '音色清晰純淨，樂句整體流暢度大幅提升'
-      ],
+      highlights: ['右手音階跑動顆粒感極佳', '左手伴奏平衡恰到好處'],
       technical_tips: [
-        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
-        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。'
+        '左手 Alberti bass (5-1-3-1 指法) 旋轉手腕自然發力，大拇指切勿用力下砸。',
+        '右手顫音 (Trill) 與裝飾音要均勻靈巧，利用指尖彈簧般的彈性落鍵。',
       ],
       theory_tips: [
-        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
-        '巴哈複調音樂雙手各自獨立，注意二聲部對位線條清晰度。'
+        '古典奏鳴曲式呈示部結構（第一主題 C 大調，第二主題 G 大調）。',
+        '古典樂句的起伏原則：上行微漸強，下行微漸弱，句尾收音優雅。',
       ],
       homework: [
-        '徹爾尼 599 第 20 首：配合節拍器由慢練漸進提升至目標速度 BPM 80，每日練習 15 分鐘',
-        '巴哈初步第 3 首：雙手分開單獨慢練第 1 至 4 小節，熟記指法與聲部進行',
-        '針對第 12 小節左手伴奏手腕放鬆度錄製 15 秒打卡音訊供批改'
+        '第 1-28 小節呈示部以 BPM 96 穩定合奏 5 遍',
+        '右手音階琶音單獨以節拍器提速至 BPM 108 練習',
+        '錄製一段完整第一樂章影音供批改',
       ],
-      encouragement: '右手顆粒感的進步非常亮眼！只要把左手的手腕放鬆、伴奏輕下來，整首曲子的層次就會如同水晶般清澈。繼續加油！',
-      bpm_recommendation: 80,
+      encouragement: '莫札特的純淨典雅與音階顆粒感彈得非常乾淨漂亮！太棒了！',
+      bpm_recommendation: 96,
     },
-    created_at: '2026-09-18T10:00:00+08:00',
-    song_title: '徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
+    created_at: '2026-09-09T10:00:00+08:00',
+    song_title: '莫札特：C大調鋼琴奏鳴曲 K.545 第一樂章 經典觸鍵',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+  },
+  {
+    id: 'lesson-7',
+    appointment_id: 'app-lin-5',
+    audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
+    raw_transcript:
+      '今天心悅在蕭邦升c小調圓舞曲 Op.64 No.2 的速度彈性 (Rubato) 與右手裝飾音表現得非常優異。左手三拍子圓舞曲伴奏的第二拍與第三拍要輕盈彈跳，襯托右手如歌般的哀愁旋律。回家作業請把第 33 到 64 小節的連續音階與琶音用 BPM 88 穩定慢練，注意指法放鬆！',
+    clean_summary_json: {
+      highlights: ['右手速度彈性 (Rubato) 富有音樂性', '裝飾音與琶音輕巧流暢'],
+      technical_tips: [
+        '第 33 小節琶音右手指法放鬆，注意第四指落點準確度與手腕支撐。',
+        '左手圓舞曲伴奏「重-輕-輕」律動要鮮明，第 2、3 拍手腕自然微提。',
+      ],
+      theory_tips: [
+        '升 c 小調調性色彩分析，注意主和弦與拿坡里六和弦的和聲張力。',
+        '圓舞曲結構中 Piu mosso 與 Tempo I 的速度對比切換。',
+      ],
+      homework: [
+        '第 33 至 64 小節以 BPM 88 慢練並使用節拍器校對 10 遍',
+        '每日音階琶音手指獨立性練習 15 分鐘',
+        '錄製一段 15 秒打卡音訊供老師檢視',
+      ],
+      encouragement: '音樂感受力與觸鍵層次大幅提升，旋律非常有感染力！繼續保持！',
+      bpm_recommendation: 88,
+    },
+    created_at: '2026-09-16T10:00:00+08:00',
+    song_title: '蕭邦：升c小調圓舞曲 Op.64 No.2 速度彈性與觸鍵',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
 ];
@@ -557,6 +1169,7 @@ interface DemoContextType {
   teacherProfile: Teacher;
   studentProfile: Student;
   activeStudentId: string;
+  isVerifiedStudent: boolean;
   isMultiChildParent: boolean;
   linkedStudents: StudentInfo[];
   allStudents: StudentInfo[];
@@ -587,34 +1200,15 @@ const STORAGE_KEYS = {
   ROLE: 'musimate_active_role',
   STUDENT_ID: 'musimate_active_student_id',
   AUTH: 'musimate_is_authenticated',
-  APPOINTMENTS: 'musimate_appointments_v5',
+  APPOINTMENTS: 'musimate_appointments_v0914',
 };
 
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [currentRole, setCurrentRole] = useState<Role>('student');
-  const [activeStudentId, setActiveStudentId] = useState<string>(MOCK_STUDENT.id);
+  const [activeStudentId, setActiveStudentId] = useState<string>('');
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>(INITIAL_SLOTS);
-  const [appointments, setAppointments] = useState<Appointment[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        // 清理舊版快取
-        localStorage.removeItem('musimate_appointments_v1');
-        localStorage.removeItem('musimate_appointments_v2');
-        localStorage.removeItem('musimate_appointments_v3');
-        localStorage.removeItem('musimate_appointments_v4');
-
-        const saved = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-      } catch (e) {
-        console.warn('Failed to parse cached appointments:', e);
-      }
-    }
-    return INITIAL_APPOINTMENTS;
-  });
+  const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
   const [rescheduleRequests, setRescheduleRequests] = useState<RescheduleRequest[]>([]);
   const [lessonRecords, setLessonRecords] = useState<LessonRecord[]>(INITIAL_LESSONS);
   const [demoVideos, setDemoVideos] = useState<TeacherDemoVideo[]>(INITIAL_DEMO_VIDEOS);
@@ -681,51 +1275,154 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     syncSupabaseSchedules();
   }, []);
 
-  // 雙重狀態保存機制：初始化時優先讀取 URL 參數與 LocalStorage
+  // 雙重狀態保存機制：初始化時優先讀取 LIFF 登入身分、URL 參數與 LocalStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const studentParam = params.get('student') || params.get('student_id');
-      const lineUserIdParam = params.get('line_user_id');
-      const roleParam = params.get('role');
+    async function initLiffAuth() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryId =
+          urlParams.get('student_id') ||
+          urlParams.get('line_user_id') ||
+          urlParams.get('user_id') ||
+          urlParams.get('student') ||
+          urlParams.get('mock_user');
 
-      let initialStudentId = MOCK_STUDENT.id;
+        let targetId: string | null = queryId;
 
-      if (studentParam) {
-        const found = ALL_MOCK_STUDENTS.find(
-          (s) =>
-            s.student.id.toLowerCase() === studentParam.toLowerCase() ||
-            s.user.name.toLowerCase().includes(studentParam.toLowerCase()) ||
-            s.user.id.toLowerCase() === studentParam.toLowerCase()
-        );
-        if (found) initialStudentId = found.student.id;
-      } else if (lineUserIdParam) {
-        const found = ALL_MOCK_STUDENTS.find((s) => s.user.line_user_id === lineUserIdParam);
-        if (found) initialStudentId = found.student.id;
-      } else {
-        const savedStudentId = localStorage.getItem(STORAGE_KEYS.STUDENT_ID);
-        if (savedStudentId && ALL_MOCK_STUDENTS.some((s) => s.student.id === savedStudentId)) {
-          initialStudentId = savedStudentId;
+        // 1. 嘗試由 LINE LIFF Native SDK 取得身分
+        try {
+          const liff = (await import('@line/liff')).default;
+          const liffId = process.env.NEXT_PUBLIC_LIFF_ID || '2011164851-lGsEnQWB';
+          await liff.init({ liffId });
+
+          let liveLineId: string | null = null;
+          let displayName: string | null = null;
+          let pictureUrl: string | undefined = undefined;
+
+          if (liff.isLoggedIn() || liff.isInClient()) {
+            try {
+              const profile = await liff.getProfile();
+              if (profile?.userId) {
+                liveLineId = profile.userId;
+                displayName = profile.displayName || null;
+                pictureUrl = profile.pictureUrl;
+              }
+            } catch (pe) {
+              console.warn('liff.getProfile error in DemoContext:', pe);
+            }
+
+            if (!liveLineId) {
+              const ctx = liff.getContext();
+              if (ctx?.userId) {
+                liveLineId = ctx.userId;
+              }
+            }
+            if (!liveLineId) {
+              const idToken = liff.getDecodedIDToken();
+              if (idToken?.sub) {
+                liveLineId = idToken.sub;
+              }
+            }
+          }
+
+          if (liveLineId) {
+            targetId = liveLineId;
+            console.log(`🎯 [DemoContext LIFF Auth] 抓到真實登入學員 LINE ID: ${liveLineId}, 暱稱: ${displayName}`);
+
+            // 自動非同步寫入資料庫
+            fetch('/api/student/bind-line', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true',
+              },
+              body: JSON.stringify({
+                line_user_id: liveLineId,
+                display_name: displayName,
+                picture_url: pictureUrl,
+                student_name: displayName,
+              }),
+            }).catch((e) => console.warn('自動綁定請求略過:', e));
+          }
+        } catch (liffErr) {
+          console.info('ℹ️ DemoContext LIFF 初始化略過 (Web 模式):', liffErr);
         }
-      }
 
-      setActiveStudentId(initialStudentId);
-      localStorage.setItem(STORAGE_KEYS.STUDENT_ID, initialStudentId);
+        // 2. 如果沒有從 URL 或 LIFF 抓到，檢查 LocalStorage (排除 guest/new_student)
+        if (!targetId) {
+          const cached =
+            localStorage.getItem(STORAGE_KEYS.STUDENT_ID) ||
+            localStorage.getItem('musimate_student_id');
+          if (cached && cached !== 'new_student' && cached !== 'guest') {
+            targetId = cached;
+          }
+        }
 
-      const savedRole = (roleParam as Role) || (localStorage.getItem(STORAGE_KEYS.ROLE) as Role);
-      if (savedRole === 'teacher' || savedRole === 'student') {
-        setCurrentRole(savedRole);
-      }
+        // 3. 根據 targetId 與 displayName 比對學生並鎖定當前學生身分 (未驗證訪客嚴禁預設劉心悅)
+        let matchedId = '';
+        const dName = (displayName || '').trim().toLowerCase();
+        const tId = (targetId || '').trim();
+        const qId = (queryId || '').trim().toLowerCase();
+        const matchCandidate = `${tId} ${dName}`.toLowerCase();
 
-      const savedAuth = localStorage.getItem(STORAGE_KEYS.AUTH);
-      if (savedAuth !== null) {
-        setIsAuthenticated(savedAuth === 'true');
+        if (
+          tId === 'U26ed3c0e48864aebdc244594cf780df0' ||
+          tId === MOCK_STUDENT_CHARLES.id ||
+          matchCandidate.includes('charles') ||
+          matchCandidate.includes('查爾斯') ||
+          matchCandidate.includes('許雅婷')
+        ) {
+          matchedId = MOCK_STUDENT_CHARLES.id;
+        } else if (
+          tId === 'U2a2f432d824e353e8eb3fbe579def2cf' ||
+          tId === MOCK_STUDENT_JOHNNY.id ||
+          tId === 'u0000000-0000-0000-0000-000000000004' ||
+          matchCandidate.includes('johnny') ||
+          matchCandidate.includes('阿堅') ||
+          matchCandidate.includes('陳子翔')
+        ) {
+          matchedId = MOCK_STUDENT_JOHNNY.id;
+        } else if (
+          tId === 'Uf2457bf35e0d6d3060b60838d9a9c91c' ||
+          tId === MOCK_STUDENT.id ||
+          matchCandidate.includes('劉心悅') ||
+          matchCandidate.includes('心悅') ||
+          dName === 'lin' ||
+          qId === 'lin'
+        ) {
+          matchedId = MOCK_STUDENT.id;
+        }
+
+        setActiveStudentId(matchedId);
+        if (matchedId) {
+          console.log(`✅ [DemoContext] 鎖定正式學員 ID: ${matchedId} (來源: ${matchCandidate})`);
+          localStorage.setItem(STORAGE_KEYS.STUDENT_ID, matchedId);
+          localStorage.setItem('musimate_student_id', matchedId);
+        } else {
+          console.log('✨ [DemoContext] 未驗證訪客/新生，清除舊暫存並進入選樂器探索模式');
+          localStorage.removeItem(STORAGE_KEYS.STUDENT_ID);
+          localStorage.removeItem('musimate_student_id');
+          localStorage.removeItem('musimate_active_student_id');
+        }
+
+        const roleParam = urlParams.get('role');
+        const savedRole = (roleParam as Role) || (localStorage.getItem(STORAGE_KEYS.ROLE) as Role);
+        if (savedRole === 'teacher' || savedRole === 'student') {
+          setCurrentRole(savedRole);
+        }
+
+        const savedAuth = localStorage.getItem(STORAGE_KEYS.AUTH);
+        if (savedAuth !== null) {
+          setIsAuthenticated(savedAuth === 'true');
+        }
+      } catch (e) {
+        console.warn('LocalStorage read error:', e);
       }
-    } catch (e) {
-      console.warn('LocalStorage read error:', e);
     }
+
+    initLiffAuth();
 
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEYS.STUDENT_ID && e.newValue) {
@@ -739,9 +1436,13 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // 取得當前學生物件
+  const isVerifiedStudent = Boolean(
+    activeStudentId && ALL_MOCK_STUDENTS.some((s) => s.student.id === activeStudentId)
+  );
+
+  // 取得當前學生物件 (若為未驗證訪客則回傳 NEW_STUDENT_INFO，嚴防個資外洩)
   const activeStudentInfo =
-    ALL_MOCK_STUDENTS.find((s) => s.student.id === activeStudentId) || ALL_MOCK_STUDENTS[0];
+    ALL_MOCK_STUDENTS.find((s) => s.student.id === activeStudentId) || NEW_STUDENT_INFO;
 
   const currentStudentProfile = activeStudentInfo.student;
   const currentStudentUser = activeStudentInfo.user;
@@ -756,17 +1457,24 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isMultiChildParent = linkedStudents.length > 1;
 
   const switchStudent = (studentId: string) => {
-    // 限制只能在自己名下的小孩中切換 (若為單一學生則不允許切換為他人)
-    const allowedPool = isMultiChildParent ? linkedStudents : [activeStudentInfo];
-    const found = allowedPool.find((s) => s.student.id === studentId);
+    const found = ALL_MOCK_STUDENTS.find((s) => s.student.id === studentId);
     if (found) {
       setActiveStudentId(found.student.id);
       setCurrentRole('student');
       setIsAuthenticated(true);
       if (typeof window !== 'undefined') {
         localStorage.setItem(STORAGE_KEYS.STUDENT_ID, found.student.id);
+        localStorage.setItem('musimate_student_id', found.student.id);
+        localStorage.setItem('musimate_active_student_id', found.student.id);
         localStorage.setItem(STORAGE_KEYS.ROLE, 'student');
         localStorage.setItem(STORAGE_KEYS.AUTH, 'true');
+      }
+      console.log(`✅ [DemoContext] 切換學員為: ${found.user.name} (${found.student.id})`);
+    } else {
+      setActiveStudentId('');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(STORAGE_KEYS.STUDENT_ID);
+        localStorage.removeItem('musimate_student_id');
       }
     }
   };
@@ -985,6 +1693,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         teacherProfile: MOCK_TEACHER,
         studentProfile: currentStudentProfile,
         activeStudentId,
+        isVerifiedStudent,
         isMultiChildParent,
         linkedStudents,
         allStudents: ALL_MOCK_STUDENTS,

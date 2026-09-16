@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDemoContext } from '@/context/DemoContext';
+import { ContactSupportModal } from '@/components/ContactSupportModal';
 import {
   Calendar,
   Clock,
@@ -28,31 +29,65 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
   onClose,
 }) => {
   const router = useRouter();
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const {
     studentProfile,
     activeStudentId,
     allStudents,
     appointments,
+    switchStudent,
   } = useDemoContext();
 
   if (!isOpen) return null;
 
-  const currentStudentId = activeStudentId || studentProfile.id;
-  const currentStudentInfo =
-    allStudents.find((s) => s.student.id === currentStudentId) || allStudents[0];
+  const isVerified = Boolean(
+    activeStudentId &&
+    (activeStudentId === '55555555-5555-4555-b555-555555555555' ||
+      activeStudentId === '89e45974-7f00-4bfd-bd84-3eb26351a150' ||
+      activeStudentId === 'b0000000-0000-0000-0000-000000000001' ||
+      allStudents.some((s) => s.student.id === activeStudentId && s.student.id !== 'new_student'))
+  );
 
-  const studentFullName = currentStudentInfo?.user?.name || '劉心悅';
+  const currentStudentId = activeStudentId;
+  const currentStudentInfo = allStudents.find((s) => s.student.id === currentStudentId);
+
+  const getNavUrl = (url: string) => {
+    if (!currentStudentId) return url;
+    const hasQuery = url.includes('?');
+    return `${url}${hasQuery ? '&' : '?'}student_id=${encodeURIComponent(currentStudentId)}`;
+  };
+
+  const defaultFallbackName =
+    currentStudentId === '89e45974-7f00-4bfd-bd84-3eb26351a150'
+      ? '許雅婷 (Charles)'
+      : currentStudentId === 'b0000000-0000-0000-0000-000000000001'
+      ? '陳子翔 (Johnny / 阿堅)'
+      : currentStudentId === '55555555-5555-4555-b555-555555555555'
+      ? '劉心悅 (Lin)'
+      : '新生訪客';
+
+  const defaultFallbackAvatar =
+    currentStudentId === '89e45974-7f00-4bfd-bd84-3eb26351a150'
+      ? 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150'
+      : currentStudentId === 'b0000000-0000-0000-0000-000000000001'
+      ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'
+      : currentStudentId === '55555555-5555-4555-b555-555555555555'
+      ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
+      : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+
+  const studentFullName = currentStudentInfo?.user?.name || defaultFallbackName;
   const cleanStudentName = studentFullName.replace(/\s*\(.*?\)\s*/g, '').trim();
-  const studentDisplayName = `${cleanStudentName} 同學`;
-  const studentInstrument = currentStudentInfo?.instrument?.split(' ')[0] || '小提琴';
-  const studentPeriod = 3;
-  const studentCourseSubtitle = `${studentInstrument}課 · 第${studentPeriod}期進行中`;
+  const studentDisplayName = isVerified ? `${cleanStudentName} 同學` : '新生訪客 (未綁定)';
+  const studentAvatarUrl = currentStudentInfo?.user?.avatar_url || defaultFallbackAvatar;
+  const studentInstrument = currentStudentInfo?.instrument?.split(' ')[0] || '古典鋼琴';
+  const studentPeriod = currentStudentId === '55555555-5555-4555-b555-555555555555' ? 3 : 1;
+  const studentCourseSubtitle = isVerified ? `${studentInstrument}課 · 第${studentPeriod}期進行中` : '探索中 · 尚未綁定正式學員合約';
 
   return (
-    <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
+    <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
       {/* 半透明黑底遮罩 (55% opacity) */}
       <div
-        className="absolute inset-0 bg-black/55 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in cursor-pointer"
+        className="fixed inset-0 bg-black/55 backdrop-blur-xs transition-opacity duration-300 animate-in fade-in cursor-pointer"
         onClick={onClose}
       />
 
@@ -60,7 +95,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
       <aside className="w-[300px] h-full bg-white shadow-[-8px_0px_24px_rgba(0,0,0,0.12)] rounded-l-[24px] flex flex-col justify-between relative z-10 animate-in slide-in-from-right duration-300 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex flex-col">
           {/* 頂部學員個人資料 */}
-          <div className="relative pt-10 pb-6 px-6 bg-[rgba(250,246,240,0.94)] rounded-tl-[24px] flex flex-col gap-4">
+          <div className="relative pt-10 pb-5 px-6 bg-[rgba(250,246,240,0.94)] rounded-tl-[24px] flex flex-col gap-3.5">
             {/* 右上角關閉按鈕 */}
             <button
               type="button"
@@ -75,28 +110,61 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-[rgba(155,126,200,0.14)] border border-[rgba(155,126,200,0.25)] flex items-center justify-center overflow-hidden shrink-0">
                 <img
-                  src={
-                    currentStudentInfo?.user.avatar_url ||
-                    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'
-                  }
+                  src={studentAvatarUrl}
                   alt={studentDisplayName}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <div className="text-[20px] font-bold text-[#2B3049] leading-tight font-['Sora']">
+              <div className="flex flex-col gap-0.5">
+                <div className="text-[18px] font-bold text-[#2B3049] leading-tight font-['Sora']">
                   {studentDisplayName}
                 </div>
-                <div className="text-[13px] text-[#7A7E90] font-normal leading-tight font-['Sora'] flex items-center gap-1.5">
+                <div className="text-[12px] text-[#7A7E90] font-normal leading-tight font-['Sora'] flex items-center gap-1.5">
                   <span>{studentCourseSubtitle}</span>
                   {currentStudentInfo?.user.line_user_id && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[9px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       已連線
                     </span>
                   )}
                 </div>
               </div>
             </div>
+
+            {/* 快速切換學生身分 (僅正式學員測試模式顯示，訪客完全隱藏) */}
+            {isVerified && (
+              <div className="flex flex-col gap-1.5 pt-2.5 border-t border-[#EAE6E1]">
+                <span className="text-[10px] font-bold text-[#7A7E90] uppercase tracking-wider">
+                  👤 切換測試學員：
+                </span>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { id: '55555555-5555-4555-b555-555555555555', label: '劉心悅' },
+                    { id: '89e45974-7f00-4bfd-bd84-3eb26351a150', label: '許雅婷' },
+                    { id: 'b0000000-0000-0000-0000-000000000001', label: '陳子翔(堅)' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => {
+                        switchStudent(s.id);
+                        localStorage.setItem('musimate_student_id', s.id);
+                        localStorage.setItem('musimate_active_student_id', s.id);
+                        onClose();
+                        router.push(`/student/schedule?student_id=${s.id}`);
+                      }}
+                      className={`py-1 px-1 text-center rounded-lg text-[10px] font-bold transition-all truncate ${
+                        currentStudentId === s.id
+                          ? 'bg-[#68C5AB] text-white shadow-xs'
+                          : 'bg-white text-[#2B3049] border border-[#F0EAE1] hover:bg-[#FAF6F0]'
+                      }`}
+                      title={s.label}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Section 1: 功能選單 */}
@@ -111,7 +179,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/schedule');
+                  router.push(getNavUrl('/student/schedule'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -132,7 +200,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/schedule?action=reschedule');
+                  router.push(getNavUrl('/student/schedule?action=reschedule'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -153,7 +221,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/summary/lesson-1');
+                  router.push(getNavUrl('/student/summary'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -174,7 +242,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/practice');
+                  router.push(getNavUrl('/student/practice'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -195,7 +263,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/stamps');
+                  router.push(getNavUrl('/student/stamps'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -216,7 +284,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/history');
+                  router.push(getNavUrl('/student/history'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -237,7 +305,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/billing');
+                  router.push(getNavUrl('/student/billing'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -258,7 +326,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  router.push('/student/courses');
+                  router.push(getNavUrl('/student/courses'));
                 }}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
@@ -285,27 +353,6 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
             </div>
 
             <div className="flex flex-col">
-              {/* LINE 推播卡片管理中心 */}
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  router.push('/admin/notifications');
-                }}
-                className="w-full h-12 flex justify-between items-center hover:bg-purple-50 active:bg-purple-100 rounded-lg transition-colors text-left cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#9B7EC8] shrink-0" />
-                  <div className="w-6 h-6 rounded-full bg-[#F6F2FB] flex items-center justify-center shrink-0">
-                    <div className="w-2 h-2 rounded-full bg-[#9B7EC8]" />
-                  </div>
-                  <Award className="w-4.5 h-4.5 text-[#9B7EC8] shrink-0" strokeWidth={2} />
-                  <span className="text-[14px] font-bold text-[#9B7EC8] font-['Sora']">LINE 推播卡片管理</span>
-                </div>
-                <span className="text-[10px] bg-[#9B7EC8]/15 text-[#9B7EC8] px-2 py-0.5 rounded-full font-bold">11 種情境</span>
-              </button>
-              <div className="w-full h-0 border-b border-[#F3F1ED]" />
-
               {/* FAQ */}
               <button
                 type="button"
@@ -330,9 +377,7 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
               {/* 聯繫客服 */}
               <button
                 type="button"
-                onClick={() => {
-                  alert('如需客服協助，請直接於 MusiMate 官方 LINE 帳號留言，或洽詢林佩芬老師工作室。');
-                }}
+                onClick={() => setIsSupportModalOpen(true)}
                 className="w-full h-12 flex justify-between items-center hover:bg-slate-50 active:bg-slate-100 rounded-lg transition-colors text-left cursor-pointer"
               >
                 <div className="flex items-center gap-3">
@@ -356,6 +401,12 @@ export const StudentMoreDrawer: React.FC<StudentMoreDrawerProps> = ({
           </span>
         </div>
       </aside>
+
+      {/* 聯繫客服彈出視窗 */}
+      <ContactSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+      />
     </div>
   );
 };

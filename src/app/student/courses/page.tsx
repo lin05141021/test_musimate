@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 import { ChevronLeft, X, ChevronDown, Check, Sparkles, Music, Youtube, Instagram, Share2 } from 'lucide-react';
-import { StudentTabBar } from '@/components/StudentTabBar';
-import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
 import { useStudentToast } from '@/context/ToastContext';
+import { useDemoContext } from '@/context/DemoContext';
 
 // 8 大樂器資料
 interface InstrumentItem {
@@ -158,17 +158,17 @@ interface TeacherItem {
 
 const PIANO_TEACHERS: TeacherItem[] = [
   {
-    id: 't-chang',
-    name: '張芷嫣',
-    tag: '伴奏鋼琴',
-    tags: ['伴奏鋼琴', '音樂理論教學', '室內樂鋼琴'],
+    id: 't-lin',
+    name: '林佩芬',
+    tag: '古典鋼琴 / 伴奏',
+    tags: ['古典鋼琴', '伴奏鋼琴', '音樂理論教學'],
     avatar: '/UI/teacher_avatar.png',
     shortBio: '國內多所音樂廳特約首席伴奏，合奏經驗無數。深入剖析聲部對位與情感流動，引導學員體驗最動人的合奏藝術。',
     fullBio: '國立師大音樂系碩士，主修鋼琴，副修豎笛。\n音樂教學資歷 10 年，培養超過 30 位學生錄取音樂專班。\n\n曾擔任國內多所音樂廳特約首席伴奏，合奏經驗無數。擅長深入剖析聲部對位與情感流動，引導學員體驗最動人的合奏藝術。',
     accentColor: '#B58EBE',
   },
   {
-    id: 't-lin',
+    id: 't-lin2',
     name: '林雅琴',
     tag: '鋼琴',
     tags: ['古典鋼琴', '德奧樂派詮釋', '大師班指導'],
@@ -216,9 +216,11 @@ const TIME_SLOTS = [
   '08/30 (日) 11:00-11:30',
 ];
 
-export default function CoursesPage() {
+function CoursesContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useStudentToast();
+  const { currentUser, isVerifiedStudent } = useDemoContext();
 
   // 狀態管理：目前流程步驟
   const [step, setStep] = useState<'instruments' | 'teachers' | 'teacher_detail'>('instruments');
@@ -226,6 +228,20 @@ export default function CoursesPage() {
     INSTRUMENTS.find((i) => i.id === 'piano') || INSTRUMENTS[4]
   );
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherItem>(PIANO_TEACHERS[0]);
+
+  // 監聽 URL 樂器參數 (例如 ?instrument=piano 或 ?select=piano)
+  useEffect(() => {
+    const instParam = searchParams.get('instrument') || searchParams.get('select') || searchParams.get('inst');
+    if (instParam) {
+      const match = INSTRUMENTS.find(
+        (i) => i.id.toLowerCase() === instParam.toLowerCase() || i.name.includes(instParam)
+      );
+      if (match) {
+        setSelectedInstrument(match);
+        setStep('teachers');
+      }
+    }
+  }, [searchParams]);
 
   // 預約試上彈窗控制
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -264,12 +280,13 @@ export default function CoursesPage() {
   // 送出預約
   const handleSubmitBooking = async () => {
     setIsSubmitting(true);
+    const applicantName = (currentUser?.name && !currentUser.name.includes('guest') ? currentUser.name : '新生訪客').replace(/\s*\(.*?\)\s*/g, '').trim();
     try {
       const res = await fetch('/api/courses/trial-booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          student_name: '劉心悅',
+          student_name: applicantName,
           teacher_name: selectedTeacher.name,
           instrument: selectedInstrument.name,
           time_slot: selectedTimeSlot,
@@ -310,62 +327,36 @@ export default function CoursesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E5E0D8] flex items-center justify-center p-0 sm:p-4 font-['Sora',sans-serif]">
-      {/* 手機外框容器 (Google Pixel 9a: 360px 寬，可捲動) */}
-      <div className="w-[360px] h-[800px] max-w-full max-h-[100dvh] sm:max-h-[820px] bg-[#FAF6F0] rounded-[40px] shadow-[0px_12px_24px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col relative border border-[#F0EAE1]">
-        
-        {/* ============================================================ */}
-        {/* 頂部 Header 列 (高 64px，左 Logo，返回按鈕若非第一步) */}
-        {/* ============================================================ */}
-        <header className="h-[64px] shrink-0 px-5 border-b border-[#F0EAE1] bg-[#FAF6F0] flex justify-between items-center z-20">
-          <div className="flex items-center gap-2">
-            {step !== 'instruments' && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (step === 'teacher_detail') {
-                    setStep('teachers');
-                  } else if (step === 'teachers') {
-                    setStep('instruments');
-                  }
-                }}
-                className="w-8 h-8 rounded-full bg-white/80 border border-[#F0EAE1] flex items-center justify-center text-[#2C2A29] hover:bg-white active:scale-95 transition-all shadow-xs cursor-pointer mr-1"
-                title="返回上一頁"
-              >
-                <ChevronLeft className="w-5 h-5 text-[#2B3049]" />
-              </button>
-            )}
-            <div className="w-[140px] h-[36px] relative cursor-pointer" onClick={() => setStep('instruments')}>
-              <Image
-                src="/UI/logo.png"
-                alt="MusiMate"
-                fill
-                className="object-contain object-left"
-                priority
-                onError={(e: any) => {
-                  e.currentTarget.src = '/logo.png';
-                }}
-              />
-            </div>
-          </div>
+    <div className="w-full flex flex-col gap-4 font-['Sora',sans-serif] select-none pb-12 animate-in fade-in">
+      {/* 頂部步驟導覽列（若在第 2/3 步則顯示返回按鈕與預約試上快捷按鈕） */}
+      {step !== 'instruments' && (
+        <div className="w-full flex items-center justify-between px-1 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (step === 'teacher_detail') {
+                setStep('teachers');
+              } else if (step === 'teachers') {
+                setStep('instruments');
+              }
+            }}
+            className="flex items-center gap-1 text-[13px] font-bold text-[#2B3049] bg-white px-3 py-1.5 rounded-full border border-[#F0EAE1] hover:bg-slate-50 active:scale-95 transition-all shadow-2xs cursor-pointer"
+          >
+            <ChevronLeft className="w-4 h-4 text-[#2B3049]" />
+            <span>返回{step === 'teacher_detail' ? '師資清單' : '樂器選擇'}</span>
+          </button>
 
-          <div className="flex items-center gap-2">
-            {step === 'teacher_detail' && (
-              <button
-                type="button"
-                onClick={() => handleOpenBookingModal(selectedTeacher)}
-                className="px-3 py-1.5 rounded-full bg-[#B58EBE] text-white text-[12px] font-semibold shadow-xs hover:opacity-90 active:scale-95 transition-all cursor-pointer"
-              >
-                預約試上
-              </button>
-            )}
-          </div>
-        </header>
-
-        {/* ============================================================ */}
-        {/* 可滾動主內容區域 (Step 1, Step 2, Step 3 均在內渲染) */}
-        {/* ============================================================ */}
-        <main className="flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex flex-col">
+          {step === 'teacher_detail' && (
+            <button
+              type="button"
+              onClick={() => handleOpenBookingModal(selectedTeacher)}
+              className="px-3.5 py-1.5 rounded-full bg-[#B58EBE] text-white text-[12px] font-bold shadow-xs hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+            >
+              預約試上
+            </button>
+          )}
+        </div>
+      )}
           
           {/* ------------------------------------------------------------ */}
           {/* STEP 1: 選樂器 (Select Instrument) */}
@@ -682,7 +673,6 @@ export default function CoursesPage() {
               </footer>
             </div>
           )}
-        </main>
 
         {/* ============================================================ */}
         {/* STEP 4: 預約試上彈出視窗 (Trial Booking Modal) */}
@@ -858,16 +848,14 @@ export default function CoursesPage() {
             </div>
           </div>
         )}
-
-        {/* 底部導覽列 */}
-        <StudentTabBar activeTab="more" onMoreClick={() => setIsMoreDrawerOpen(true)} />
-
-        {/* 側邊更多功能抽屜 */}
-        <StudentMoreDrawer
-          isOpen={isMoreDrawerOpen}
-          onClose={() => setIsMoreDrawerOpen(false)}
-        />
-      </div>
     </div>
+  );
+}
+
+export default function CoursesPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-sm text-[#7A7E90]">載入課程師資中...</div>}>
+      <CoursesContent />
+    </Suspense>
   );
 }

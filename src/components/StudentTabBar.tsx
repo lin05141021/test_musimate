@@ -20,12 +20,24 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
   const pathname = usePathname() || '';
   // 自安全環境讀取 URL search query，避免 Next.js SSG 靜態建置時拋出 Suspense 邊界錯誤
   const [action, setAction] = React.useState<string | null>(null);
+  const [studentId, setStudentId] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const sp = new URLSearchParams(window.location.search);
       setAction(sp.get('action'));
+      const sid =
+        sp.get('student_id') ||
+        sp.get('user_id') ||
+        sp.get('line_user_id') ||
+        localStorage.getItem('musimate_student_id');
+      if (sid && sid !== 'new_student' && sid !== 'guest') {
+        setStudentId(sid);
+      } else {
+        setStudentId(null);
+      }
     }
-  }, []);
+  }, [pathname]);
 
   // 自動依據路徑推導當前 Active Tab (也可由外部 props 強制指定)
   const currentTab =
@@ -178,12 +190,12 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
       <nav
         role="navigation"
         aria-label="學生端功能導航"
-        className={`w-full max-w-[360px] mx-auto border-t border-[#EAE3D6] flex flex-col items-center select-none ${className}`}
+        className={`w-full max-w-md mx-auto border-t border-[#EAE3D6] flex flex-col items-center select-none ${className}`}
         style={{
           paddingTop: '8px',
           paddingBottom: '12px',
-          paddingLeft: '8px',
-          paddingRight: '8px',
+          paddingLeft: '12px',
+          paddingRight: '12px',
           background:
             "linear-gradient(0deg, rgba(250, 246, 240, 0.72) 0%, rgba(255, 255, 255, 0.60) 100%), url('/water_color_nav.png')",
           backgroundSize: 'cover',
@@ -238,23 +250,26 @@ export const StudentTabBar: React.FC<StudentTabBarProps> = ({
 
             if (isMore) {
               return (
-                <div
+                <button
+                  type="button"
                   key={tab.key}
-                  className="flex-1"
+                  className="flex-1 bg-transparent border-0 p-0 m-0 outline-none cursor-pointer"
                   onClick={() => {
                     onMoreClick?.();
                     onTabChange?.(tab.key);
                   }}
                 >
                   {content}
-                </div>
+                </button>
               );
             }
+
+            const finalHref = studentId ? `${tab.href}?student_id=${encodeURIComponent(studentId)}` : tab.href;
 
             return (
               <Link
                 key={tab.key}
-                href={tab.href}
+                href={finalHref}
                 replace={true}
                 className="flex-1"
                 onClick={() => onTabChange?.(tab.key)}

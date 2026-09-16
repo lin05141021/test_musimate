@@ -2,12 +2,9 @@
 
 import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Navbar } from '@/components/Navbar';
 
 export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname() || '';
-  const isStudentPage = pathname.startsWith('/student');
-  const isTeacherPage = pathname.startsWith('/teacher');
 
   // 全域 LIFF 路由智慧分發器：攔截所有來自 LINE 的 liff.state / redirect 參數並即時跳轉至對應頁面
   useEffect(() => {
@@ -79,11 +76,11 @@ export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // 4. 檢查專屬 LIFF Client ID
       if (!target && liffClientId) {
-        if (liffClientId === '2011164851-3YNtzchu') { // 調課請假專屬 LIFF
+        if (liffClientId === '2011164851-3YNtzchu') {
           if (currentPath !== '/student/schedule') {
             target = '/student/schedule?action=reschedule';
           }
-        } else if (liffClientId === '2011164851-id3vAnRx') { // 開始新課程專屬 LIFF
+        } else if (liffClientId === '2011164851-id3vAnRx') {
           target = '/student/courses';
         }
       }
@@ -102,27 +99,10 @@ export const AppLayoutWrapper: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [pathname]);
 
-  // 如果是在學生端手機版頁面（/student/*）或教師端頁面（/teacher/*），
-  // 完全移除全站通用舊版 Navbar 與 Footer，讓各子系統自帶專屬沉浸式頂部導航
-  if (isStudentPage || isTeacherPage) {
-    return (
-      <div className="w-full min-h-screen bg-[#FAF6F0]">
-        {children}
-      </div>
-    );
-  }
-
-  // 老師端或系統首頁 (桌面版模式)
   return (
-    <>
-      <Navbar />
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-        {children}
-      </main>
-      <footer className="border-t border-[#EFECE6] py-6 text-center text-xs text-[#7A736E] bg-white/80 backdrop-blur-md mt-12">
-        Harmonix AI Studio &copy; {new Date().getFullYear()} - 溫暖音樂教室 AI 小幫手 (MVP Version)
-      </footer>
-    </>
+    <div className="w-full min-h-screen bg-[#FAF6F0]">
+      {children}
+    </div>
   );
 };
 

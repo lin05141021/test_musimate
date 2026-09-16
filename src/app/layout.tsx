@@ -1,32 +1,40 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { LiffAuthProvider } from '@/context/LiffAuthContext';
 import { DemoProvider } from '@/context/DemoContext';
 import { ToastProvider } from '@/context/ToastContext';
-import { LiffAuthProvider } from '@/context/LiffAuthContext';
-import { AppLayoutWrapper } from '@/components/AppLayoutWrapper';
+import { MobileContainer } from '@/components/MobileContainer';
 
 export const metadata: Metadata = {
-  title: 'Harmonix AI Studio - 溫暖音樂教室 AI 小幫手',
-  description: '溫暖柔和的 AI 音樂教學輔助系統，提供智慧調課、課堂情緒過濾摘要與 AI 雙影片比對診斷。',
+  title: 'MusiMate 學生學習端 | LINE LIFF',
+  description: '獨立音樂教師專屬 Studio OS — 學生課表、練習打卡與學習週報',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="zh-TW">
-      <body className="antialiased text-[#332C27] bg-[#FAF7F2] min-h-screen flex flex-col font-sans">
-        <DemoProvider>
-          <ToastProvider>
+      <body className="bg-[#FAF6F0] text-[#2B3049] antialiased">
+        <ToastProvider>
+          <DemoProvider>
             <LiffAuthProvider>
-              <AppLayoutWrapper>{children}</AppLayoutWrapper>
+              <MobileContainer>
+                {children}
+              </MobileContainer>
             </LiffAuthProvider>
-          </ToastProvider>
-        </DemoProvider>
+          </DemoProvider>
+        </ToastProvider>
       </body>
     </html>
   );
 }
-

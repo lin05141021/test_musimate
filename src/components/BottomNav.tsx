@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Calendar, Mic, RefreshCw, BookOpen, CreditCard } from 'lucide-react';
@@ -8,6 +8,21 @@ import clsx from 'clsx';
 
 export function BottomNav() {
   const pathname = usePathname();
+  const [studentId, setStudentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sid =
+        urlParams.get('student_id') ||
+        urlParams.get('user_id') ||
+        urlParams.get('line_user_id') ||
+        localStorage.getItem('musimate_student_id');
+      if (sid) {
+        setStudentId(sid);
+      }
+    }
+  }, [pathname]);
 
   const navItems = [
     { href: '/student/schedule', label: '課表報到', icon: Calendar },
@@ -22,10 +37,12 @@ export function BottomNav() {
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+        const finalHref = studentId ? `${item.href}?student_id=${encodeURIComponent(studentId)}` : item.href;
+
         return (
           <Link
             key={item.href}
-            href={item.href}
+            href={finalHref}
             className={clsx(
               'flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-medium transition-all',
               isActive
@@ -41,3 +58,4 @@ export function BottomNav() {
     </nav>
   );
 }
+

@@ -34,10 +34,10 @@ const DEFAULT_CHECKIN_DATA: CheckinResponseData = {
   student_id: '55555555-5555-4555-b555-555555555555',
   period_term: 3,
   total_slots: 60,
-  stamped_count: 18,
-  streak_days: 7,
-  has_checked_in_today: false,
-  last_checkin_date: '2026-09-03',
+  stamped_count: 19,
+  streak_days: 8,
+  has_checked_in_today: true,
+  last_checkin_date: '2026-09-13',
   stamps: [
     { slot_index: 1, color: '#FFDDE2', rotation: -6, icon_type: 'note', checked_date: '08/17' },
     { slot_index: 2, color: '#D1F2EB', rotation: 5, icon_type: 'clef', checked_date: '08/18' },
@@ -57,6 +57,7 @@ const DEFAULT_CHECKIN_DATA: CheckinResponseData = {
     { slot_index: 16, color: '#D4E6F1', rotation: 6, icon_type: 'clef', checked_date: '09/01' },
     { slot_index: 17, color: '#FDEBD0', rotation: -6, icon_type: 'star', checked_date: '09/02' },
     { slot_index: 18, color: '#FCF3CF', rotation: 4, icon_type: 'flame', checked_date: '09/03' },
+    { slot_index: 19, color: '#FFDDE2', rotation: -5, icon_type: 'sparkle', checked_date: '09/13' },
   ],
   achievements: [
     {

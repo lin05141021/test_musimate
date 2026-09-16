@@ -184,6 +184,7 @@ export type AppointmentStatus = 'confirmed' | 'cancelled' | 'rescheduled' | 'att
 
 export interface Appointment {
   id: string;
+  contract_id?: string;
   student_id: string;
   student_name?: string;
   teacher_id: string;
@@ -195,6 +196,7 @@ export interface Appointment {
   location?: string;
   payment_status?: 'paid' | 'unpaid' | 'pay_per_lesson';
   payment_type?: 'prepaid' | 'postpaid';
+  term_period?: number;
 }
 
 export interface AvailableSlotResponse {

@@ -73,10 +73,61 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const fallbackPracticeLogs = [
+      {
+        id: 'prac-lin-3',
+        student_id: studentId,
+        song_title: '莫札特 K.545 第一樂章 呈示部 (目標 96 BPM)',
+        duration_seconds: 15,
+        audio_url: 'https://actions.google.com/sounds/v1/instruments/piano_chords.ogg',
+        bpm: 96,
+        bpm_stability_score: 96,
+        pitch_accuracy_score: 98,
+        ai_feedback_draft:
+          'AI 聲學模型分析：右手十六分音符音階顆粒感清晰均勻，左手 Alberti bass (5-1-3-1) 伴奏聲部平衡極佳，速度與拍頻標準差僅 1.2 BPM。',
+        teacher_feedback:
+          '林佩芬老師批改：觸鍵非常乾淨俐落！古典奏鳴曲式的典雅風格詮釋得很好，繼續保持！',
+        status: 'REVIEWED_AND_SENT',
+        created_at: '2026-09-12T16:30:00+08:00',
+      },
+      {
+        id: 'prac-lin-2',
+        student_id: studentId,
+        song_title: '德布西《月光》 琶音色彩與弱音 (目標 54 BPM)',
+        duration_seconds: 15,
+        audio_url: 'https://actions.google.com/sounds/v1/instruments/piano_chords.ogg',
+        bpm: 54,
+        bpm_stability_score: 93,
+        pitch_accuracy_score: 95,
+        ai_feedback_draft:
+          'AI 聲學模型分析：弱音 (p) 觸鍵柔和細膩，低音踏板切換時機乾淨，無殘留混濁共鳴，九八拍複合拍律動平穩。',
+        teacher_feedback:
+          '林佩芬老師批改：音色很有意境與詩意！注意第 30 小節右手大跳時手腕要提前放鬆帶動。',
+        status: 'REVIEWED_AND_SENT',
+        created_at: '2026-09-08T19:20:00+08:00',
+      },
+      {
+        id: 'prac-lin-1',
+        student_id: studentId,
+        song_title: '貝多芬《月光》第三樂章 急板琶音 (目標 120 BPM)',
+        duration_seconds: 15,
+        audio_url: 'https://actions.google.com/sounds/v1/instruments/piano_chords.ogg',
+        bpm: 118,
+        bpm_stability_score: 91,
+        pitch_accuracy_score: 94,
+        ai_feedback_draft:
+          'AI 聲學模型分析：連續上升琶音第 1 指轉指流暢，重音落點精準，戲劇張力充足；唯後半段手腕微緊，建議深呼吸減壓。',
+        teacher_feedback:
+          '林佩芬老師批改：急板的爆發力與狂暴氣勢非常出色！主和弦落鍵時肩膀記得保持下沉。',
+        status: 'REVIEWED_AND_SENT',
+        created_at: '2026-09-01T20:10:00+08:00',
+      },
+    ];
+
     return NextResponse.json({
       success: true,
-      source: 'empty',
-      data: [],
+      source: 'fallback',
+      data: fallbackPracticeLogs,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

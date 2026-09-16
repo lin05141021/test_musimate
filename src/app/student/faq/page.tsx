@@ -1,8 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
-import { StudentTabBar } from '@/components/StudentTabBar';
-import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
+import React from 'react';
 
 interface FAQItem {
   id: string;
@@ -103,107 +101,68 @@ const FAQ_DATA: FAQCategory[] = [
 ];
 
 export default function FAQPage() {
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-
   return (
-    <div className="min-h-screen bg-[#EDE8DE] sm:bg-[#E5E0D8] flex items-center justify-center p-0 sm:p-4 font-['Sora',sans-serif] select-none">
-      {/* 360px Mobile Viewport Container with Smooth Vertical Scrolling */}
-      <div className="w-[360px] h-[844px] max-w-full max-h-[100dvh] sm:max-h-[844px] bg-[#FAF6F0] rounded-[40px] shadow-[0px_12px_24px_rgba(43,48,73,0.13)] overflow-hidden flex flex-col relative border border-[#F0EAE1]">
-        
-        {/* 1. Header Bar (64px) */}
-        <header className="w-full h-16 px-5 py-3 bg-[#FAF6F0] border-b border-[#F0EAE1] flex justify-between items-center shrink-0 z-20">
-          <div className="w-[161px] h-10 relative flex items-center">
-            <img
-              src="/UI/logo.png"
-              alt="Musi Mate"
-              className="w-[161px] h-10 object-contain object-left cursor-pointer"
-              onClick={() => typeof window !== 'undefined' && window.history.back()}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            <span className="text-[#2B3049] text-xl font-bold font-['Sora'] tracking-wider hidden [:not([style*='display: none'])+&]:hidden">
-              Musi Mate
+    <div className="w-full flex flex-col gap-4 font-['Sora',sans-serif] select-none pb-12 animate-in fade-in">
+      {/* Title and Subtitle */}
+      <div className="flex flex-col gap-1.5 px-1 pt-1">
+        <h1 className="text-[#2B3049] text-[20px] font-bold font-['Sora']">
+          MusiMate 常見問題
+        </h1>
+        <p className="text-[#6F6F6F] text-[14px] font-normal leading-[19.6px] font-['Sora']">
+          AI 小幫手為您解答常見疑問與操作須知
+        </p>
+      </div>
+
+      {/* FAQ Categories */}
+      {FAQ_DATA.map((category, catIdx) => (
+        <div
+          key={catIdx}
+          className="w-full p-4 bg-white rounded-2xl border border-[rgba(181,142,190,0.25)] flex flex-col gap-4 shadow-[0px_4px_12px_rgba(43,48,73,0.02)]"
+        >
+          {/* Category Pill Badge */}
+          <div className="px-3 py-1.5 bg-[rgba(181,142,190,0.13)] rounded-full self-start inline-flex items-center">
+            <span className="text-[#B58EBE] text-[13px] font-bold font-['Sora']">
+              {category.title}
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[12px] font-bold text-[#B58EBE]">FAQ</span>
-            <span className="text-[11px] text-[#A3A7BA]">· 常見問題</span>
-          </div>
-        </header>
 
-        {/* 2. Main Content Area (flex-1 獨立垂直滾動) */}
-        <main className="flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent] px-5 pt-4 pb-8 flex flex-col gap-4">
-          
-          {/* Title and Subtitle */}
-          <div className="flex flex-col gap-1.5">
-            <h1 className="text-[#2B3049] text-[20px] font-bold font-['Sora']">
-              MusiMate 常見問題
-            </h1>
-            <p className="text-[#6F6F6F] text-[14px] font-normal leading-[19.6px] font-['Sora']">
-              AI 小幫手為您解答
-            </p>
-          </div>
-
-          {/* FAQ Categories */}
-          {FAQ_DATA.map((category, catIdx) => (
-            <div
-              key={catIdx}
-              className="w-full p-4 bg-white rounded-2xl border border-[rgba(181,142,190,0.25)] flex flex-col gap-4 shadow-[0px_4px_12px_rgba(43,48,73,0.02)]"
-            >
-              {/* Category Pill Badge */}
-              <div className="px-3 py-1.5 bg-[rgba(181,142,190,0.13)] rounded-full self-start inline-flex items-center">
-                <span className="text-[#B58EBE] text-[14px] font-bold font-['Sora']">
-                  {category.title}
-                </span>
-              </div>
-
-              {/* Q&A Items List */}
-              <div className="flex flex-col gap-3.5">
-                {category.items.map((item, itemIdx) => (
-                  <div key={item.id} className="flex flex-col gap-2.5">
-                    
-                    {/* Question Row */}
-                    <div className="flex items-start gap-2">
-                      <div className="px-1.5 py-0.5 bg-[#B58EBE] rounded-md flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-white text-[12px] font-bold font-['Sora']">
-                          {item.qNum}
-                        </span>
-                      </div>
-                      <div className="flex-1 text-[#2B3049] text-[14px] font-bold leading-[20px] font-['Sora']">
-                        {item.question}
-                      </div>
-                    </div>
-
-                    {/* Answer Text */}
-                    <div className="pl-8 text-[#6F6F6F] text-[14px] font-normal leading-[18px] font-['Sora']">
-                      {item.answer}
-                    </div>
-
-                    {/* Divider between questions in the same card */}
-                    {itemIdx < category.items.length - 1 && (
-                      <div className="w-full h-0 border-b border-[rgba(181,142,190,0.25)] pt-1" />
-                    )}
+          {/* Q&A Items List */}
+          <div className="flex flex-col gap-3.5">
+            {category.items.map((item, itemIdx) => (
+              <div key={item.id} className="flex flex-col gap-2.5">
+                
+                {/* Question Row */}
+                <div className="flex items-start gap-2">
+                  <div className="px-1.5 py-0.5 bg-[#B58EBE] rounded-md flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-white text-[11px] font-bold font-['Sora']">
+                      {item.qNum}
+                    </span>
                   </div>
-                ))}
+                  <div className="flex-1 text-[#2B3049] text-[14px] font-bold leading-[20px] font-['Sora']">
+                    {item.question}
+                  </div>
+                </div>
+
+                {/* Answer Text */}
+                <div className="pl-7 text-[#6F6F6F] text-[13px] font-normal leading-[18px] font-['Sora']">
+                  {item.answer}
+                </div>
+
+                {/* Divider between questions in the same card */}
+                {itemIdx < category.items.length - 1 && (
+                  <div className="w-full h-0 border-b border-[rgba(181,142,190,0.20)] pt-1" />
+                )}
               </div>
-            </div>
-          ))}
-
-          {/* Copyright / Footer */}
-          <div className="pt-2 pb-2 text-center text-[#6F6F6F] text-[12px] font-['Sora']">
-            © 2026 Musi Mate · FAQ
+            ))}
           </div>
-        </main>
+        </div>
+      ))}
 
-        {/* 3. Bottom Floating Navigation Bar */}
-        <footer className="flex-shrink-0 w-full z-30 bg-[#FAF6F0] shadow-[0_-4px_16px_rgba(0,0,0,0.06)] border-t border-[#EFECE6]">
-          <StudentTabBar activeTab="more" onMoreClick={() => setDrawerOpen(true)} />
-        </footer>
-
-        {/* 4. Slide-up More Drawer */}
-        <StudentMoreDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      {/* Copyright / Footer */}
+      <div className="pt-2 pb-2 text-center text-[#A3A7BA] text-[12px] font-['Sora']">
+        © 2026 Musi Mate · 常見問題與使用指南
       </div>
     </div>
   );
 }
+

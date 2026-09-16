@@ -11,8 +11,6 @@ import {
   CreditCard,
   AlertCircle
 } from 'lucide-react';
-import { StudentTabBar } from '@/components/StudentTabBar';
-import { StudentMoreDrawer } from '@/components/StudentMoreDrawer';
 
 interface LessonRecord {
   id: string;
@@ -101,39 +99,9 @@ export default function StudentHistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EDE8DE] sm:bg-[#E5E0D8] flex items-center justify-center p-0 sm:p-4 font-['Sora',sans-serif] select-none">
-      {/* 360px Mobile Viewport Container */}
-      <div className="w-[360px] h-[844px] max-w-full max-h-[100dvh] sm:max-h-[844px] bg-[#FAF6F0] rounded-[40px] shadow-[0px_12px_24px_rgba(43,48,73,0.13)] overflow-hidden flex flex-col relative border border-[#F0EAE1]">
-        
-        {/* 1. Header Bar (64px) */}
-        <header className="w-full h-16 px-5 py-3 bg-[#FAF6F0] border-b border-[#F0EAE1] flex justify-between items-center shrink-0 z-20">
-          <div className="w-[161px] h-10 relative flex items-center">
-            {/* Logo image with fallback */}
-            <img
-              src="/UI/logo.png"
-              alt="Musi Mate"
-              className="w-[161px] h-10 object-contain object-left cursor-pointer"
-              onClick={() => router.push('/')}
-              onError={(e) => {
-                // Fallback if logo not found
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-            <span className="text-[#2B3049] text-xl font-bold font-['Sora'] tracking-wider hidden [:not([style*='display: none'])+&]:hidden">
-              Musi Mate
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[12px] font-bold text-[#4A8FD9]">第 {currentTerm} 期</span>
-            <span className="text-[11px] text-[#A3A7BA]">· 歷史紀錄</span>
-          </div>
-        </header>
-
-        {/* 2. Main Scrollable Content Area (flex-1 獨立垂直滾動) */}
-        <main className="flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#D8CFC4_transparent] flex flex-col gap-3 pb-8">
-
-        {/* 2. Top Term Info Card */}
-        <div className="px-5 pt-1 pb-3">
+    <div className="w-full flex flex-col gap-4 font-['Sora',sans-serif] select-none pb-12 animate-in fade-in">
+      {/* 1. Top Term Info Card */}
+      <div className="w-full">
           <div className="w-full p-4 bg-white rounded-2xl border border-[#EAE4DC] flex flex-col gap-3 shadow-[0px_4px_16px_rgba(43,48,73,0.02)]">
             
             {/* Subtitle Indicator */}
@@ -437,22 +405,11 @@ export default function StudentHistoryPage() {
             </div>
 
             {/* Copyright */}
-            <div className="pt-2 pb-2 text-center text-[#6F6F6F] text-[12px] font-['Sora']">
-              © 2026 Musi Mate
+            <div className="pt-2 pb-2 text-center text-[#A3A7BA] text-[12px] font-['Sora']">
+              © 2026 Musi Mate · 課程與繳費紀錄
             </div>
           </div>
         )}
-
-        </main>
-
-        {/* 3. Footer TabBar */}
-        <footer className="flex-shrink-0 w-full z-30 bg-[#FAF6F0] shadow-[0_-4px_16px_rgba(0,0,0,0.06)] border-t border-[#EFECE6]">
-          <StudentTabBar activeTab="more" onMoreClick={() => setDrawerOpen(true)} />
-        </footer>
-
-        {/* 4. Slide-up More Drawer */}
-        <StudentMoreDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
-      </div>
     </div>
   );
 }

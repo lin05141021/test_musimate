@@ -21,68 +21,97 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'student_id required' }, { status: 400 });
     }
 
-    // 1. 先查詢 Supabase schedules 表中的正式排程
-    let schedulesData: any[] = [];
-    const { data: dbSchedules, error: schedError } = await serverSupabase
-      .from('schedules')
+    // 1. 先查詢 Supabase sched_lessons 表中的正式排程
+    let dbLessonsData: any[] = [];
+    const { data: dbLessons } = await serverSupabase
+      .from('sched_lessons')
       .select('*')
-      .order('date', { ascending: true });
+      .eq('student_id', studentId)
+      .order('start_time', { ascending: true });
 
-    if (dbSchedules && dbSchedules.length > 0) {
-      // 篩選劉心悅或當前學生
-      const matched = dbSchedules.filter((s: any) => 
-        s.student_id === studentId || 
-        s.student_name?.includes('劉心悅') || 
-        s.student_name?.includes('Lin')
-      );
-      schedulesData = matched.length > 0 ? matched : dbSchedules;
+    if (dbLessons && dbLessons.length > 0) {
+      dbLessonsData = dbLessons;
     }
 
-    // 2. 建構 10 堂常態契約排程
+    // 2. 建構/格式化 10 堂週一常態契約排程
     const formatted = [];
-    const baseDate = new Date();
-    // 取得下一個週三或排定日
-    for (let i = 1; i <= 10; i++) {
-      const lessonDate = new Date(baseDate);
-      lessonDate.setDate(baseDate.getDate() + (i - 1) * 7);
-      const dateStr = lessonDate.toISOString().split('T')[0];
-      
-      const startTimeISO = `${dateStr}T10:00:00+08:00`;
-      const endTimeISO = `${dateStr}T12:00:00+08:00`;
 
-      let status = 'SCHEDULED';
-      if (i === 1) status = 'COMPLETED';
-      if (i === 2) status = 'SCHEDULED';
-
-      formatted.push({
-        id: `sched-lesson-${i}-${studentId.slice(0, 8)}`,
-        student_id: studentId,
-        teacher_id: DEFAULT_TEACHER.id,
-        teacher_name: DEFAULT_TEACHER.name,
-        start_time: startTimeISO,
-        end_time: endTimeISO,
-        location: DEFAULT_TEACHER.location,
-        status: status,
-        instrument: '古典鋼琴 (Piano)',
-        memo_notes: i === 1 
-          ? '課堂回顧：車爾尼 Op.599 No.50 視奏驗收完畢，觸鍵力度均勻'
-          : i === 2
-          ? '本堂重點：巴哈初步觸鍵清晰度與右手旋律歌唱性'
-          : `第 ${i} 堂常態課堂：古典鋼琴技巧進階訓練`,
-        student_checkin_at: i === 1 ? startTimeISO : null,
-        lesson_index: i,
-        is_leave: false,
-        is_rescheduled: false,
-        is_pending_reschedule: false,
-        pending_request_id: null,
-        pending_reschedule_reason: null,
-        total_lessons: 10,
+    if (dbLessonsData.length > 0) {
+      dbLessonsData.slice(0, 10).forEach((s: any, idx: number) => {
+        formatted.push({
+          id: s.id || `sched-lesson-${idx + 1}-${studentId.slice(0, 8)}`,
+          student_id: studentId,
+          teacher_id: s.teacher_id || DEFAULT_TEACHER.id,
+          teacher_name: DEFAULT_TEACHER.name,
+          start_time: s.start_time,
+          end_time: s.end_time,
+          location: DEFAULT_TEACHER.location,
+          status: s.status || 'SCHEDULED',
+          instrument: '古典鋼琴 (Piano)',
+          memo_notes: idx === 0 
+            ? '課堂回顧：車爾尼 Op.599 No.50 視奏驗收完畢，觸鍵力度均勻'
+            : idx === 1
+            ? '本堂重點：巴哈初步觸鍵清晰度與右手旋律歌唱性'
+            : `第 ${idx + 1} 堂常態課堂：古典鋼琴技巧進階訓練`,
+          student_checkin_at: s.student_checkin_at || (s.status === 'COMPLETED' ? s.start_time : null),
+          lesson_index: idx + 1,
+          is_leave: s.status === 'RESCHEDULE_PENDING',
+          is_rescheduled: s.status === 'RESCHEDULED',
+          is_pending_reschedule: false,
+          pending_request_id: null,
+          pending_reschedule_reason: null,
+          total_lessons: 10,
+        });
       });
+    }
+
+    // 若筆數不足 10 堂，則由最近的週一 (Monday) 開始補充週一常態時段
+    if (formatted.length < 10) {
+      const baseDate = new Date();
+      const day = baseDate.getDay(); // 0: Sun, 1: Mon...
+      const diffToMonday = day === 0 ? 1 : (day === 1 ? 0 : (8 - day));
+      baseDate.setDate(baseDate.getDate() + diffToMonday);
+
+      const startIndex = formatted.length + 1;
+      for (let i = startIndex; i <= 10; i++) {
+        const lessonDate = new Date(baseDate);
+        lessonDate.setDate(baseDate.getDate() + (i - startIndex) * 7);
+        const dateStr = lessonDate.toISOString().split('T')[0];
+        
+        const startTimeISO = `${dateStr}T14:00:00+08:00`;
+        const endTimeISO = `${dateStr}T15:00:00+08:00`;
+
+        let status = 'SCHEDULED';
+        if (i === 1) status = 'COMPLETED';
+
+        formatted.push({
+          id: `sched-lesson-${i}-${studentId.slice(0, 8)}`,
+          student_id: studentId,
+          teacher_id: DEFAULT_TEACHER.id,
+          teacher_name: DEFAULT_TEACHER.name,
+          start_time: startTimeISO,
+          end_time: endTimeISO,
+          location: DEFAULT_TEACHER.location,
+          status: status,
+          instrument: '古典鋼琴 (Piano)',
+          memo_notes: i === 1 
+            ? '課堂回顧：車爾尼 Op.599 No.50 視奏驗收完畢，觸鍵力度均勻'
+            : `第 ${i} 堂常態課堂：古典鋼琴技巧進階訓練 (固定週一)`,
+          student_checkin_at: i === 1 ? startTimeISO : null,
+          lesson_index: i,
+          is_leave: false,
+          is_rescheduled: false,
+          is_pending_reschedule: false,
+          pending_request_id: null,
+          pending_reschedule_reason: null,
+          total_lessons: 10,
+        });
+      }
     }
 
     return NextResponse.json({
       success: true,
-      source: 'database_schedules',
+      source: 'database_sched_lessons',
       data: formatted,
       meta: {
         total_contract_lessons: 10,

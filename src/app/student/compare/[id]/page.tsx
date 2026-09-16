@@ -80,55 +80,59 @@ export default function StudentCompareDetailPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-4 pb-28">
-      {/* Navigation Top Action */}
+    <div className="space-y-4 pb-28 animate-in fade-in">
+      {/* 頂部導航橫列 */}
       <div className="flex items-center justify-between">
         <Link
           href="/student/practice"
           replace={true}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7A736E] hover:text-[#332C27] transition-colors"
+          className="inline-flex items-center gap-1 text-xs font-bold text-[#63667B] hover:text-[#2B3049] transition-colors py-1.5 px-3 rounded-lg bg-white/80 border border-[#EBDCB9] shadow-xs"
         >
-          <ArrowLeft className="w-4 h-4" /> 返回作業學習中心 (P4)
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>返回作業打卡</span>
         </Link>
-        <span className="text-xs text-[#785338] font-bold bg-[#F2E8D8] px-3.5 py-1 rounded-full border border-[#EADFC9]">
-          比對 ID: {practice.id}
+        <span className="text-[11px] font-bold bg-[#FAF6F0] text-[#885424] border border-[#C58D34]/30 px-3 py-1 rounded-full shadow-xs">
+          鋼琴 · AI 影音比對診斷
         </span>
       </div>
 
-      {/* Main Dual-Screen Comparison Card */}
-      <div className="warm-card p-6 sm:p-8 rounded-3xl border border-[#EFECE6] shadow-warm space-y-8 bg-white">
+      {/* 主卡片：AI 比對診斷總覽 */}
+      <div className="bg-white border border-[#EBDCB9] rounded-2xl p-4 space-y-4 shadow-xs">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#EFECE6] pb-6">
+        <div className="flex items-start justify-between border-b border-[#F0EAE1] pb-3 gap-2">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF2EC] text-[#8C6D53] border border-[#E8D4C5] text-xs font-bold">
-              <Sliders className="w-3.5 h-3.5 text-[#E88D67]" />
-              雙畫面 AI 影音比對診斷 (P6)
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-[#68C5AB]/20 text-[#2B7A66] text-[11px] font-bold">
+                AI 聲學比對
+              </span>
+              <span className="text-[11px] text-[#63667B] flex items-center gap-1 font-mono">
+                <Clock className="w-3 h-3 text-[#68C5AB]" />
+                {new Date(practice.created_at).toLocaleDateString('zh-TW')}
+              </span>
             </div>
-            <h1 className="text-2xl font-extrabold text-[#332C27] tracking-tight">
+            <h1 className="text-base font-extrabold text-[#2B3049] leading-snug">
               {demo.title}
             </h1>
-            <p className="text-xs text-[#7A736E] font-medium">
-              上傳日期：{new Date(practice.created_at).toLocaleDateString('zh-TW')} · AI 聲學比對模型已完成分析
+            <p className="text-xs text-[#8E90A6]">
+              指導教師：林佩芬 老師 · AI 聲學模型已完成綜合比對
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-right">
-              <span className="text-[10px] text-[#7A736E] font-bold block uppercase">AI 綜合得分</span>
-              <span className="text-2xl font-black text-[#3D5240]">{practice.ai_feedback_json.overall_score} 分</span>
-            </div>
+          <div className="text-right shrink-0 bg-[#EFF9F6] border border-[#A2DEC8] px-3 py-1.5 rounded-xl shadow-xs">
+            <span className="text-[10px] text-[#2B7A66] font-bold block">AI 綜合得分</span>
+            <span className="text-xl font-black text-[#1F5C4E]">{practice.ai_feedback_json.overall_score} 分</span>
           </div>
         </div>
 
         {/* Dual Video Players */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Left: Student Video */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-[#332C27] px-1">
-              <span>👤 學生練習影片 (Student Practice)</span>
-              <span className="text-[#E88D67] font-mono text-[11px]">BPM {practice.ai_feedback_json.bpm_detected}</span>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-bold text-[#2B3049] px-1">
+              <span>👤 學生練習 (劉心悅)</span>
+              <span className="text-[#E05D52] font-mono text-[11px]">BPM {practice.ai_feedback_json.bpm_detected}</span>
             </div>
-            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video border border-[#EFECE6] shadow-sm">
+            <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-[#EBDCB9] shadow-xs">
               <video
                 ref={studentVideoRef}
                 src={practice.video_url}
@@ -140,12 +144,12 @@ export default function StudentCompareDetailPage() {
           </div>
 
           {/* Right: Teacher Demo Video */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-[#332C27] px-1">
-              <span>🎓 老師標準範例 (Teacher Demo)</span>
-              <span className="text-[#8C6D53] font-mono text-[11px]">BPM {demo.midi_data?.bpm || 96}</span>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs font-bold text-[#2B3049] px-1">
+              <span>🎓 老師示範 (林佩芬)</span>
+              <span className="text-[#885424] font-mono text-[11px]">BPM {demo.midi_data?.bpm || 96}</span>
             </div>
-            <div className="relative rounded-2xl overflow-hidden bg-black aspect-video border border-[#EFECE6] shadow-sm">
+            <div className="relative rounded-xl overflow-hidden bg-black aspect-video border border-[#EBDCB9] shadow-xs">
               <video
                 ref={teacherVideoRef}
                 src={demo.video_url}
@@ -158,58 +162,61 @@ export default function StudentCompareDetailPage() {
         </div>
 
         {/* Unified Playback Controls & Timeline */}
-        <div className="bg-[#FAF7F2] p-6 rounded-2xl border border-[#EFECE6] space-y-4">
+        <div className="bg-[#FAF6F0] p-3.5 rounded-xl border border-[#EBDCB9] space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={handleTogglePlay}
-                className="px-5 py-2 rounded-full bg-[#8C6D53] hover:bg-[#765942] text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-[#8C6D53]/20 transition-all"
+                className="px-3.5 py-1.5 rounded-full bg-[#C58D34] hover:bg-[#AA7129] active:scale-95 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-                {isPlaying ? '暫停雙視角' : '同步播放'}
+                <span>{isPlaying ? '暫停雙視角' : '同步播放'}</span>
               </button>
               <button
+                type="button"
                 onClick={() => handleSeek(0)}
-                className="p-2 rounded-full bg-white hover:bg-[#EFECE6] text-[#7A736E] text-xs font-bold border border-[#EFECE6] transition-all"
+                className="p-1.5 rounded-full bg-white hover:bg-[#FAF6F0] active:scale-95 text-[#63667B] text-xs font-bold border border-[#EBDCB9] transition-all cursor-pointer shadow-xs"
                 title="回到開頭"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="flex items-center gap-4 text-xs font-bold">
-              <span className="text-[#3D5240] bg-[#E3E8E1] px-3 py-1 rounded-full">
-                音準：{practice.ai_feedback_json.pitch_accuracy}%
+            <div className="flex items-center gap-2 text-xs font-bold">
+              <span className="text-[#1F5C4E] bg-[#EFF9F6] border border-[#A2DEC8] px-2.5 py-0.5 rounded-full text-[11px]">
+                音準 {practice.ai_feedback_json.pitch_accuracy}%
               </span>
-              <span className="text-[#8C6D53] bg-[#FAF2EC] px-3 py-1 rounded-full">
-                節奏：{practice.ai_feedback_json.rhythm_accuracy}%
+              <span className="text-[#885424] bg-[#FAF6F0] border border-[#C58D34]/30 px-2.5 py-0.5 rounded-full text-[11px]">
+                節奏 {practice.ai_feedback_json.rhythm_accuracy}%
               </span>
             </div>
           </div>
 
           {/* Timeline Markers */}
-          <div className="space-y-2">
-            <span className="text-[11px] font-bold text-[#7A736E] block">AI 標記時間軸（點擊跳至該小節診斷）：</span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div className="space-y-1.5">
+            <span className="text-[11px] font-bold text-[#63667B] block">AI 標記時間軸（點擊切換小節診斷）：</span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {practice.ai_feedback_json.timeline_markers.map((marker, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => {
                     setSelectedMarker(marker);
                     handleSeek(marker.time);
                   }}
-                  className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
+                  className={`p-2.5 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
                     selectedMarker?.time === marker.time
-                      ? 'bg-white border-[#8C6D53] shadow-sm ring-2 ring-[#8C6D53]/20'
-                      : 'bg-[#FAF2EC]/50 border-[#E8D4C5] hover:bg-white'
+                      ? 'bg-white border-[#C58D34] shadow-xs ring-2 ring-[#C58D34]/20'
+                      : 'bg-white/70 border-[#EBDCB9] hover:bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold font-mono text-[#8C6D53]">00:0{marker.time}</span>
-                    <span className="text-xs font-semibold text-[#332C27] line-clamp-1">{marker.title}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold font-mono text-[#885424]">00:0{marker.time}</span>
+                    <span className="text-xs font-semibold text-[#2B3049] line-clamp-1">{marker.title}</span>
                   </div>
                   <span
-                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
                       marker.severity === 'error'
                         ? 'bg-rose-100 text-rose-700'
                         : marker.severity === 'warning'
@@ -227,37 +234,38 @@ export default function StudentCompareDetailPage() {
 
         {/* Selected Marker Detail Card */}
         {selectedMarker && (
-          <div className="p-6 rounded-3xl bg-[#FAF2EC] border border-[#E8D4C5] space-y-3 shadow-sm">
+          <div className="p-4 rounded-xl bg-[#FAF6F0] border border-[#EBDCB9] space-y-2.5 shadow-xs">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span
-                  className={`px-3 py-0.5 rounded-full text-[10px] font-bold ${
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                     selectedMarker.severity === 'error'
-                      ? 'bg-[#FCEADE] text-[#B85536] border border-[#F6D0B8]'
+                      ? 'bg-rose-100 text-rose-700 border border-rose-200'
                       : selectedMarker.severity === 'warning'
-                      ? 'bg-white text-[#8C6D53] border border-[#E8D4C5]'
-                      : 'bg-[#E3E8E1] text-[#3D5240] border border-[#C5D2C2]'
+                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                   }`}
                 >
                   {selectedMarker.type === 'pitch' ? '音高誤差' : selectedMarker.type === 'rhythm' ? '節奏搶拍' : '姿態建議'}
                 </span>
-                <h3 className="font-bold text-sm text-[#332C27]">
+                <h3 className="font-bold text-xs text-[#2B3049]">
                   {selectedMarker.title} (時間點: {selectedMarker.time} 秒)
                 </h3>
               </div>
 
               <button
+                type="button"
                 onClick={() => handleSeek(selectedMarker.time)}
-                className="text-xs text-[#8C6D53] hover:text-[#765942] font-bold"
+                className="text-xs text-[#C58D34] hover:text-[#AA7129] font-bold cursor-pointer"
               >
                 重播此片段
               </button>
             </div>
 
-            <p className="text-xs text-[#7A736E] font-medium leading-relaxed">{selectedMarker.description}</p>
+            <p className="text-xs text-[#63667B] font-medium leading-relaxed">{selectedMarker.description}</p>
 
-            <div className="p-3.5 rounded-2xl bg-white border border-[#EFECE6] text-xs text-[#332C27] font-medium">
-              💡 <span className="font-bold text-[#8C6D53]">AI 改善建議：</span> {selectedMarker.recommendation}
+            <div className="p-2.5 rounded-lg bg-white border border-[#EBDCB9] text-xs text-[#2B3049] font-medium">
+              💡 <span className="font-bold text-[#885424]">AI 改善建議：</span> {selectedMarker.recommendation}
             </div>
           </div>
         )}
