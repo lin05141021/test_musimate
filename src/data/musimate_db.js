@@ -7,7 +7,7 @@
  */
 
 const MusiMateDB = (() => {
-    const STORAGE_KEY = 'musimate_supabase_cached_db_v3';
+    const STORAGE_KEY = 'musimate_supabase_cached_db_v4';
     const RECONCILED_KEY = 'musimate_reconciled_ids';
     const REMAINING_HOURS_PREFIX = 'musimate_remaining_hours_';
 
@@ -33,12 +33,19 @@ const MusiMateDB = (() => {
                 line_user_id: null
             },
             {
-                id: 'fd510464-adb3-4006-82c6-c88eb97c8c62',
-                role: 'teacher',
-                name: 'Charles Lin (查爾斯老師)',
-                email: 'chl@gmail.com',
-                password: 'teacher123',
-                avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+                id: 'u-lin-student',
+                role: 'student',
+                name: '劉心悅 (Lin)',
+                email: 'lin.student@harmony.edu',
+                avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+                line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c'
+            },
+            {
+                id: 'u-kumei-student',
+                role: 'student',
+                name: '久美',
+                email: 'kumei.student@harmony.edu',
+                avatar_url: 'https://api.dicebear.com/7.x/notionists/svg?seed=Kumei',
                 line_user_id: null
             },
             {
@@ -50,44 +57,12 @@ const MusiMateDB = (() => {
                 line_user_id: null
             },
             {
-                id: 'u-lin-student',
-                role: 'student',
-                name: '劉心悅 (Lin)',
-                email: 'lin.student@harmony.edu',
-                avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
-                line_user_id: 'Uf2457bf35e0d6d3060b60838d9a9c91c'
-            },
-            {
                 id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u',
                 role: 'student',
                 name: '許雅婷 (Charles / 查爾斯)',
                 email: 'yating.student@harmony.edu',
                 avatar_url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
                 line_user_id: 'U26ed3c0e48864aebdc244594cf780df0'
-            },
-            {
-                id: '89bdd196-dd00-4fc0-ab4d-16683f63bd6b-u',
-                role: 'student',
-                name: '賴冠廷',
-                email: 'guanting.student@harmony.edu',
-                avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
-            },
-            {
-                id: '8e00b084-4da3-4791-9085-aeafbaa88037-u',
-                role: 'student',
-                name: '劉冠廷',
-                email: 'kt.student@harmony.edu',
-                avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
-            },
-            {
-                id: 'b83a496f-d728-4b36-bb3e-650bf4347703-u',
-                role: 'student',
-                name: '王義川',
-                email: 'yichuan.student@harmony.edu',
-                avatar_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
-                line_user_id: null
             }
         ],
         teachers: [
@@ -97,37 +72,118 @@ const MusiMateDB = (() => {
                 name: '林佩芬',
                 instrument: '古典鋼琴 · 流行爵士鋼琴',
                 bio: '國立維也納音樂學院碩士，具備 12 年教學資歷，專注於觸鍵音色與音樂詮釋。'
-            },
-            {
-                id: 'fd510464-adb3-4006-82c6-c88eb97c8c62',
-                user_id: 'fd510464-adb3-4006-82c6-c88eb97c8c62',
-                name: 'Charles Lin',
-                instrument: '鋼琴 (Piano)',
-                bio: '專業鋼琴演奏與 AI 音樂教學。'
             }
         ],
         students: [
-            { id: 's-lin', user_id: 'u-lin-student', name: '劉心悅 (Lin)', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 2000, default_location: '音符琴房 A303' },
+            { id: 's-lin', user_id: 'u-lin-student', name: '劉心悅 (Lin)', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 2000, default_location: '音符琴房 A303', period: 3 },
+            { id: 's-kumei', user_id: 'u-kumei-student', name: '久美', default_instrument: '古典鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '音符琴房 A303', is_new_student: true },
             { id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', user_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', name: '林小明', default_instrument: '小提琴 (Violin)', rate_per_lesson: 1200, default_location: '大安琴房 A 室' },
-            { id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s', user_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u', name: '許雅婷', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '大安琴房 A 室' },
-            { id: '89bdd196-dd00-4fc0-ab4d-16683f63bd6b-s', user_id: '89bdd196-dd00-4fc0-ab4d-16683f63bd6b-u', name: '賴冠廷', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '大安琴房 A 室' },
-            { id: '8e00b084-4da3-4791-9085-aeafbaa88037-s', user_id: '8e00b084-4da3-4791-9085-aeafbaa88037-u', name: '劉冠廷', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '大安琴房 A 室' },
-            { id: 'b83a496f-d728-4b36-bb3e-650bf4347703-s', user_id: 'b83a496f-d728-4b36-bb3e-650bf4347703-u', name: '王義川', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1200, default_location: '大安琴房 A 室' }
+            { id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s', user_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-u', name: '許雅婷', default_instrument: '鋼琴 (Piano)', rate_per_lesson: 1600, default_location: '大安琴房 A 室' }
         ],
         schedule_slots: [
-            { id: 's1', start_time: '2026-08-24T10:00:00+08:00', end_time: '2026-08-24T11:00:00+08:00', location: '音符琴房 A301', is_available: true },
-            { id: 's2', start_time: '2026-08-25T14:00:00+08:00', end_time: '2026-08-25T15:00:00+08:00', location: '音符琴房 A303', is_available: true },
-            { id: 's3', start_time: '2026-08-27T10:00:00+08:00', end_time: '2026-08-27T11:00:00+08:00', location: '音符琴房 A301', is_available: true },
-            { id: 's4', start_time: '2026-08-27T14:00:00+08:00', end_time: '2026-08-27T15:00:00+08:00', location: '音符琴房 A303', is_available: true },
-            { id: 's5', start_time: '2026-08-28T10:00:00+08:00', end_time: '2026-08-28T11:00:00+08:00', location: '音符琴房 A301', is_available: true }
+            { id: 's1', start_time: '2026-09-18T14:00:00+08:00', end_time: '2026-09-18T15:00:00+08:00', location: '音符琴房 A301', is_available: true },
+            { id: 's2', start_time: '2026-09-19T14:00:00+08:00', end_time: '2026-09-19T15:00:00+08:00', location: '音符琴房 A303', is_available: true },
+            { id: 's3', start_time: '2026-09-21T10:00:00+08:00', end_time: '2026-09-21T11:00:00+08:00', location: '音符琴房 A301', is_available: true },
+            { id: 's4', start_time: '2026-09-22T14:00:00+08:00', end_time: '2026-09-22T15:00:00+08:00', location: '音符琴房 A303', is_available: true },
+            { id: 's5', start_time: '2026-09-25T14:00:00+08:00', end_time: '2026-09-25T15:00:00+08:00', location: '音符琴房 A301', is_available: true }
         ],
         appointments: [
-            { id: 'app-yating', student_id: '26b2f3dd-cc6f-4a97-8cda-6bc43aee3384-s', student_name: '許雅婷', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-24T10:00:00+08:00', end_time: '2026-08-24T11:00:00+08:00', location: '大安琴房 A 室', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '哈農練習曲與莫札特奏鳴曲' },
-            { id: 'app-ming', student_id: 'bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb', student_name: '林小明', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-25T14:00:00+08:00', end_time: '2026-08-25T15:00:00+08:00', location: '大安琴房 A 室', status: 'confirmed', instrument: '小提琴 (Violin)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '塞茲小提琴協奏曲 第一樂章' },
-            { id: 'app-lin', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-26T10:00:00+08:00', end_time: '2026-08-26T12:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '蕭邦夜曲 Op.9 No.2 踏板與裝飾音' },
-            { id: 'app-guanting', student_id: '89bdd196-dd00-4fc0-ab4d-16683f63bd6b-s', student_name: '賴冠廷', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-26T14:00:00+08:00', end_time: '2026-08-26T15:00:00+08:00', location: '大安琴房 A 室', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '徹爾尼 599' },
-            { id: 'app-kt', student_id: '8e00b084-4da3-4791-9085-aeafbaa88037-s', student_name: '劉冠廷', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-28T19:00:00+08:00', end_time: '2026-08-28T20:00:00+08:00', location: '大安琴房 A 室', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'pay_per_lesson', payment_type: 'postpaid', memo_notes: '流行鋼琴伴奏' },
-            { id: 'app-yichuan', student_id: 'b83a496f-d728-4b36-bb3e-650bf4347703-s', student_name: '王義川', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', start_time: '2026-08-30T10:00:00+08:00', end_time: '2026-08-30T11:00:00+08:00', location: '大安琴房 A 室', status: 'confirmed', instrument: '鋼琴 (Piano)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '巴哈創意曲' }
+            // ==========================================
+            // 劉心悅 (Lin) - 第 3 期 進行中剩餘課程 (3 堂課)
+            // ==========================================
+            {
+                id: 'app-lin-rem-1',
+                student_id: 's-lin',
+                student_name: '劉心悅 (Lin)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-12T10:00:00+08:00',
+                end_time: '2026-09-12T12:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (Piano)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '第 3 期 · 蕭邦夜曲 Op.9 No.2 踏板與裝飾音'
+            },
+            {
+                id: 'app-lin-rem-2',
+                student_id: 's-lin',
+                student_name: '劉心悅 (Lin)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-16T10:00:00+08:00',
+                end_time: '2026-09-16T12:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (Piano)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '第 3 期 · 貝多芬月光奏鳴曲第三樂章 琶音與強弱對比'
+            },
+            {
+                id: 'app-lin-rem-3',
+                student_id: 's-lin',
+                student_name: '劉心悅 (Lin)',
+                teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd',
+                teacher_name: '林佩芬 老師',
+                start_time: '2026-09-18T10:00:00+08:00',
+                end_time: '2026-09-18T12:00:00+08:00',
+                location: '音符琴房 A303',
+                status: 'confirmed',
+                instrument: '古典鋼琴 (Piano)',
+                payment_status: 'paid',
+                payment_type: 'postpaid',
+                memo_notes: '第 3 期結業堂 · 徹爾尼 599 第 20 首 & 巴哈初步第 3 首 (含 AI 語音週報)',
+                has_voice_report: true,
+                voice_report_id: 'lesson-6'
+            },
+
+            // ==========================================
+            // 劉心悅 (Lin) - 第 4 期 已預約新學期課程 (10 堂課)
+            // ==========================================
+            { id: 'app-lin-t4-1', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-09-23T19:00:00+08:00', end_time: '2026-09-23T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第1堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 1 堂課' },
+            { id: 'app-lin-t4-2', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-09-30T19:00:00+08:00', end_time: '2026-09-30T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第2堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 2 堂課' },
+            { id: 'app-lin-t4-3', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-10-07T19:00:00+08:00', end_time: '2026-10-07T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第3堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 3 堂課' },
+            { id: 'app-lin-t4-4', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-10-14T19:00:00+08:00', end_time: '2026-10-14T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第4堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 4 堂課' },
+            { id: 'app-lin-t4-5', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-10-21T19:00:00+08:00', end_time: '2026-10-21T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第5堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 5 堂課' },
+            { id: 'app-lin-t4-6', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-10-28T19:00:00+08:00', end_time: '2026-10-28T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第6堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 6 堂課' },
+            { id: 'app-lin-t4-7', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-04T19:00:00+08:00', end_time: '2026-11-04T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第7堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 7 堂課' },
+            { id: 'app-lin-t4-8', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-11T19:00:00+08:00', end_time: '2026-11-11T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第8堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 8 堂課' },
+            { id: 'app-lin-t4-9', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-18T19:00:00+08:00', end_time: '2026-11-18T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第9堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 9 堂課' },
+            { id: 'app-lin-t4-10', student_id: 's-lin', student_name: '劉心悅 (Lin)', teacher_id: 'df637b26-7cab-443b-8801-4361fb35afdd', teacher_name: '林佩芬 老師', start_time: '2026-11-25T19:00:00+08:00', end_time: '2026-11-25T21:00:00+08:00', location: '音符琴房 A303', status: 'confirmed', instrument: '古典鋼琴 (第4期 第10堂)', payment_status: 'paid', payment_type: 'prepaid', memo_notes: '第 4 期 第 10 堂課' }
+        ],
+        lessons: [
+            {
+                id: 'lesson-6',
+                appointment_id: 'app-lin-rem-3',
+                student_name: '劉心悅 (Lin)',
+                created_at: '2026-09-18T10:00:00+08:00',
+                song_title: '徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
+                teacher_name: '林佩芬 老師 (Teacher Lin)',
+                raw_transcript: '今天小明彈徹爾尼 599 第 20 首，右手顆粒感進步很多，但第 12 小節左手伴奏太重，請放輕手腕帶動。作業練第 20 首速度 80，加上巴哈初步第 3 首前四小節。',
+                clean_summary_json: {
+                    highlights: [
+                        '徹爾尼 599 第 20 首右手顆粒感顯著進步，手指獨立性佳',
+                        '音色清晰純淨，樂句整體流暢度大幅提升'
+                    ],
+                    technical_tips: [
+                        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
+                        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。'
+                    ],
+                    theory_tips: [
+                        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
+                        '巴哈複調音樂雙手各自獨立，注意二聲部對位線條清晰度。'
+                    ],
+                    homework: [
+                        '徹爾尼 599 第 20 首：配合節拍器由慢練漸進提升至目標速度 BPM 80，每日練習 15 分鐘',
+                        '巴哈初步第 3 首：雙手分開單獨慢練第 1 至 4 小節，熟記指法與聲部進行',
+                        '針對第 12 小節左手伴奏手腕放鬆度錄製 15 秒打卡音訊供批改'
+                    ],
+                    encouragement: '右手顆粒感的進步非常亮眼！只要把左手的手腕放鬆、伴奏輕下來，整首曲子的層次就會如同水晶般清澈。繼續加油！',
+                    bpm_recommendation: 80
+                }
+            }
         ]
     };
 

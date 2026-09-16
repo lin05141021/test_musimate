@@ -281,12 +281,12 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-09-16T10:00:00+08:00',
-    end_time: '2026-09-16T12:00:00+08:00',
-    status: 'confirmed',
+    start_time: '2026-09-18T10:00:00+08:00',
+    end_time: '2026-09-18T12:00:00+08:00',
+    status: 'completed',
     instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
-    payment_status: 'pay_per_lesson',
+    payment_status: 'paid',
     payment_type: 'postpaid',
   },
   {
@@ -295,8 +295,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-09-19T10:00:00+08:00',
-    end_time: '2026-09-19T12:00:00+08:00',
+    start_time: '2026-09-22T10:00:00+08:00',
+    end_time: '2026-09-22T12:00:00+08:00',
     status: 'confirmed',
     instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
@@ -309,8 +309,8 @@ const INITIAL_APPOINTMENTS: Appointment[] = [
     student_name: '劉心悅 (Lin)',
     teacher_id: MOCK_TEACHER.id,
     teacher_name: '林佩芬 老師 (Teacher Lin)',
-    start_time: '2026-09-23T10:00:00+08:00',
-    end_time: '2026-09-23T12:00:00+08:00',
+    start_time: '2026-09-25T10:00:00+08:00',
+    end_time: '2026-09-25T12:00:00+08:00',
     status: 'confirmed',
     instrument: '古典鋼琴 (Piano)',
     location: '音符琴房 A303',
@@ -481,6 +481,36 @@ const INITIAL_LESSONS: LessonRecord[] = [
     },
     created_at: '2026-09-02T10:00:00+08:00',
     song_title: '德布西：《貝加馬斯克組曲》第三首〈月光〉',
+    teacher_name: '林佩芬 老師 (Teacher Lin)',
+  },
+  {
+    id: 'lesson-6',
+    appointment_id: 'app-lin-6',
+    audio_url: 'https://actions.google.com/sounds/v1/ambiences/rain_heavy.ogg',
+    raw_transcript: '今天小明彈徹爾尼 599 第 20 首，右手顆粒感進步很多，但第 12 小節左手伴奏太重，請放輕手腕帶動。作業練第 20 首速度 80，加上巴哈初步第 3 首前四小節。',
+    clean_summary_json: {
+      highlights: [
+        '徹爾尼 599 第 20 首右手顆粒感顯著進步，手指獨立性佳',
+        '音色清晰純淨，樂句整體流暢度大幅提升'
+      ],
+      technical_tips: [
+        '第 12 小節左手伴奏觸鍵偏重，請以放輕手腕自然呼吸帶動，避免手臂下壓用力。',
+        '右手快速音群保持掌關節穩定拱形，指尖垂直觸鍵確保顆粒分明。'
+      ],
+      theory_tips: [
+        '注意主從和聲平衡：右手為主旋律、左手為背景和弦伴奏，兩手強弱需有明顯層次。',
+        '巴哈複調音樂雙手各自獨立，注意二聲部對位線條清晰度。'
+      ],
+      homework: [
+        '徹爾尼 599 第 20 首：配合節拍器由慢練漸進提升至目標速度 BPM 80，每日練習 15 分鐘',
+        '巴哈初步第 3 首：雙手分開單獨慢練第 1 至 4 小節，熟記指法與聲部進行',
+        '針對第 12 小節左手伴奏手腕放鬆度錄製 15 秒打卡音訊供批改'
+      ],
+      encouragement: '右手顆粒感的進步非常亮眼！只要把左手的手腕放鬆、伴奏輕下來，整首曲子的層次就會如同水晶般清澈。繼續加油！',
+      bpm_recommendation: 80,
+    },
+    created_at: '2026-09-18T10:00:00+08:00',
+    song_title: '徹爾尼 599 第 20 首 & 巴哈初步第 3 首',
     teacher_name: '林佩芬 老師 (Teacher Lin)',
   },
 ];

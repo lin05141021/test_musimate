@@ -2,24 +2,424 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>調課確認 (學生端 Modal) - MusiMate</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- 統一共用樣式庫 -->
-    <link rel="stylesheet" href="../../UI/style_0824.css">
-    <link rel="stylesheet" href="schedule_styles.css">
     <!-- LINE LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <!-- Supabase 雲端即時資料庫 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
+
+    <!-- 100% 內嵌獨立樣式表 (完全避免外部 CSS 檔案 404 遺失問題) -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-brown: #CEAB98;
+            --primary-dark: #2B3049;
+            --bg-cream: #FAF6F0;
+            --bg-outer: #EAE6DF;
+            --card-border: #F0EAE1;
+            --text-main: #2B3049;
+            --text-muted: #7A736E;
+        }
+
+        body {
+            background: var(--bg-outer);
+            font-family: 'Sora', 'Noto Sans TC', -apple-system, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            max-width: 100%;
+            min-height: 800px;
+            background: var(--bg-cream);
+            border-radius: 36px;
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .nav-header {
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            background: var(--bg-cream);
+            border-bottom: 1px solid #F0EBE1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-brown);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(206, 171, 152, 0.4);
+        }
+
+        .student-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(206, 171, 152, 0.2);
+            border: 1px solid var(--primary-brown);
+            font-size: 13px;
+            font-weight: 700;
+            color: #4A3A31;
+        }
+
+        .main-content {
+            padding: 16px 18px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .page-header {
+            text-align: center;
+        }
+
+        .page-title {
+            color: var(--primary-brown);
+            font-size: 24px;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .lesson-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .lesson-item {
+            width: 100%;
+            padding: 12px 14px;
+            background: white;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(43, 48, 73, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-badge {
+            min-width: 54px;
+            padding: 8px 4px;
+            text-align: center;
+            background: #FAF6F0;
+            border-radius: 12px;
+            border: 1px solid #EFECE6;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .date-badge .day-number { font-size: 17px; font-weight: 800; line-height: 1.1; }
+        .date-badge .day-weekday { font-size: 11px; color: #7A7471; margin-top: 2px; }
+
+        .lesson-card-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-card {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(206, 171, 152, 0.12);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border: 1px solid rgba(206, 171, 152, 0.25);
+        }
+
+        .info-card-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .time-text {
+            color: var(--text-main);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .course-title {
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .location-text {
+            color: #556080;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .music-gradient-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #C9A259 0%, #68C5AB 50%, #BB65B2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+        }
+
+        .btn-reschedule {
+            width: 100%;
+            padding: 7px 10px;
+            background: #FAF6F0;
+            border-radius: 8px;
+            text-align: center;
+            color: #6F6F6F;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #E5DEC9;
+        }
+
+        .home-bar-wrapper {
+            width: 100%;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 6px;
+        }
+
+        .home-bar {
+            width: 130px;
+            height: 5px;
+            background: var(--text-main);
+            border-radius: 10px;
+        }
+
+        /* 調課 Modal */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            z-index: 100;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 340px;
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: scaleIn 0.25s ease-out;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F0EBE1;
+            padding-bottom: 8px;
+        }
+
+        .modal-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-close-modal {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #FAF6F0;
+            border: none;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .form-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .original-lesson-box {
+            padding: 10px 12px;
+            background: #FAF6F0;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #EFECE6;
+            line-height: 1.4;
+        }
+
+        .slot-select-box {
+            width: 100%;
+            padding: 10px 12px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #E5DEC9;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .btn-submit-reschedule {
+            width: 100%;
+            padding: 11px;
+            background: var(--primary-brown);
+            color: white;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(206, 171, 152, 0.35);
+        }
+
+        .btn-take-leave {
+            width: 100%;
+            padding: 10px;
+            background: #FAF6F0;
+            color: #6F6F6F;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid #E5DEC9;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .alert-msg {
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
 </head>
-<body class="mobile-view">
+<body>
 
 <div class="mobile-frame">
     <div>
@@ -31,24 +431,22 @@
 
         <!-- 導航列 -->
         <div class="nav-header">
-            <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'" style="cursor: pointer;">
+            <div class="brand-logo" onclick="location.href='student_schedule.html'">
                 <div class="brand-icon">🎵</div>
                 <span>MusiMate</span>
             </div>
-            <span id="studentNamePill" style="font-size: 12px; font-weight: bold; color: #4A3A31; background: rgba(206, 171, 152, 0.25); padding: 4px 10px; border-radius: 12px; border: 1px solid #CEAB98;">載入中...</span>
+            <span id="studentNamePill" class="student-pill">載入中...</span>
         </div>
 
         <!-- 頁面主內容 (底層課表) -->
         <div class="main-content">
             <div class="page-header">
-                <h1 class="page-title">我的課表</h1>
-                <p id="changeClassSubtitle" class="page-subtitle">林佩芬 老師 · 預約課堂清單 (點擊可調課)</p>
+                <h1 class="page-title">調課與請假</h1>
+                <p id="changeClassSubtitle" class="page-subtitle">林佩芬 老師 · 個人課堂清單</p>
             </div>
 
             <!-- 課表清單 (由 JS 動態渲染) -->
             <div id="appointmentListContainer" class="lesson-list"></div>
-
-            <div style="text-align: center; color: #8C827A; font-size: 12px; font-weight: 700; padding: 6px 0;">無新的預約課程了</div>
         </div>
     </div>
 
@@ -57,12 +455,9 @@
         <div class="home-bar"></div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- 調課確認 Modal (由 JS 控制動態開啟/關閉與欄位填充)       -->
-    <!-- ======================================================== -->
+    <!-- 調課確認 Modal -->
     <div id="rescheduleModal" class="modal-overlay">
         <div class="modal-card">
-            <!-- Modal 標題與關閉按鈕 -->
             <div class="modal-header">
                 <div class="modal-title">
                     <span>🔄</span>
@@ -71,10 +466,9 @@
                 <button class="btn-close-modal" onclick="closeRescheduleModal()">✖</button>
             </div>
 
-            <!-- 即時操作提示 -->
             <div id="feedbackBox" style="display: none;"></div>
 
-            <!-- 原課程資訊 (JS 動態填入) -->
+            <!-- 原課程資訊 -->
             <div class="form-block">
                 <label class="form-label">原預約課程資訊</label>
                 <div id="originalLessonInfo" class="original-lesson-box">
@@ -82,19 +476,19 @@
                 </div>
             </div>
 
-            <!-- 可調課時段下拉選單 (JS 動態填入張老師開放時段) -->
+            <!-- 可調課時段下拉選單 -->
             <div class="form-block">
-                <label class="form-label">直接改調其他開放時段</label>
+                <label class="form-label">直接改調林佩芬老師開放時段</label>
                 <select id="slotSelector" class="slot-select-box"></select>
             </div>
 
             <!-- 操作按鈕 -->
             <div class="modal-buttons">
-                <button class="btn-submit-reschedule" onclick="submitReschedule()">確認直接調課</button>
-                <button class="btn-take-leave" onclick="submitLeave()">先請假 (時數自動保留待補課)</button>
+                <button class="btn-submit-reschedule" onclick="submitReschedule()">確認直接改期</button>
+                <button class="btn-take-leave" onclick="submitLeave()">先請假 (時數存入未排時數池)</button>
             </div>
 
-            <div style="text-align: center; color: #999999; font-size: 11px; line-height: 1.4;">
+            <div style="text-align: center; color: #999999; font-size: 10px; line-height: 1.4;">
                 💡 依教室規範，開課 24 小時前可免費線上調課或請假，請假後原時段將釋放，時數保留無期限。
             </div>
         </div>
@@ -103,7 +497,7 @@
 
 <script>
 let currentSelectedAppointment = null;
-let currentStudentId = 's0000000-0000-0000-0000-000000000005';
+let currentStudentName = '劉心悅 (Lin)';
 
 function formatDate(isoStr) {
     const d = new Date(isoStr);
@@ -114,7 +508,7 @@ function formatDate(isoStr) {
     return {
         monthDay: `${month}/${date}`,
         weekday: `(${w})`,
-        fullStr: `${String(month).padStart(2, '0')}/${String(date).padStart(2, '0')} (週${w})`
+        fullStr: `${month}月${date}日 (週${w})`
     };
 }
 
@@ -128,22 +522,37 @@ function renderSchedule() {
     if (!window.MusiMateDB) return;
     const urlParams = new URLSearchParams(window.location.search);
     const lessonId = urlParams.get('lesson_id');
-    const teacherSchedule = window.MusiMateDB.getTeacherSchedule();
-    
-    let targetAppt = teacherSchedule.appointments.find(a => a.id === lessonId);
-    if (!targetAppt) {
-        targetAppt = teacherSchedule.appointments.find(a => a.student_name.includes('Lin') || a.student_id.includes('5')) || teacherSchedule.appointments[0];
+    const paramStudent = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name');
+
+    const students = window.MusiMateDB.getStudents();
+    let targetStudent = null;
+
+    if (paramStudent) {
+        targetStudent = students.find(s => s.student_id === paramStudent || s.id === paramStudent || s.name.includes(paramStudent));
+    }
+    if (!targetStudent) {
+        targetStudent = students.find(s => s.name.includes('劉心悅') || s.name.includes('Lin')) || students[0];
     }
 
-    if (targetAppt) {
-        currentStudentId = targetAppt.student_id;
-        document.getElementById('studentNamePill').innerText = targetAppt.student_name;
-        document.getElementById('changeClassSubtitle').innerText = `林佩芬老師 · ${targetAppt.student_name} 課堂清單`;
+    if (targetStudent) {
+        currentStudentName = targetStudent.name;
+        document.getElementById('studentNamePill').innerText = targetStudent.name;
+        document.getElementById('changeClassSubtitle').innerText = `林佩芬 老師 · ${targetStudent.name} 專屬課表`;
     }
 
-    const appts = window.MusiMateDB.getAppointmentsByStudent(currentStudentId);
-
+    const appts = window.MusiMateDB.getAppointmentsByStudent(currentStudentName);
     const container = document.getElementById('appointmentListContainer');
+
+    if (appts.length === 0) {
+        container.innerHTML = `
+            <div style="padding: 30px 16px; text-align: center; color: #8C827A; background: white; border-radius: 16px;">
+                <div style="font-size: 28px; margin-bottom: 6px;">🎼</div>
+                <div style="font-weight: 700; font-size: 14px; color: #2B3049;">目前尚無已預約課堂</div>
+            </div>
+        `;
+        return;
+    }
+
     container.innerHTML = appts.map(appt => {
         const dateObj = formatDate(appt.start_time);
         const timeSpan = formatTime(appt.start_time, appt.end_time);
@@ -159,7 +568,7 @@ function renderSchedule() {
                 <div class="info-card" style="${isLeave ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
                     <div class="info-card-left">
                         <div class="time-text">${timeSpan}</div>
-                        <div class="course-title">${appt.student_name} - 林佩芬老師${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課</div>
+                        <div class="course-title">${appt.student_name} - 林佩芬老師鋼琴課</div>
                         <div class="location-text">${appt.location || '音符琴房 A303'} · ${isLeave ? '📌 已請假 (時數保留)' : '✅ 正常上課'}</div>
                     </div>
                     <div class="music-gradient-icon">${isLeave ? '⏳' : '🎵'}</div>
@@ -180,20 +589,18 @@ function openRescheduleModal(appointmentId) {
     if (!appt) return;
 
     currentSelectedAppointment = appt;
-    currentStudentId = appt.student_id;
 
     const dateObj = formatDate(appt.start_time);
     const timeSpan = formatTime(appt.start_time, appt.end_time);
 
     document.getElementById('originalLessonInfo').innerHTML = `
-        <div style="color: #2B3049; font-weight: 700; font-size: 14px;">${dateObj.fullStr} ${timeSpan}</div>
-        <div style="font-size: 12px; color: #7A7471; margin-top: 4px;">學員：${appt.student_name} · 地點：${appt.location} · 課程：${appt.instrument || '鋼琴'}</div>
+        <div style="color: #2B3049; font-weight: 700; font-size: 13px;">${dateObj.fullStr} ${timeSpan}</div>
+        <div style="font-size: 11px; color: #7A7471; margin-top: 3px;">學員：${appt.student_name} · 地點：${appt.location}</div>
     `;
 
-    // 動態讀取林佩芬老師行事曆即時開放的空閒時段
     const activeSlots = window.MusiMateDB.getAvailableSlots();
-
     const select = document.getElementById('slotSelector');
+
     if (activeSlots.length > 0) {
         select.innerHTML = activeSlots.map(slot => {
             const slotDate = formatDate(slot.start_time);
@@ -201,7 +608,7 @@ function openRescheduleModal(appointmentId) {
             return `<option value="${slot.start_time}|${slot.end_time}|${slot.location}">${slotDate.fullStr} ${slotTime} (${slot.location})</option>`;
         }).join('');
     } else {
-        select.innerHTML = '<option value="">目前暫無其他開放時段，建議選擇先請假</option>';
+        select.innerHTML = '<option value="">目前暫無其他開放時段，建議先請假保留時數</option>';
     }
 
     document.getElementById('feedbackBox').style.display = 'none';
@@ -210,18 +617,16 @@ function openRescheduleModal(appointmentId) {
 
 function closeRescheduleModal() {
     document.getElementById('rescheduleModal').style.display = 'none';
-    location.href = `student_schedule.html?student_id=${currentStudentId}`;
+    location.href = `student_schedule.html?student=${encodeURIComponent(currentStudentName)}`;
 }
 
 function submitReschedule() {
     if (!currentSelectedAppointment || !window.MusiMateDB) return;
-
     const select = document.getElementById('slotSelector');
     if (!select.value) {
         alert('請先選擇欲調整的新時段！');
         return;
     }
-
     const [newStart, newEnd, newLocation] = select.value.split('|');
 
     window.MusiMateDB.rescheduleAppointment(currentSelectedAppointment.id, {
@@ -232,7 +637,7 @@ function submitReschedule() {
 
     const feedback = document.getElementById('feedbackBox');
     feedback.className = 'alert-msg alert-success';
-    feedback.innerText = '✅ 調課已成功送出！原時段已釋放，新時段已同步更新至林佩芬老師課表。';
+    feedback.innerText = '✅ 調課已成功送出！原時段已釋放，新時段已同步至林佩芬老師課表。';
     feedback.style.display = 'block';
 
     setTimeout(() => {
@@ -242,12 +647,11 @@ function submitReschedule() {
 
 function submitLeave() {
     if (!currentSelectedAppointment || !window.MusiMateDB) return;
-
     window.MusiMateDB.requestLeave(currentSelectedAppointment.id);
 
     const feedback = document.getElementById('feedbackBox');
     feedback.className = 'alert-msg alert-success';
-    feedback.innerText = '📌 請假已送出！該堂課時數已完整存入您的「已繳費未排時數」，原時段已釋放回開放時段池。';
+    feedback.innerText = '📌 請假已送出！該堂課時數已存入您的已繳費未排時數池，可隨時預約補課。';
     feedback.style.display = 'block';
 
     setTimeout(() => {
@@ -255,82 +659,13 @@ function submitLeave() {
     }, 1000);
 }
 
-function getClosestStudentAppointment(studentId) {
-    if (!window.MusiMateDB) return null;
-    const appts = window.MusiMateDB.getAppointmentsByStudent(studentId);
-    if (!appts || appts.length === 0) return null;
-    
-    // 依據時間由近到遠精準排序
-    const sorted = [...appts].sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-    
-    // 優先挑選尚未請假的預約
-    const confirmedAppt = sorted.find(a => a.status === 'confirmed');
-    if (confirmedAppt) return confirmedAppt;
-    
-    // 其次選最早的一筆
-    return sorted[0];
-}
-
-async function initLiffAuth() {
-    try {
-        if (typeof liff !== 'undefined') {
-            await liff.init({ liffId: '2011164851-3YNtzchu' });
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                if (window.MusiMateDB && profile && profile.userId) {
-                    const result = window.MusiMateDB.authLiffUser(profile);
-                    if (result && result.student) {
-                        currentStudentId = result.student.id || result.student.student_id;
-                        document.getElementById('studentNamePill').innerText = `${result.user ? result.user.name : '學員'}`;
-                        renderSchedule();
-                        const urlParams = new URLSearchParams(window.location.search);
-                        if (!urlParams.get('lesson_id')) {
-                            const closest = getClosestStudentAppointment(currentStudentId);
-                            if (closest) openRescheduleModal(closest.id);
-                        }
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        console.warn('LIFF Auth in changeclass skipped/failed:', e);
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const targetLessonId = urlParams.get('lesson_id');
-    const paramStudentId = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name');
-    
-    if (window.MusiMateDB) {
-        let active = null;
-        if (paramStudentId) {
-            const students = window.MusiMateDB.getStudents();
-            active = students.find(s => s.student_id === paramStudentId || s.id === paramStudentId || s.name === paramStudentId);
-        }
-        if (!active) {
-            active = window.MusiMateDB.getActiveStudent();
-        }
-        if (active) {
-            currentStudentId = active.student_id || active.id;
-            document.getElementById('studentNamePill').innerText = active.name;
-        } else {
-            const students = window.MusiMateDB.getStudents();
-            if (students.length > 0) {
-                currentStudentId = students[0].student_id || students[0].id;
-                document.getElementById('studentNamePill').innerText = students[0].name;
-            }
-        }
-    }
-
     renderSchedule();
     if (targetLessonId) {
         openRescheduleModal(targetLessonId);
-    } else {
-        const closest = getClosestStudentAppointment(currentStudentId);
-        if (closest) openRescheduleModal(closest.id);
     }
-    initLiffAuth();
 });
 </script>
 

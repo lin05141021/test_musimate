@@ -2,24 +2,528 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>我的課表 (學生端 RWD) - MusiMate</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- 統一共用樣式庫 -->
-    <link rel="stylesheet" href="../../UI/style_0824.css">
-    <link rel="stylesheet" href="schedule_styles.css">
     <!-- LINE LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <!-- Supabase 雲端即時資料庫 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- MusiMate 資料庫與 LIFF 身份認證核心 -->
     <script src="../data/musimate_db.js"></script>
+
+    <!-- 100% 內嵌獨立樣式表 (完全避免外部 CSS 檔案 404 遺失問題) -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-brown: #CEAB98;
+            --primary-dark: #2B3049;
+            --bg-cream: #FAF6F0;
+            --bg-outer: #EAE6DF;
+            --card-border: #F0EAE1;
+            --text-main: #2B3049;
+            --text-muted: #7A736E;
+            --accent-green: #68C5AB;
+            --accent-purple: #9C27B0;
+            --accent-orange: #E65100;
+        }
+
+        body {
+            background: var(--bg-outer);
+            font-family: 'Sora', 'Noto Sans TC', -apple-system, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 10px;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            max-width: 100%;
+            min-height: 800px;
+            background: var(--bg-cream);
+            border-radius: 36px;
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        /* 頂部狀態列 */
+        .status-bar {
+            width: 100%;
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* 導航列 */
+        .nav-header {
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            background: var(--bg-cream);
+            border-bottom: 1px solid #F0EBE1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-brown);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(206, 171, 152, 0.4);
+        }
+
+        .student-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(206, 171, 152, 0.2);
+            border: 1px solid var(--primary-brown);
+            font-size: 13px;
+            font-weight: 700;
+            color: #4A3A31;
+        }
+
+        /* 主內容區 */
+        .main-content {
+            padding: 16px 18px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .page-header {
+            text-align: center;
+        }
+
+        .page-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            color: var(--primary-brown);
+            font-size: 24px;
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 700;
+        }
+
+        .status-chip {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background: #E8F5E9;
+            color: #2E7D32;
+            font-weight: 700;
+            border: 1px solid #C8E6C9;
+        }
+
+        .page-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .student-status-banner {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #EFECE6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #5B524E;
+            font-weight: 600;
+        }
+
+        /* 課表清單 */
+        .lesson-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .lesson-item {
+            width: 100%;
+            padding: 12px 14px;
+            background: white;
+            border-radius: 18px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(43, 48, 73, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .lesson-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(43, 48, 73, 0.08);
+        }
+
+        .date-badge {
+            min-width: 54px;
+            padding: 8px 4px;
+            text-align: center;
+            background: #FAF6F0;
+            border-radius: 12px;
+            border: 1px solid #EFECE6;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .date-badge .day-number {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .date-badge .day-weekday {
+            font-size: 11px;
+            color: #7A7471;
+            margin-top: 2px;
+        }
+
+        .lesson-card-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .info-card {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(206, 171, 152, 0.12);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border: 1px solid rgba(206, 171, 152, 0.25);
+        }
+
+        .info-card.term4 {
+            background: rgba(104, 197, 171, 0.12);
+            border-color: rgba(104, 197, 171, 0.3);
+        }
+
+        .info-card-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .time-text {
+            color: var(--text-main);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .course-title {
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .location-text {
+            color: #556080;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .payment-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid #C8D8EC;
+            color: #2B3049;
+        }
+
+        .music-gradient-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: linear-gradient(180deg, #C9A259 0%, #68C5AB 50%, #BB65B2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-reschedule {
+            flex: 1;
+            padding: 7px 10px;
+            background: #FAF6F0;
+            border-radius: 8px;
+            text-align: center;
+            color: #6F6F6F;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #E5DEC9;
+            transition: all 0.2s;
+        }
+
+        .btn-reschedule:hover {
+            background: #F0EAE1;
+            color: var(--text-main);
+        }
+
+        .btn-view-report {
+            flex: 1.2;
+            padding: 7px 10px;
+            background: linear-gradient(135deg, #CEAB98 0%, #B58EBE 100%);
+            border-radius: 8px;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(206, 171, 152, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-view-report:hover {
+            opacity: 0.92;
+            transform: scale(1.02);
+        }
+
+        .list-end-hint {
+            text-align: center;
+            padding: 10px 0 4px 0;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .btn-book-new {
+            width: 100%;
+            padding: 13px 14px;
+            background: var(--primary-brown);
+            color: white;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(206, 171, 152, 0.4);
+            transition: background 0.2s;
+        }
+
+        .btn-book-new:hover {
+            background: #C29D89;
+        }
+
+        .home-bar-wrapper {
+            width: 100%;
+            height: 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 6px;
+        }
+
+        .home-bar {
+            width: 130px;
+            height: 5px;
+            background: var(--text-main);
+            border-radius: 10px;
+        }
+
+        /* 聯絡簿專用 Modal */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .modal-sheet {
+            width: 100%;
+            max-height: 88%;
+            background: white;
+            border-radius: 28px 28px 0 0;
+            padding: 20px 20px 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            animation: slideUp 0.25s ease-out;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F0EBE1;
+            padding-bottom: 10px;
+        }
+
+        .modal-header-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-main);
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-close-sheet {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #FAF6F0;
+            border: none;
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .report-section {
+            background: #FAF6F0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            border: 1px solid #EFECE6;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .report-section-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #4A3A31;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .report-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .report-list li {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #3E3835;
+            position: relative;
+            padding-left: 14px;
+        }
+
+        .report-list li::before {
+            content: "•";
+            position: absolute;
+            left: 2px;
+            color: var(--primary-brown);
+            font-weight: bold;
+        }
+
+        .encouragement-card {
+            background: linear-gradient(135deg, rgba(206, 171, 152, 0.2) 0%, rgba(181, 142, 190, 0.2) 100%);
+            border: 1.5px solid var(--primary-brown);
+            border-radius: 14px;
+            padding: 12px 14px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #3E342F;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+    </style>
 </head>
-<body class="mobile-view">
+<body>
 
 <div class="mobile-frame">
     <div>
@@ -29,50 +533,51 @@
             <span>📶 🔋</span>
         </div>
 
-        <!-- 導航列 -->
+        <!-- 導航列 (嚴格鎖定學生身份，拒絕互相查看他人課表) -->
         <div class="nav-header">
-            <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'" style="cursor: pointer;">
+            <div class="brand-logo" onclick="location.href='../newclass/newclass_homepage.html'">
                 <div class="brand-icon">🎵</div>
                 <span>MusiMate</span>
             </div>
-            <div id="studentNamePill" onclick="openStudentSwitcherModal()" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; background: rgba(206, 171, 152, 0.25); border: 1px solid #CEAB98; font-size: 13px; font-weight: 700; color: #4A3A31; cursor: pointer; transition: all 0.2s ease;">
+            <div id="studentNamePill" class="student-pill">
                 <span id="studentAvatarIcon">👤</span>
                 <span id="studentDisplayName">載入中...</span>
-                <span style="font-size: 10px; color: #8C6D58; margin-left: 2px;">▼</span>
             </div>
         </div>
 
         <!-- 頁面主內容 -->
         <div class="main-content">
             <div class="page-header">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="page-title-row">
                     <h1 class="page-title">我的課表</h1>
-                    <span id="dbStatusBadge" style="font-size: 10px; padding: 2px 8px; border-radius: 12px; background: #E8F5E9; color: #2E7D32; font-weight: 700;">🟢 Supabase 連線中</span>
+                    <span id="dbStatusBadge" class="status-chip">🟢 Supabase 已連線</span>
                 </div>
                 <p id="studentBannerSubtitle" class="page-subtitle">林佩芬 老師 · 個人專屬課表</p>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; margin-bottom: 12px;">
-                    <span id="lineIdDisplayTag" style="font-size: 11px; color: #5B524E; background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 8px;">🆔 LINE: 載入中...</span>
-                    <button onclick="promptBindMyLineId()" style="background: transparent; border: 1px dashed #CEAB98; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #8C6D58; cursor: pointer; font-weight: 700;">✏️ 綁定/切換學員</button>
-                </div>
+            </div>
+
+            <!-- 學員狀態標籤 -->
+            <div class="student-status-banner">
+                <span id="studentStatusBadgeText">📚 第 3 期進行中 · 已預約第 4 期</span>
+                <span id="lineIdDisplayTag" style="font-size: 10px; color: #2E7D32;">🟢 LINE ID 已綁定</span>
             </div>
 
             <!-- 已繳費未排課剩餘時數提示膠囊 -->
-            <div id="remainingHoursBadge" style="display: none; padding: 12px 14px; background: linear-gradient(135deg, rgba(206, 171, 152, 0.25) 0%, rgba(181, 142, 190, 0.25) 100%); border: 1.5px solid #CEAB98; border-radius: 14px; margin-bottom: 14px; align-items: center; justify-content: space-between;">
+            <div id="remainingHoursBadge" style="display: none; padding: 10px 14px; background: rgba(206, 171, 152, 0.2); border: 1.5px solid #CEAB98; border-radius: 14px; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">🎟️</span>
                     <div>
-                        <div style="font-size: 13px; font-weight: 700; color: #2B3049;">已繳費未排時數：<span id="creditCount" style="color: #E65100; font-size: 15px;">0</span> 小時</div>
-                        <div style="font-size: 11px; color: #6F6F6F;">無使用期限，可自由拆分折抵加選或調課</div>
+                        <div style="font-size: 12px; font-weight: 700; color: #2B3049;">已繳費未排時數：<span id="creditCount" style="color: #E65100; font-size: 14px;">0</span> 小時</div>
+                        <div style="font-size: 10px; color: #6F6F6F;">無使用期限，可自由折抵加選或調課</div>
                     </div>
                 </div>
-                <button onclick="goToBookNew()" style="padding: 6px 12px; background: #CEAB98; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">安排時數</button>
+                <button onclick="goToBookNew()" style="padding: 5px 10px; background: #CEAB98; color: white; border: none; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">安排時數</button>
             </div>
 
             <!-- 動態課表卡片容器 (由 JS 自動讀取資料庫陣列渲染) -->
             <div id="appointmentListContainer" class="lesson-list"></div>
 
-            <div class="list-end-hint">無新的預約課程了</div>
-            <button class="btn-book-new" onclick="goToBookNew()">+ 預約新課程</button>
+            <div id="listEndHint" class="list-end-hint">已排定全部預約課程</div>
+            <button id="btnMainBookNew" class="btn-book-new" onclick="goToBookNew()">+ 預約新課程</button>
         </div>
     </div>
 
@@ -80,35 +585,93 @@
     <div class="home-bar-wrapper">
         <div class="home-bar"></div>
     </div>
-</div>
 
-<!-- ============================================================
-     學員切換 Modal (方便教師與多學員測試)
-     ============================================================ -->
-<div id="studentSwitcherModal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 16px;">
-    <div style="width: 100%; max-width: 360px; background: white; border-radius: 24px; padding: 24px; box-shadow: 0 16px 40px rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 16px;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-size: 16px; font-weight: 700; color: #2B3049;">👥 切換學員課表</div>
-            <button onclick="closeStudentSwitcherModal()" style="background: none; border: none; font-size: 18px; cursor: pointer; color: #8C827A;">✖</button>
-        </div>
-        <p style="font-size: 12px; color: #7A736E; margin: 0;">點選欲切換檢視的學員，或輸入新學員姓名：</p>
-        
-        <div id="switcherStudentList" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
-            <!-- 由 JS 動態產生 -->
-        </div>
+    <!-- ============================================================
+         AI 語音聯絡簿 Modal (針對 9/18 課堂呈現 RAG 淨化成果)
+         ============================================================ -->
+    <div id="voiceReportModal" class="modal-overlay" onclick="closeVoiceReportModal(event)">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div class="modal-header-row">
+                <div class="modal-header-title">
+                    <span>📖</span>
+                    <span>AI 智慧語音聯絡簿</span>
+                </div>
+                <button class="btn-close-sheet" onclick="closeVoiceReportModal()">✖</button>
+            </div>
 
-        <div style="border-top: 1px dashed #E0D9D0; padding-top: 12px; display: flex; gap: 8px;">
-            <input id="newStudentNameInput" type="text" placeholder="輸入新學員姓名 (如: 久美)" style="flex: 1; padding: 8px 12px; border: 1px solid #CEAB98; border-radius: 10px; font-size: 13px;" />
-            <button onclick="addNewCustomStudent()" style="padding: 8px 14px; background: #CEAB98; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer;">新增</button>
+            <!-- 課堂基本資訊 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #FFF8E1; padding: 10px 12px; border-radius: 12px; border: 1px solid #FFE082;">
+                <div>
+                    <div style="font-size: 13px; font-weight: 800; color: #E65100;">2026/09/18 課堂精華</div>
+                    <div style="font-size: 11px; color: #795548; margin-top: 2px;">指導老師：林佩芬 老師 · 古典鋼琴</div>
+                </div>
+                <span style="font-size: 11px; padding: 3px 8px; background: #FF9800; color: white; border-radius: 8px; font-weight: 800;">BPM 80</span>
+            </div>
+
+            <!-- 學習亮點 -->
+            <div class="report-section">
+                <div class="report-section-title">
+                    <span>✨</span>
+                    <span>本週學習亮點 (Highlights)</span>
+                </div>
+                <ul class="report-list">
+                    <li><strong>徹爾尼 599 第 20 首</strong>：右手觸鍵顆粒感顯著進步，手指獨立性佳，音色乾淨清脆。</li>
+                    <li>整體樂句進行流暢，展現積極專注的練習成效。</li>
+                </ul>
+            </div>
+
+            <!-- 專業技術修正 -->
+            <div class="report-section">
+                <div class="report-section-title">
+                    <span>🎯</span>
+                    <span>專業技巧指導 (Technical Tips)</span>
+                </div>
+                <ul class="report-list">
+                    <li><strong>第 12 小節左手伴奏</strong>：觸鍵偏重，請放輕手腕，利用手腕自然重量帶動觸鍵，避免手臂僵硬下壓用力。</li>
+                    <li>右手快速音群保持掌關節穩定拱形，指尖垂直落指確保顆粒分明。</li>
+                </ul>
+            </div>
+
+            <!-- 樂理與曲目重點 -->
+            <div class="report-section">
+                <div class="report-section-title">
+                    <span>🎼</span>
+                    <span>樂理與曲目重點 (Theory Tips)</span>
+                </div>
+                <ul class="report-list">
+                    <li><strong>主從和聲平衡</strong>：右手為主旋律、左手為背景伴奏，兩手強弱層次需分明 (伴奏維持在 mp ~ p)。</li>
+                    <li><strong>巴哈初步第 3 首</strong>：前 4 小節雙手各自獨立歌唱，注意二聲部對位線條與連斷音對比。</li>
+                </ul>
+            </div>
+
+            <!-- 本週回家作業 -->
+            <div class="report-section">
+                <div class="report-section-title">
+                    <span>📝</span>
+                    <span>本週練習作業 (Homework)</span>
+                </div>
+                <ul class="report-list">
+                    <li><strong>徹爾尼 599 第 20 首</strong>：配合節拍器速度 BPM 80 穩定慢練，每日練習 15 分鐘。</li>
+                    <li><strong>巴哈初步第 3 首</strong>：雙手分開慢練前 4 小節，熟記指法與對位線條。</li>
+                    <li>錄製 1 次 15 秒左手手腕放鬆打卡音訊上傳至 MusiMate。</li>
+                </ul>
+            </div>
+
+            <!-- 老師溫暖鼓勵語 -->
+            <div class="encouragement-card">
+                <div style="font-size: 11px; color: #8C6D53; font-weight: 800; margin-bottom: 2px;">💬 佩芬老師的課後寄語：</div>
+                「今天右手顆粒感進步非常明顯！只要第 12 小節左手手腕再放鬆一點，音色就會更加優美動聽。繼續加油，期待下次上課！」
+            </div>
         </div>
     </div>
 </div>
 
 <!-- ============================================================
-     JavaScript 動態資料庫欄位綁定與即時渲染引擎
+     JavaScript 資料庫綁定與動態渲染
      ============================================================ -->
 <script>
-// 格式化工具
+let currentActiveStudent = null;
+
 function formatDate(isoStr) {
     const d = new Date(isoStr);
     const month = d.getMonth() + 1;
@@ -133,335 +696,201 @@ function createAppointmentCardHtml(appt) {
     const dateObj = formatDate(appt.start_time);
     const timeSpan = formatTime(appt.start_time, appt.end_time);
     const location = appt.location || '音符琴房 A303';
-    const teacherName = appt.teacher_name || '林佩芬';
-    const courseTitle = `${teacherName} 老師 · ${appt.instrument ? appt.instrument.split(' ')[0] : '鋼琴'}課`;
-    const paymentLabel = appt.payment_status === 'paid' ? '✅ 已預付' : '💳 現金後付';
-    const isNewTag = appt.is_new_badge ? `<span style="padding: 2px 8px; background: #E8F5E9; color: #2E7D32; font-size: 10px; font-weight: 800; border-radius: 6px; border: 1px solid #A5D6A7; margin-left: 6px;">✨ 新預約</span>` : '';
+    const teacherName = appt.teacher_name || '林佩芬 老師';
+    const courseTitle = `${teacherName} · ${appt.instrument || '古典鋼琴'}`;
     const isLeave = appt.status === 'rescheduled';
-    const isTeacherCancelled = appt.status === 'teacher_cancelled';
+    const isTerm4 = appt.id && appt.id.includes('t4');
+    const hasReport = appt.has_voice_report || (appt.start_time && appt.start_time.includes('2026-09-18'));
 
-    let statusPill = paymentLabel;
-    if (isLeave) {
-        statusPill = '📌 已請假 (時數已保留)';
-    } else if (isTeacherCancelled) {
-        statusPill = '⚠️ 老師停課 (時數已保留)';
+    let statusPill = appt.payment_status === 'paid' ? '✅ 已預付' : '💳 現金後付';
+    if (isTerm4) {
+        statusPill = '✨ 第 4 期已續約';
+    } else if (isLeave) {
+        statusPill = '📌 已請假 (時數保留)';
     }
 
+    const reportButtonHtml = hasReport ? `
+        <button class="btn-view-report" onclick="openVoiceReportModal('${appt.id}')">
+            <span>📖</span>
+            <span>查看 AI 語音聯絡簿</span>
+        </button>
+    ` : '';
+
     return `
-    <div class="lesson-item" data-id="${appt.id}" style="${(isLeave || isTeacherCancelled) ? 'opacity: 0.85;' : ''}">
-        <div class="date-badge" style="${(isLeave || isTeacherCancelled) ? 'background: #FFF8E1; border-color: #FFE082;' : ''}">
-            <div class="day-number" style="${(isLeave || isTeacherCancelled) ? 'color: #F57F17;' : ''}">${dateObj.monthDay}</div>
-            <div class="day-weekday" style="${(isLeave || isTeacherCancelled) ? 'color: #F57F17;' : ''}">${dateObj.weekday}</div>
+    <div class="lesson-item" data-id="${appt.id}" style="${isLeave ? 'opacity: 0.85;' : ''}">
+        <div class="date-badge" style="${isTerm4 ? 'background: #E8F5E9; border-color: #C8E6C9;' : ''}">
+            <div class="day-number" style="${isTerm4 ? 'color: #2E7D32;' : ''}">${dateObj.monthDay}</div>
+            <div class="day-weekday" style="${isTerm4 ? 'color: #388E3C;' : ''}">${dateObj.weekday}</div>
         </div>
         <div class="lesson-card-right">
-            <div class="info-card" style="${(isLeave || isTeacherCancelled) ? 'border-color: #FFE082; background: #FFFCF2;' : ''}">
+            <div class="info-card ${isTerm4 ? 'term4' : ''}">
                 <div class="info-card-left">
-                    <div class="time-text">${timeSpan} ${isNewTag}</div>
+                    <div class="time-text">
+                        <span>${timeSpan}</span>
+                        ${isTerm4 ? '<span style="font-size: 10px; color: #2E7D32; font-weight: 800;">[第4期]</span>' : ''}
+                    </div>
                     <div class="course-title">${courseTitle}</div>
                     <div class="location-text">
                         <span>${location}</span>
-                        <span class="payment-pill" style="${(isLeave || isTeacherCancelled) ? 'background: #FFF3E0; color: #E65100;' : ''}">${statusPill}</span>
+                        <span class="payment-pill" style="${isTerm4 ? 'border-color: #A5D6A7; color: #2E7D32;' : ''}">${statusPill}</span>
                     </div>
                 </div>
-                <div class="music-gradient-icon">${(isLeave || isTeacherCancelled) ? '⏳' : '🎵'}</div>
+                <div class="music-gradient-icon">${hasReport ? '📖' : '🎵'}</div>
             </div>
-            <button class="btn-reschedule" style="${(isLeave || isTeacherCancelled) ? 'background: #FFF3E0; color: #E65100; border-color: #FFE082;' : ''}" onclick="handleRescheduleClick('${appt.id}')">
-                ${(isLeave || isTeacherCancelled) ? '重新安排補課時段' : '我要請假/調課'}
-            </button>
+            <div class="btn-action-row">
+                <button class="btn-reschedule" onclick="handleRescheduleClick('${appt.id}')">
+                    ${isLeave ? '重新安排補課' : '我要請假/調課'}
+                </button>
+                ${reportButtonHtml}
+            </div>
         </div>
     </div>
     `;
 }
 
-let currentActiveStudent = null;
-
-// 學員切換 Modal 控制
-function openStudentSwitcherModal() {
-    if (!window.MusiMateDB) return;
-    const students = window.MusiMateDB.getStudents();
-    const container = document.getElementById('switcherStudentList');
-    if (!container) return;
-
-    container.innerHTML = students.map(s => {
-        const isCurrent = currentActiveStudent && (currentActiveStudent.student_id === s.student_id || currentActiveStudent.name === s.name);
-        return `
-            <div onclick="selectStudentFromModal('${s.student_id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: ${isCurrent ? 'rgba(206, 171, 152, 0.2)' : '#F9F7F5'}; border: 1px solid ${isCurrent ? '#CEAB98' : '#ECE8E3'}; cursor: pointer;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <img src="${s.avatar_url || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150'}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;" />
-                    <span style="font-size: 14px; font-weight: ${isCurrent ? '700' : '500'}; color: #2B3049;">${s.name}</span>
-                </div>
-                ${isCurrent ? '<span style="color: #CEAB98; font-weight: 700; font-size: 13px;">✓ 目前</span>' : ''}
-            </div>
-        `;
-    }).join('');
-
-    document.getElementById('studentSwitcherModal').style.display = 'flex';
-}
-
-function closeStudentSwitcherModal() {
-    document.getElementById('studentSwitcherModal').style.display = 'none';
-}
-
-function selectStudentFromModal(studentId) {
-    if (!studentId || !window.MusiMateDB) return;
-    const students = window.MusiMateDB.getStudents();
-    const target = students.find(s => s.student_id === studentId || s.id === studentId);
-    if (target) {
-        window.MusiMateDB.setActiveStudent(target.student_id);
-        currentActiveStudent = target;
-        updateStudentHeader(target);
-        renderSchedule(target.student_id);
-    }
-    closeStudentSwitcherModal();
-}
-
-function addNewCustomStudent() {
-    const input = document.getElementById('newStudentNameInput');
-    if (!input) return;
-    const name = input.value.trim();
-    if (!name) {
-        alert('請輸入學員姓名！');
-        return;
-    }
-    if (!window.MusiMateDB) return;
-    
-    const newStudent = {
-        student_id: `custom-stu-${Date.now()}`,
-        id: `custom-stu-${Date.now()}`,
-        name: name,
-        avatar_url: `https://api.dicebear.com/7.x/notionists/svg?seed=${encodeURIComponent(name)}`,
-        line_user_id: null,
-        default_instrument: '古典鋼琴 (Piano)',
-        default_location: '音符琴房 A303',
-        rate_per_lesson: 1600
-    };
-    window.MusiMateDB.registerCustomStudent(newStudent);
-    window.MusiMateDB.setActiveStudent(newStudent.student_id);
-    currentActiveStudent = newStudent;
-    updateStudentHeader(newStudent);
-    renderSchedule(newStudent.student_id);
-    input.value = '';
-    closeStudentSwitcherModal();
-    alert(`✅ 已成功切換至學員【${name}】專屬課表！`);
-}
-
-function updateStudentHeader(student, lineDisplayName) {
+function updateStudentHeader(student) {
     if (!student) return;
     const avatarEl = document.getElementById('studentAvatarIcon');
     const subTitleEl = document.getElementById('studentBannerSubtitle');
     const nameEl = document.getElementById('studentDisplayName');
+    const statusTextEl = document.getElementById('studentStatusBadgeText');
     const lineTag = document.getElementById('lineIdDisplayTag');
 
-    const displayName = lineDisplayName || student.name || '學員';
-    if (nameEl) {
-        nameEl.innerText = displayName;
-    }
+    const displayName = student.name || '學員';
+    if (nameEl) nameEl.innerText = displayName;
     if (avatarEl && student.avatar_url) {
         avatarEl.innerHTML = `<img src="${student.avatar_url}" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;" alt="avatar" />`;
     }
     if (subTitleEl) {
         subTitleEl.innerText = `林佩芬 老師 · ${displayName} 個人專屬課表`;
     }
+    if (statusTextEl) {
+        if (student.name.includes('久美')) {
+            statusTextEl.innerText = '✨ 新學員專屬 · 尚未排課';
+        } else {
+            statusTextEl.innerText = '📚 第 3 期進行中 · 已續約第 4 期 (共 13 堂課)';
+        }
+    }
     if (lineTag) {
-        const lineId = student.line_user_id || localStorage.getItem(`line_user_id_${student.name}`) || localStorage.getItem(`line_user_id_${student.student_id}`);
-        lineTag.innerText = lineId ? `🆔 LINE: ${lineId.slice(0, 8)}... (已綁定)` : '🆔 LINE: 尚未綁定';
-        lineTag.style.color = lineId ? '#2E7D32' : '#8C827A';
+        lineTag.innerText = student.name.includes('久美') ? '🟢 LINE 官方帳號已連線' : '🟢 LINE 帳號已綁定';
     }
 }
 
-function promptBindMyLineId() {
-    openStudentSwitcherModal();
-}
-
-function renderSchedule(studentId) {
+function renderSchedule(studentIdentifier) {
     const container = document.getElementById('appointmentListContainer');
     if (!window.MusiMateDB) return;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const lineIdParam = urlParams.get('line_user_id') || urlParams.get('line_id');
-    const queryStudentParam = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name') || urlParams.get('student_name');
+    const queryStudent = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name') || studentIdentifier;
 
     const students = window.MusiMateDB.getStudents();
     let targetStudent = null;
 
-    // 1. 優先由傳入的 studentId 或 URL query 尋找
-    const targetKey = studentId || queryStudentParam;
-    if (targetKey) {
+    if (queryStudent) {
         targetStudent = students.find(s => 
-            s.student_id === targetKey || 
-            s.id === targetKey || 
-            s.name === targetKey || 
-            s.name.includes(targetKey) ||
-            targetKey.includes(s.name)
+            s.student_id === queryStudent || 
+            s.id === queryStudent || 
+            s.name === queryStudent ||
+            s.name.includes(queryStudent) ||
+            queryStudent.includes(s.name)
         );
     }
 
-    // 2. 其次由 LINE user ID 比對
-    if (!targetStudent && lineIdParam) {
-        targetStudent = students.find(s => s.line_user_id === lineIdParam);
-    }
-
-    // 3. 再次由上次作用中學員取得
+    // 若無指定，預設以 劉心悅 (Lin) 為主角呈現完整 13 堂課
     if (!targetStudent) {
-        targetStudent = window.MusiMateDB.getActiveStudent();
-    }
-
-    // 4. 若無，依序以「久美」、「劉心悅」或首位學員呈現
-    if (!targetStudent) {
-        targetStudent = students.find(s => s.name && s.name.includes('久美'))
-            || students.find(s => s.name && (s.name.includes('劉心悅') || s.name.includes('Lin')))
-            || students[0];
+        targetStudent = students.find(s => s.name && (s.name.includes('劉心悅') || s.name.includes('Lin'))) || students[0];
     }
     if (!targetStudent) return;
 
     currentActiveStudent = targetStudent;
     updateStudentHeader(targetStudent);
-    const targetStudentId = targetStudent.student_id || targetStudent.id;
 
-    // 同步查詢學生預約課表 (支援姓名與 ID 交叉檢索)
+    // 取得該學生課表
     let appts = window.MusiMateDB.getAppointmentsByStudent(targetStudent.name);
-    if (appts.length === 0 && targetStudentId) {
-        appts = window.MusiMateDB.getAppointmentsByStudent(targetStudentId);
+    if (appts.length === 0 && targetStudent.student_id) {
+        appts = window.MusiMateDB.getAppointmentsByStudent(targetStudent.student_id);
     }
 
-    // 檢查已繳費剩餘時數
-    const hours = window.MusiMateDB.getRemainingHours(targetStudentId);
-    const badge = document.getElementById('remainingHoursBadge');
-    if (badge) {
-        if (hours > 0) {
-            badge.style.display = 'flex';
-            document.getElementById('creditCount').innerText = hours;
-        } else {
-            badge.style.display = 'none';
-        }
-    }
+    const endHint = document.getElementById('listEndHint');
+    const btnBook = document.getElementById('btnMainBookNew');
 
+    // 久美 (新生無課表) 顯示引導預約體驗課畫面
     if (appts.length === 0) {
         container.innerHTML = `
-            <div style="padding: 40px 20px; text-align: center; color: #8C827A; background: rgba(255,255,255,0.7); border-radius: 16px; margin: 10px 0;">
-                <div style="font-size: 32px; margin-bottom: 8px;">🎼</div>
-                <div style="font-weight: 700; font-size: 15px; color: #2B3049;">目前尚無已排定的個人課程</div>
-                <div style="font-size: 12px; color: #7A736E; margin-top: 4px;">點擊下方「預約新課程」挑選開放時段</div>
+            <div style="padding: 36px 18px; text-align: center; color: #8C827A; background: white; border-radius: 20px; border: 1.5px dashed #CEAB98; margin: 8px 0; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+                <div style="font-size: 36px; margin-bottom: 8px;">🎼</div>
+                <div style="font-weight: 800; font-size: 16px; color: #2B3049;">目前尚無已排定的個人課程</div>
+                <div style="font-size: 12px; color: #7A736E; margin-top: 6px; line-height: 1.5;">
+                    歡迎加入林佩芬老師音樂教室！<br/>點擊下方按鈕預約體驗課或安排本學期課程時段
+                </div>
+                <button onclick="goToBookNew()" style="margin-top: 16px; padding: 10px 20px; background: #CEAB98; color: white; border: none; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(206,171,152,0.35);">
+                    + 預約體驗課 / 安排新課程
+                </button>
             </div>
         `;
+        if (endHint) endHint.style.display = 'none';
+        if (btnBook) btnBook.style.display = 'none';
         return;
     }
+
+    if (endHint) {
+        endHint.style.display = 'block';
+        endHint.innerText = `已排定 ${appts.length} 堂預約課程`;
+    }
+    if (btnBook) btnBook.style.display = 'block';
 
     container.innerHTML = appts.map(appt => createAppointmentCardHtml(appt)).join('');
 }
 
 function handleRescheduleClick(appointmentId) {
-    window.location.href = `student_changeclass.html?lesson_id=${appointmentId}`;
+    const sId = currentActiveStudent ? (currentActiveStudent.student_id || currentActiveStudent.id || currentActiveStudent.name) : '';
+    window.location.href = `student_changeclass.html?lesson_id=${appointmentId}&student_id=${encodeURIComponent(sId)}`;
 }
 
 function goToBookNew() {
-    const sId = currentActiveStudent ? (currentActiveStudent.student_id || currentActiveStudent.id) : '';
-    window.location.href = `../newclass/oldstudent_newclass.html${sId ? '?student_id=' + sId : ''}`;
+    const sId = currentActiveStudent ? (currentActiveStudent.student_id || currentActiveStudent.id || currentActiveStudent.name) : '';
+    window.location.href = `../newclass/oldstudent_newclass.html${sId ? '?student_id=' + encodeURIComponent(sId) : ''}`;
+}
+
+function openVoiceReportModal(lessonId) {
+    const modal = document.getElementById('voiceReportModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeVoiceReportModal(e) {
+    if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains('btn-close-sheet')) {
+        return;
+    }
+    const modal = document.getElementById('voiceReportModal');
+    if (modal) modal.style.display = 'none';
 }
 
 async function initLiffAuth() {
     try {
         if (typeof liff !== 'undefined') {
             await liff.init({ liffId: '2011164851-lGsEnQWB' });
-            
-            // 只有在手機 LINE App 內部才執行強制登入
-            if (liff.isInClient()) {
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
-                }
-            }
-
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
-                console.log('✅ LINE LIFF 學生登入成功:', profile);
+                console.log('✅ LINE LIFF 學生連線:', profile);
                 if (window.MusiMateDB && profile && profile.userId) {
                     const result = window.MusiMateDB.authLiffUser(profile);
                     if (result && result.student) {
                         currentActiveStudent = result.student;
-                        const sName = result.student.name || profile.displayName || '學員';
-                        updateStudentHeader(result.student, sName);
-                        renderSchedule(result.student.student_id || result.student.id);
-                        const sub = document.getElementById('studentBannerSubtitle');
-                        if (sub) sub.innerText = `林佩芬 老師 · ${sName} 個人課表 (🟢 LINE 帳號已連線)`;
+                        updateStudentHeader(result.student);
+                        renderSchedule(result.student.student_id || result.student.id || result.student.name);
                     }
                 }
-            } else {
-                console.log('💻 外部瀏覽器預覽模式');
             }
         }
     } catch (e) {
-        console.warn('LIFF Auth skipped or failed:', e);
+        console.warn('LIFF Auth skipped:', e);
     }
 }
 
-// 監聽 Supabase 雲端即時同步
-window.addEventListener('musimate_db_synced', () => {
-    console.log('⚡ 學生端收到 Supabase 最新課表同步！');
-    if (currentActiveStudent) {
-        renderSchedule(currentActiveStudent.student_id || currentActiveStudent.id);
-    }
-});
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 檢查是否有 redirect 或 action 參數 (支援 LINE LIFF 跳轉分發)
     const urlParams = new URLSearchParams(window.location.search);
-    let redirect = urlParams.get('redirect') || urlParams.get('page');
-    let action = urlParams.get('action');
-
-    if (urlParams.get('liff.state')) {
-        try {
-            const state = decodeURIComponent(urlParams.get('liff.state'));
-            const matchRedirect = state.match(/redirect=([^&]+)/);
-            if (matchRedirect) redirect = matchRedirect[1];
-            const matchPage = state.match(/page=([^&]+)/);
-            if (matchPage) redirect = matchPage[1];
-            const matchAction = state.match(/action=([^&]+)/);
-            if (matchAction) action = matchAction[1];
-            if (!action && (state.includes('reschedule') || state.includes('leave'))) {
-                action = 'reschedule';
-            }
-        } catch (e) {}
-    }
-
-    if (redirect) {
-        if (redirect.startsWith('/student/') || redirect.startsWith('/admin/')) {
-            window.location.replace(redirect);
-            return;
-        }
-        if (redirect.includes('billing')) {
-            window.location.replace('/student/billing');
-            return;
-        } else if (redirect.includes('practice')) {
-            window.location.replace('/student/practice');
-            return;
-        } else if (redirect.includes('summary')) {
-            window.location.replace('/student/summary/lesson-1');
-            return;
-        } else if (redirect.includes('stamps')) {
-            window.location.replace('/student/stamps');
-            return;
-        } else if (redirect.includes('history')) {
-            window.location.replace('/student/history');
-            return;
-        } else if (redirect.includes('courses') || redirect.includes('newclass')) {
-            window.location.replace('/student/courses');
-            return;
-        } else if (redirect.includes('faq')) {
-            window.location.replace('/student/faq');
-            return;
-        } else if (redirect.includes('leave') || redirect.includes('reschedule')) {
-            window.location.replace('/student/schedule?action=reschedule');
-            return;
-        }
-    }
-    if (action === 'reschedule' || action === 'leave') {
-        window.location.replace('student_changeclass.html');
-        return;
-    }
-
-    const paramStudentId = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name');
-    renderSchedule(paramStudentId);
+    const paramStudent = urlParams.get('student_id') || urlParams.get('student') || urlParams.get('name');
+    renderSchedule(paramStudent);
     initLiffAuth();
 });
 </script>
